@@ -12,6 +12,5 @@ class Usuarios extends Table {
   DateTimeColumn get dataCriacao =>
       dateTime().withDefault(currentDateAndTime)();
 
-  BoolColumn get ativo =>
-      boolean().withDefault(const Constant(true))();
+  BoolColumn get ativo => boolean().withDefault(const Constant(true))();
 }
