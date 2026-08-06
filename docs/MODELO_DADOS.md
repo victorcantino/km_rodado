@@ -125,6 +125,11 @@ observacao
 
 Representa os valores informados das plataformas.
 
+> Pendência de modelagem: a documentação relaciona o ganho diretamente à
+> jornada, enquanto a tabela Drift atual exige uma pausa. A relação definitiva
+> entre Ganho, Jornada e Pausa será decidida em uma tarefa futura; este documento
+> não deve ser usado para alterar essas entidades antes dessa decisão.
+
 O registro pode ser parcial durante a jornada.
 
 Exemplo:
