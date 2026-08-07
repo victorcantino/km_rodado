@@ -15,21 +15,15 @@ class Veiculos extends Table {
 
   DateTimeColumn get dataCompra => dateTime().nullable()();
 
-  IntColumn get quilometragemCompra =>
-      integer().nullable()();
+  IntColumn get quilometragemCompra => integer().nullable()();
 
-  RealColumn get valorCompra =>
-      real().nullable()();
+  RealColumn get valorCompra => real().nullable()();
 
-  RealColumn get valorVendaEstimado =>
-      real().nullable()();
+  RealColumn get valorVendaEstimado => real().nullable()();
 
-  RealColumn get capacidadeTanque =>
-      real().withDefault(const Constant(41))();
+  RealColumn get capacidadeTanque => real().withDefault(const Constant(41))();
 
-  BoolColumn get ativo =>
-      boolean().withDefault(const Constant(true))();
+  BoolColumn get ativo => boolean().withDefault(const Constant(true))();
 
-  TextColumn get observacoes =>
-      text().nullable()();
+  TextColumn get observacoes => text().nullable()();
 }

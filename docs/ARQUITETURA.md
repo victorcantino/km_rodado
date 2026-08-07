@@ -28,11 +28,14 @@ lib/
 
 ├── core
 │ ├── constants
+│ ├── database
+│ │ ├── daos
+│ │ ├── seeds
+│ │ └── tables
+│ ├── router
 │ ├── theme
 │ ├── utils
 │ └── services
-│
-├── database
 │
 ├── features
 │
@@ -40,17 +43,15 @@ lib/
 │ │
 │ ├── jornada
 │ │
-│ ├── ganhos
-│ │
 │ ├── abastecimento
 │ │
 │ ├── manutencao
 │ │
 │ ├── financeiro
 │ │
-│ └── configuracao
-│
-├── routes
+│ ├── relatorios
+│ │
+│ └── configuracoes
 │
 └── main.dart
 
@@ -66,11 +67,14 @@ Exemplo:
 
 jornada/
 
-├── models
-├── repositories
-├── services
-├── controllers
-└── screens
+├── data
+│ ├── jornada_repository.dart
+│ └── jornada_service.dart
+│
+└── presentation
+  ├── controllers
+  ├── pages
+  └── widgets
 
 
 ---
@@ -149,14 +153,10 @@ Sincronização em nuvem
 
 # Gerenciamento de Estado
 
-Será utilizado gerenciamento de estado adequado para aplicações maiores.
+Na primeira feature será utilizado ChangeNotifier com AnimatedBuilder.
 
-Possíveis opções:
-
-- Riverpod;
-- Bloc.
-
-A escolha será definida durante a implementação.
+A escolha de uma solução para outras etapas será revisada após a conclusão da
+Jornada. Não há Provider, Riverpod ou Bloc integrados ao fluxo atual.
 
 ---
 
