@@ -1,15 +1,14 @@
-# Tarefa atual — Abertura de jornada
+# Tarefa atual — Validação da abertura de jornada
 
 ## Objetivo
 
-Concluir o fluxo de abertura de jornada pela interface após a estabilização da
-base técnica.
+Validar o fluxo de abertura de jornada implementado pela interface.
 
 ## Contexto
 
-A JornadaPage utiliza JornadaController e AnimatedBuilder. O
-AbrirJornadaDialog possui somente a estrutura visual: a página ainda não abre o
-diálogo e o botão Salvar ainda não valida nem retorna os dados.
+A JornadaPage abre o AbrirJornadaDialog, recebe odômetro e cidade de origem e
+chama JornadaController.abrirJornada(). O diálogo valida os campos antes de
+retornar e a página apresenta falhas operacionais com SnackBar.
 
 O usuário 1 e o veículo 1 são registros temporários garantidos de forma
 idempotente antes do carregamento da jornada aberta.
@@ -24,13 +23,18 @@ idempotente antes do carregamento da jornada aberta.
 - Não implementar o fechamento nesta tarefa.
 - Não decidir nesta tarefa a relação definitiva entre Ganho, Jornada e Pausa.
 
-## Pronto quando
+## Concluído
 
 - O botão Abrir Jornada abre o diálogo.
-- Odômetro e cidade são validados.
-- O diálogo retorna os dados para a página.
+- Odômetro e cidade de origem são validados.
+- O diálogo retorna AbrirJornadaResultado para a página.
 - A página chama JornadaController.abrirJornada().
 - A tela passa a mostrar a jornada salva.
+- Erros operacionais são apresentados com SnackBar.
 - dart format foi executado.
 - flutter analyze não apresenta erros relacionados.
 - Os testes aplicáveis passaram.
+
+## Validação pendente
+
+- Confirmar a persistência local em execução no dispositivo.
