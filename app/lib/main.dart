@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'features/jornada/presentation/pages/jornada_page.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final locale = WidgetsBinding.instance.platformDispatcher.locale;
+  await initializeDateFormatting(locale.toLanguageTag());
+
   runApp(const KmRodadoApp());
 }
 

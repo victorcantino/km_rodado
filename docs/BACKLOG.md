@@ -1,8 +1,6 @@
 # Agora
 
-- Concluir abertura da jornada
 - Concluir fechamento da jornada
-- Testar persistência
 - Revisar estrutura de pastas
 - Remover código desnecessário
 
@@ -13,6 +11,9 @@
 - Plataformas
 - Abastecimentos
 - Eficiência diária
+- Obter cidade de origem pela localização do aparelho, mantendo edição manual
+- Sugerir odômetro inicial a partir do odômetro final da última Jornada encerrada
+- Fazer a melhoria visual completa da JornadaPage após concluir o fluxo funcional
 
 # Futuro
 

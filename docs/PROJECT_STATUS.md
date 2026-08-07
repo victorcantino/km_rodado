@@ -6,8 +6,8 @@ Jornada.
 
 ## Objetivo atual
 
-Estabilizar a base existente antes de concluir a abertura de jornada pela
-interface. O fechamento não faz parte da tarefa atual.
+Validar o fluxo de abertura de jornada concluído pela interface. O fechamento
+não faz parte da tarefa atual.
 
 ## Já implementado
 
@@ -21,17 +21,23 @@ interface. O fechamento não faz parte da tarefa atual.
 - Ciclo de vida local do AppDatabase e do JornadaController
 - Criação idempotente do usuário 1 e do veículo 1 temporários
 - Estrutura visual do AbrirJornadaDialog
-- Teste de widget da estrutura atual do diálogo
+- Validação de odômetro e cidade de origem no diálogo
+- Integração do AbrirJornadaDialog com a JornadaPage
+- Abertura e recarga da jornada pela interface
+- Apresentação de falha operacional com SnackBar
+- Testes de widget do diálogo e de seu resultado
+- Persistência e recarga validadas manualmente no Linux
+- Data e hora de início formatadas conforme o idioma e a região do aparelho
+- Odômetro exibido com separador de milhares localizado
 
 ## Em andamento
 
-- Integração do AbrirJornadaDialog com a JornadaPage
+- Evolução do fluxo funcional da Jornada
 
 ## Próximo passo
 
-Fazer o botão Abrir Jornada exibir o diálogo, validar odômetro e cidade,
-retornar os dados para a JornadaPage e chamar
-JornadaController.abrirJornada().
+Implementar o fechamento de jornada em uma tarefa própria antes da melhoria
+visual completa da página.
 
 ## Decisões temporárias
 
@@ -43,8 +49,6 @@ JornadaController.abrirJornada().
 
 ## Problemas conhecidos
 
-- Ainda não existe tratamento visual de erros
-- Datas ainda não estão formatadas para exibição
-- O diálogo de abertura ainda não está ligado à página
+- O tratamento visual de erros ainda é genérico e restrito à abertura
 - O fechamento da jornada ainda não possui interface
 - A relação de Ganho com Jornada e Pausa depende de decisão futura de modelagem

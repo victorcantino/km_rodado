@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/daos/jornada_dao.dart';
@@ -6,6 +7,7 @@ import '../../../../core/database/seeds/seed.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
 import '../controllers/jornada_controller.dart';
+import '../widgets/abrir_jornada_dialog.dart';
 
 class JornadaPage extends StatefulWidget {
   const JornadaPage({super.key});
@@ -45,6 +47,42 @@ class _JornadaPageState extends State<JornadaPage> {
     await novoController.carregarJornadaAberta();
   }
 
+  Future<void> _abrirJornada() async {
+    final controller = this.controller;
+
+    if (controller == null) {
+      return;
+    }
+
+    final resultado = await showDialog<AbrirJornadaResultado>(
+      context: context,
+      builder: (context) => const AbrirJornadaDialog(),
+    );
+
+    if (!mounted || resultado == null) {
+      return;
+    }
+
+    try {
+      await controller.abrirJornada(
+        usuarioId: 1,
+        veiculoId: 1,
+        odometro: resultado.odometro,
+        cidadeOrigem: resultado.cidadeOrigem,
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não foi possível abrir a jornada. Tente novamente.'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = this.controller;
@@ -64,6 +102,15 @@ class _JornadaPageState extends State<JornadaPage> {
 
           if (controller.possuiJornadaAberta) {
             final jornada = controller.jornadaAtual!;
+            final locale = View.of(
+              context,
+            ).platformDispatcher.locale.toLanguageTag();
+            final inicioFormatado = DateFormat.yMd(
+              locale,
+            ).add_jms().format(jornada.dataHoraInicio);
+            final odometroFormatado = NumberFormat.decimalPattern(
+              locale,
+            ).format(jornada.odometroInicio);
 
             return Padding(
               padding: const EdgeInsets.all(16),
@@ -77,9 +124,9 @@ class _JornadaPageState extends State<JornadaPage> {
 
                   const SizedBox(height: 16),
 
-                  Text('Início: ${jornada.dataHoraInicio}'),
+                  Text('Início: $inicioFormatado'),
 
-                  Text('Odômetro inicial: ${jornada.odometroInicio} km'),
+                  Text('Odômetro inicial: $odometroFormatado km'),
 
                   Text('Cidade de origem: ${jornada.cidadeOrigem}'),
 
@@ -98,9 +145,7 @@ class _JornadaPageState extends State<JornadaPage> {
 
           return Center(
             child: ElevatedButton(
-              onPressed: () {
-                // vamos implementar depois
-              },
+              onPressed: _abrirJornada,
               child: const Text('Abrir Jornada'),
             ),
           );
