@@ -19,41 +19,50 @@ O aplicativo será desenvolvido inicialmente com funcionamento offline, utilizan
 
 # Arquitetura Geral
 
-O projeto seguirá uma arquitetura organizada por funcionalidades (Feature Based Architecture).
+O projeto segue uma arquitetura organizada por funcionalidades (Feature Based
+Architecture). A estrutura física cresce somente quando uma necessidade é
+implementada.
 
-Estrutura:
+## Estrutura física atual
 
-
+```text
 lib/
-
-├── core
-│ ├── constants
-│ ├── database
-│ │ ├── daos
-│ │ ├── seeds
-│ │ └── tables
-│ ├── router
-│ ├── theme
-│ ├── utils
-│ └── services
-│
-├── features
-│
-│ ├── dashboard
-│ │
-│ ├── jornada
-│ │
-│ ├── abastecimento
-│ │
-│ ├── manutencao
-│ │
-│ ├── financeiro
-│ │
-│ ├── relatorios
-│ │
-│ └── configuracoes
-│
+├── core/
+│   ├── constants/
+│   │   └── enums/
+│   │       └── status_jornada.dart
+│   └── database/
+│       ├── daos/
+│       ├── seeds/
+│       ├── tables/
+│       ├── app_database.dart
+│       └── app_database.g.dart
+├── features/
+│   └── jornada/
+│       ├── data/
+│       └── presentation/
+│           ├── controllers/
+│           ├── pages/
+│           └── widgets/
 └── main.dart
+```
+
+Arquivos e diretórios sem implementação não são mantidos apenas para reservar
+espaço para funcionalidades futuras.
+
+## Features planejadas
+
+As seguintes features fazem parte do planejamento, mas ainda não possuem
+diretórios na árvore física:
+
+- dashboard;
+- abastecimento;
+- manutenção;
+- financeiro;
+- relatórios;
+- configurações.
+
+Seus diretórios serão criados quando a implementação de cada feature começar.
 
 
 ---
