@@ -3,7 +3,16 @@ import 'package:flutter/material.dart';
 typedef AbrirJornadaResultado = ({int odometro, String cidadeOrigem});
 
 class AbrirJornadaDialog extends StatefulWidget {
-  const AbrirJornadaDialog({super.key});
+  final int? odometroInicial;
+  final int? odometroMinimo;
+  final String? cidadeOrigemInicial;
+
+  const AbrirJornadaDialog({
+    super.key,
+    this.odometroInicial,
+    this.odometroMinimo,
+    this.cidadeOrigemInicial,
+  });
 
   @override
   State<AbrirJornadaDialog> createState() => _AbrirJornadaDialogState();
@@ -12,9 +21,20 @@ class AbrirJornadaDialog extends StatefulWidget {
 class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
   final formKey = GlobalKey<FormState>();
 
-  final odometroController = TextEditingController();
+  late final TextEditingController odometroController;
 
-  final cidadeController = TextEditingController();
+  late final TextEditingController cidadeController;
+
+  @override
+  void initState() {
+    super.initState();
+    odometroController = TextEditingController(
+      text: widget.odometroInicial?.toString() ?? '',
+    );
+    cidadeController = TextEditingController(
+      text: widget.cidadeOrigemInicial ?? '',
+    );
+  }
 
   @override
   void dispose() {
@@ -53,6 +73,12 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
 
                 if (odometro < 0) {
                   return 'O odômetro não pode ser negativo.';
+                }
+
+                final odometroMinimo = widget.odometroMinimo;
+
+                if (odometroMinimo != null && odometro < odometroMinimo) {
+                  return 'O odômetro não pode ser menor que o último registrado.';
                 }
 
                 return null;

@@ -9,6 +9,7 @@ class JornadaController extends ChangeNotifier {
   JornadaController(this._service);
 
   Jornada? jornadaAtual;
+  Jornada? ultimaJornadaFinalizada;
 
   bool carregando = false;
 
@@ -20,6 +21,7 @@ class JornadaController extends ChangeNotifier {
 
     try {
       jornadaAtual = await _service.jornadaAberta();
+      ultimaJornadaFinalizada = await _service.ultimaJornadaFinalizada();
     } finally {
       carregando = false;
       notifyListeners();
@@ -66,6 +68,7 @@ class JornadaController extends ChangeNotifier {
       );
 
       jornadaAtual = await _service.jornadaAberta();
+      ultimaJornadaFinalizada = await _service.ultimaJornadaFinalizada();
     } finally {
       carregando = false;
       notifyListeners();

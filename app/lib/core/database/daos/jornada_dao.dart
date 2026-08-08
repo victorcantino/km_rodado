@@ -17,6 +17,15 @@ class JornadaDao extends DatabaseAccessor<AppDatabase> with _$JornadaDaoMixin {
         .getSingleOrNull();
   }
 
+  /// Retorna a Jornada finalizada mais recentemente, se existir.
+  Future<Jornada?> buscarUltimaJornadaFinalizada() {
+    return (select(jornadas)
+          ..where((j) => j.status.equalsValue(StatusJornada.finalizada))
+          ..orderBy([(j) => OrderingTerm.desc(j.dataHoraFim)])
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
   /// Insere uma nova jornada.
   Future<int> inserir(JornadasCompanion jornada) {
     return into(jornadas).insert(jornada);

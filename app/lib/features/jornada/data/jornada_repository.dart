@@ -10,6 +10,10 @@ class JornadaRepository {
     return _dao.buscarJornadaAberta();
   }
 
+  Future<Jornada?> buscarUltimaJornadaFinalizada() {
+    return _dao.buscarUltimaJornadaFinalizada();
+  }
+
   Future<int> inserir(JornadasCompanion jornada) {
     return _dao.inserir(jornada);
   }
