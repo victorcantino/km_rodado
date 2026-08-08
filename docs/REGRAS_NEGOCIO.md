@@ -61,18 +61,60 @@ O odômetro inicial deve sugerir:
 
 * último odômetro final registrado.
 
-O usuário pode corrigir manualmente.
+No fluxo operacional normal, o novo odômetro inicial deve ser maior ou igual
+ao último odômetro final registrado:
 
-Caso o valor informado seja menor que o último registro:
-
-O sistema deve gerar alerta:
-
-```
-Possível inconsistência de odômetro.
-Verifique o valor informado.
+```text
+novo odometro_inicio >= último odometro_fim
 ```
 
-A correção é permitida, pois o usuário é responsável pelo controle dos dados.
+A igualdade é permitida. Se não existir Jornada finalizada anterior ou se ela
+não possuir odômetro final, essa comparação não deve ser aplicada.
+
+O usuário pode editar a sugestão, mas não pode informar valor inferior ao
+último odômetro final no fluxo operacional de abertura.
+
+Correções retroativas serão realizadas futuramente em fluxo específico, com
+justificativa obrigatória e registro da alteração.
+
+---
+
+## 2.3 Fechamento da Jornada
+
+O odômetro final deve ser obrigatoriamente maior que o odômetro inicial.
+
+```text
+odometro_fim > odometro_inicio
+```
+
+Os quilômetros percorridos devem ser calculados por:
+
+```text
+odometro_fim - odometro_inicio
+```
+
+Uma Jornada não pode ser finalizada com zero ou com quilômetros negativos.
+
+Enquanto o GPS não estiver implementado, a cidade de origem da Jornada aberta
+deve ser sugerida como destino no fechamento. O usuário pode editar ou remover
+essa sugestão.
+
+Ao abrir a Jornada seguinte, o último destino registrado deve ser sugerido como
+cidade de origem. O usuário pode editar a sugestão.
+
+Quando o GPS estiver disponível, a localização atual terá preferência. O
+histórico continuará sendo utilizado como fallback quando a localização não
+estiver disponível.
+
+## 2.4 Correção de odômetro
+
+A correção futura de um odômetro já registrado deve:
+
+* exigir um motivo em observações;
+* definir `odometroAlterado = true`;
+* manter o usuário responsável pela correção informada.
+
+O fluxo de correção não faz parte do fechamento normal da Jornada.
 
 ---
 

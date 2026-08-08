@@ -13,6 +13,10 @@ class JornadaService {
     return _repository.buscarJornadaAberta();
   }
 
+  Future<Jornada?> ultimaJornadaFinalizada() {
+    return _repository.buscarUltimaJornadaFinalizada();
+  }
+
   Future<int> abrirJornada({
     required int usuarioId,
     required int veiculoId,
@@ -23,6 +27,15 @@ class JornadaService {
 
     if (aberta != null) {
       throw Exception('Já existe uma jornada aberta.');
+    }
+
+    final ultimaJornada = await _repository.buscarUltimaJornadaFinalizada();
+    final ultimoOdometro = ultimaJornada?.odometroFim;
+
+    if (ultimoOdometro != null && odometro < ultimoOdometro) {
+      throw Exception(
+        'O odômetro inicial não pode ser menor que o último registrado.',
+      );
     }
 
     final jornada = JornadasCompanion.insert(
@@ -46,6 +59,10 @@ class JornadaService {
 
     if (jornada == null) {
       throw Exception('Não existe jornada aberta.');
+    }
+
+    if (odometroFim <= jornada.odometroInicio) {
+      throw Exception('O odômetro final deve ser maior que o inicial.');
     }
 
     final jornadaAtualizada = jornada.copyWith(

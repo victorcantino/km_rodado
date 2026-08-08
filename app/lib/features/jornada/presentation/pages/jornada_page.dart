@@ -8,6 +8,7 @@ import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
 import '../controllers/jornada_controller.dart';
 import '../widgets/abrir_jornada_dialog.dart';
+import '../widgets/fechar_jornada_dialog.dart';
 
 class JornadaPage extends StatefulWidget {
   const JornadaPage({super.key});
@@ -56,7 +57,11 @@ class _JornadaPageState extends State<JornadaPage> {
 
     final resultado = await showDialog<AbrirJornadaResultado>(
       context: context,
-      builder: (context) => const AbrirJornadaDialog(),
+      builder: (context) => AbrirJornadaDialog(
+        odometroInicial: controller.ultimaJornadaFinalizada?.odometroFim,
+        odometroMinimo: controller.ultimaJornadaFinalizada?.odometroFim,
+        cidadeOrigemInicial: controller.ultimaJornadaFinalizada?.cidadeDestino,
+      ),
     );
 
     if (!mounted || resultado == null) {
@@ -81,6 +86,76 @@ class _JornadaPageState extends State<JornadaPage> {
         ),
       );
     }
+  }
+
+  Future<void> _fecharJornada() async {
+    final controller = this.controller;
+    final jornada = controller?.jornadaAtual;
+
+    if (controller == null || jornada == null) {
+      return;
+    }
+
+    final resultado = await showDialog<FecharJornadaResultado>(
+      context: context,
+      builder: (context) => FecharJornadaDialog(
+        odometroInicio: jornada.odometroInicio,
+        cidadeDestinoInicial: jornada.cidadeOrigem,
+      ),
+    );
+
+    if (!mounted || resultado == null) {
+      return;
+    }
+
+    try {
+      await controller.fecharJornada(
+        odometroFim: resultado.odometroFim,
+        cidadeDestino: resultado.cidadeDestino,
+        observacoes: resultado.observacoes,
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não foi possível fechar a jornada. Tente novamente.'),
+        ),
+      );
+    }
+  }
+
+  String _formatarDuracao(Duration duracao, NumberFormat numeros) {
+    if (duracao <= Duration.zero) {
+      return '${numeros.format(0)}min';
+    }
+
+    final partes = <String>[];
+    final horas = duracao.inHours;
+    final minutos = duracao.inMinutes.remainder(60);
+
+    if (horas > 0) {
+      partes.add('${numeros.format(horas)}h');
+    }
+
+    if (minutos > 0 || horas == 0) {
+      partes.add('${numeros.format(minutos)}min');
+    }
+
+    return partes.join(' ');
+  }
+
+  String _formatarLocalizacao(String cidadeOrigem, String? cidadeDestino) {
+    final origem = cidadeOrigem.trim();
+    final destino = cidadeDestino?.trim() ?? '';
+
+    if (destino.isEmpty || origem == destino) {
+      return 'Você dirigiu em $origem';
+    }
+
+    return '$origem → $destino';
   }
 
   @override
@@ -133,9 +208,7 @@ class _JornadaPageState extends State<JornadaPage> {
                   const SizedBox(height: 24),
 
                   ElevatedButton(
-                    onPressed: () {
-                      // vamos implementar depois
-                    },
+                    onPressed: _fecharJornada,
                     child: const Text('Fechar Jornada'),
                   ),
                 ],
@@ -143,11 +216,59 @@ class _JornadaPageState extends State<JornadaPage> {
             );
           }
 
-          return Center(
-            child: ElevatedButton(
-              onPressed: _abrirJornada,
-              child: const Text('Abrir Jornada'),
-            ),
+          final ultimaJornada = controller.ultimaJornadaFinalizada;
+
+          if (ultimaJornada == null) {
+            return Center(
+              child: ElevatedButton(
+                onPressed: _abrirJornada,
+                child: const Text('Abrir Jornada'),
+              ),
+            );
+          }
+
+          final locale = View.of(
+            context,
+          ).platformDispatcher.locale.toLanguageTag();
+          final numeros = NumberFormat.decimalPattern(locale);
+          final dataHoraFim = ultimaJornada.dataHoraFim!;
+          final duracao = dataHoraFim.difference(ultimaJornada.dataHoraInicio);
+          final quilometros = ultimaJornada.quilometrosPercorridos!;
+          final duracaoEmHoras =
+              duracao.inMilliseconds / Duration.millisecondsPerHour;
+          final mediaFormatada = duracaoEmHoras > 0
+              ? (NumberFormat.decimalPattern(locale)
+                      ..minimumFractionDigits = 1
+                      ..maximumFractionDigits = 1)
+                    .format(quilometros / duracaoEmHoras)
+              : null;
+
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(
+                'Jornada concluída',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                _formatarLocalizacao(
+                  ultimaJornada.cidadeOrigem,
+                  ultimaJornada.cidadeDestino,
+                ),
+              ),
+              Text('${numeros.format(quilometros)} km percorridos'),
+              Text('Duração: ${_formatarDuracao(duracao, numeros)}'),
+              Text(
+                'Média da jornada: '
+                '${mediaFormatada == null ? 'indisponível' : '$mediaFormatada km/h'}',
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _abrirJornada,
+                child: const Text('Abrir Jornada'),
+              ),
+            ],
           );
         },
       ),

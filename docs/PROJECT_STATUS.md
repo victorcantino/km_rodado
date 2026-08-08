@@ -6,8 +6,8 @@ Jornada.
 
 ## Objetivo atual
 
-Validar o fluxo de abertura de jornada concluído pela interface. O fechamento
-não faz parte da tarefa atual.
+Validar o fluxo completo de fechamento da Jornada e o resumo operacional da
+última Jornada encerrada.
 
 ## Já implementado
 
@@ -29,15 +29,24 @@ não faz parte da tarefa atual.
 - Persistência e recarga validadas manualmente no Linux
 - Data e hora de início formatadas conforme o idioma e a região do aparelho
 - Odômetro exibido com separador de milhares localizado
+- Diálogo de fechamento com destino sugerido e campos opcionais
+- Validação de odômetro final maior que o inicial na interface e no service
+- Persistência dos dados de fechamento e recarga do estado
+- Consulta da última Jornada finalizada
+- Resumo da última Jornada com localização, quilômetros, duração e média por
+  hora de Jornada
+- Sugestão do último destino como origem da próxima Jornada
+- Sugestão do último odômetro final como odômetro inicial da próxima Jornada
+- Progressão do odômetro protegida na abertura pela interface e pelo service
 
 ## Em andamento
 
-- Evolução do fluxo funcional da Jornada
+- Validação automatizada final do fluxo de Jornada
 
 ## Próximo passo
 
-Implementar o fechamento de jornada em uma tarefa própria antes da melhoria
-visual completa da página.
+Concluir as validações automatizadas antes da melhoria visual completa da
+página.
 
 ## Decisões temporárias
 
@@ -50,5 +59,4 @@ visual completa da página.
 ## Problemas conhecidos
 
 - O tratamento visual de erros ainda é genérico e restrito à abertura
-- O fechamento da jornada ainda não possui interface
 - A relação de Ganho com Jornada e Pausa depende de decisão futura de modelagem
