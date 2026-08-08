@@ -1,8 +1,5 @@
 # Agora
 
-- Revisar estrutura de pastas
-- Remover código desnecessário
-
 # Depois
 
 - Pausas

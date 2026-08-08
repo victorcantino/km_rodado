@@ -6,8 +6,8 @@ Jornada.
 
 ## Objetivo atual
 
-Validar o fluxo completo de fechamento da Jornada e o resumo operacional da
-última Jornada encerrada.
+Concluir a limpeza estrutural após a primeira feature completa, preservando o
+comportamento validado da Jornada e o schema atual do banco.
 
 ## Já implementado
 
@@ -38,15 +38,16 @@ Validar o fluxo completo de fechamento da Jornada e o resumo operacional da
 - Sugestão do último destino como origem da próxima Jornada
 - Sugestão do último odômetro final como odômetro inicial da próxima Jornada
 - Progressão do odômetro protegida na abertura pela interface e pelo service
+- Scaffolding vazio e estruturas arquiteturais concorrentes removidos
+- Estrutura física reduzida a core ativo e feature Jornada
 
 ## Em andamento
 
-- Validação automatizada final do fluxo de Jornada
+- Validação automatizada após a limpeza estrutural
 
 ## Próximo passo
 
-Concluir as validações automatizadas antes da melhoria visual completa da
-página.
+Confirmar análise e testes após a limpeza antes de iniciar outra feature.
 
 ## Decisões temporárias
 
@@ -60,3 +61,5 @@ página.
 
 - O tratamento visual de erros ainda é genérico e restrito à abertura
 - A relação de Ganho com Jornada e Pausa depende de decisão futura de modelagem
+- Configuração, Pausa, Plataforma e Ganho permanecem no schema e serão avaliados
+  nas respectivas features
