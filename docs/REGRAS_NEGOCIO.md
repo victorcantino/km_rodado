@@ -153,6 +153,10 @@ O motorista encerrou a operação.
 Uma pausa pertence obrigatoriamente a uma Jornada e interrompe a atividade do
 motorista como um todo, não uma plataforma específica.
 
+Somente uma Pausa pode permanecer aberta por Jornada. `fim == null` representa
+uma Pausa aberta. Uma nova Pausa só pode começar quando houver Jornada aberta e
+nenhuma outra Pausa aberta.
+
 Ao iniciar uma pausa:
 
 O sistema deve registrar:
@@ -162,6 +166,16 @@ O sistema deve registrar:
 
 Sem título, a interface pode apresentar `Pausa 1`, `Pausa 2` etc. A duração é
 derivada de início e fim e não deve ser persistida.
+
+O início é registrado imediatamente com o horário atual. Enquanto estiver
+aberta, a duração é recalculada na interface, sem atualizações periódicas no
+banco. Ao retomar a Jornada, o fim deve ser maior ou igual ao início.
+
+Pausas são listadas pela ordem de início e, em caso de empate, pelo ID. O título
+é normalizado com `trim`; vazio volta ao nome automático derivado da posição.
+
+Uma Jornada não pode ser finalizada enquanto existir uma Pausa aberta. O
+motorista deve primeiro retomar a Jornada.
 
 Antes de finalizar a pausa:
 
@@ -174,6 +188,9 @@ Deseja registrar os ganhos deste período?
 ```
 
 O preenchimento não deve ser obrigatório.
+
+O registro de ganhos associado à Pausa pertence à próxima entrega funcional e
+ainda não está disponível na interface.
 
 Caso não seja informado:
 

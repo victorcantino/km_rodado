@@ -1,9 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/daos/jornada_dao.dart';
+import '../../../../core/database/daos/pausa_dao.dart';
 import '../../../../core/database/seeds/seed.dart';
+import '../../../pausa/data/pausa_repository.dart';
+import '../../../pausa/data/pausa_service.dart';
+import '../../../pausa/presentation/controllers/pausa_controller.dart';
+import '../../../pausa/presentation/pausa_formatters.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
 import '../controllers/jornada_controller.dart';
@@ -19,13 +26,20 @@ class JornadaPage extends StatefulWidget {
 
 class _JornadaPageState extends State<JornadaPage> {
   JornadaController? controller;
+  PausaController? pausaController;
   late final AppDatabase database;
+  Timer? atualizadorDuracao;
 
   @override
   void initState() {
     super.initState();
 
     database = AppDatabase();
+    atualizadorDuracao = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted && pausaController?.possuiPausaAberta == true) {
+        setState(() {});
+      }
+    });
     _inicializar();
   }
 
@@ -38,14 +52,20 @@ class _JornadaPageState extends State<JornadaPage> {
 
     final dao = JornadaDao(database);
     final repository = JornadaRepository(dao);
-    final service = JornadaService(repository);
+    final pausaDao = PausaDao(database);
+    final pausaRepository = PausaRepository(pausaDao);
+    final service = JornadaService(repository, pausaRepository);
+    final pausaService = PausaService(pausaRepository, repository);
     final novoController = JornadaController(service);
+    final novoPausaController = PausaController(pausaService);
 
     setState(() {
       controller = novoController;
+      pausaController = novoPausaController;
     });
 
     await novoController.carregarJornadaAberta();
+    await novoPausaController.carregar(novoController.jornadaAtual?.id);
   }
 
   Future<void> _abrirJornada() async {
@@ -75,6 +95,7 @@ class _JornadaPageState extends State<JornadaPage> {
         odometro: resultado.odometro,
         cidadeOrigem: resultado.cidadeOrigem,
       );
+      await pausaController?.carregar(controller.jornadaAtual?.id);
     } catch (_) {
       if (!mounted) {
         return;
@@ -84,6 +105,90 @@ class _JornadaPageState extends State<JornadaPage> {
         const SnackBar(
           content: Text('Não foi possível abrir a jornada. Tente novamente.'),
         ),
+      );
+    }
+  }
+
+  Future<void> _iniciarPausa() async {
+    final jornadaId = controller?.jornadaAtual?.id;
+    final pausaController = this.pausaController;
+
+    if (jornadaId == null || pausaController == null) {
+      return;
+    }
+
+    try {
+      await pausaController.iniciar(jornadaId);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível iniciar a Pausa.')),
+      );
+    }
+  }
+
+  Future<void> _finalizarPausa() async {
+    final jornadaId = controller?.jornadaAtual?.id;
+    final pausaController = this.pausaController;
+
+    if (jornadaId == null || pausaController == null) {
+      return;
+    }
+
+    try {
+      await pausaController.finalizar(jornadaId);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível finalizar a Pausa.')),
+      );
+    }
+  }
+
+  Future<void> _editarTituloPausa(Pausa pausa) async {
+    final textoController = TextEditingController(text: pausa.titulo ?? '');
+    final titulo = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Título da Pausa'),
+        content: TextField(
+          controller: textoController,
+          autofocus: true,
+          decoration: const InputDecoration(labelText: 'Título opcional'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, textoController.text),
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+    textoController.dispose();
+
+    if (!mounted || titulo == null) {
+      return;
+    }
+
+    try {
+      await pausaController?.editarTitulo(pausa, titulo);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível editar a Pausa.')),
       );
     }
   }
@@ -161,17 +266,18 @@ class _JornadaPageState extends State<JornadaPage> {
   @override
   Widget build(BuildContext context) {
     final controller = this.controller;
+    final pausaController = this.pausaController;
 
-    if (controller == null) {
+    if (controller == null || pausaController == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Jornada')),
       body: AnimatedBuilder(
-        animation: controller,
+        animation: Listenable.merge([controller, pausaController]),
         builder: (context, _) {
-          if (controller.carregando) {
+          if (controller.carregando || pausaController.carregando) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -187,32 +293,92 @@ class _JornadaPageState extends State<JornadaPage> {
               locale,
             ).format(jornada.odometroInicio);
 
-            return Padding(
+            final pausaAberta = pausaController.pausaAberta;
+            final formatoHora = DateFormat.Hm(locale);
+
+            return ListView(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Status: ${jornada.status.name.toUpperCase()}',
-                    style: Theme.of(context).textTheme.titleLarge,
+              children: [
+                Text(
+                  'Status: ${jornada.status.name.toUpperCase()}',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+
+                const SizedBox(height: 16),
+
+                Text('Início: $inicioFormatado'),
+
+                Text('Odômetro inicial: $odometroFormatado km'),
+
+                Text('Cidade de origem: ${jornada.cidadeOrigem}'),
+
+                const SizedBox(height: 24),
+
+                if (pausaAberta == null)
+                  ElevatedButton(
+                    onPressed: _iniciarPausa,
+                    child: const Text('Pausar'),
+                  )
+                else ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Pausa em andamento',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Editar título',
+                        onPressed: () => _editarTituloPausa(pausaAberta),
+                        icon: const Icon(Icons.edit),
+                      ),
+                    ],
                   ),
+                  Text('Iniciada às ${formatoHora.format(pausaAberta.inicio)}'),
+                  Text(
+                    formatarDuracaoPausa(
+                      DateTime.now().difference(pausaAberta.inicio),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: _finalizarPausa,
+                    child: const Text('Retomar Jornada'),
+                  ),
+                ],
 
-                  const SizedBox(height: 16),
-
-                  Text('Início: $inicioFormatado'),
-
-                  Text('Odômetro inicial: $odometroFormatado km'),
-
-                  Text('Cidade de origem: ${jornada.cidadeOrigem}'),
-
+                if (pausaController.pausas.any(
+                  (pausa) => pausa.fim != null,
+                )) ...[
                   const SizedBox(height: 24),
+                  Text(
+                    'Pausas da Jornada',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  for (
+                    var indice = 0;
+                    indice < pausaController.pausas.length;
+                    indice++
+                  )
+                    if (pausaController.pausas[indice].fim != null)
+                      _PausaItem(
+                        pausa: pausaController.pausas[indice],
+                        numero: indice + 1,
+                        formatoHora: formatoHora,
+                        onEditar: _editarTituloPausa,
+                      ),
+                ],
 
+                if (pausaAberta == null) ...[
+                  const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: _fecharJornada,
                     child: const Text('Fechar Jornada'),
                   ),
                 ],
-              ),
+              ],
             );
           }
 
@@ -277,8 +443,45 @@ class _JornadaPageState extends State<JornadaPage> {
 
   @override
   void dispose() {
+    atualizadorDuracao?.cancel();
+    pausaController?.dispose();
     controller?.dispose();
     database.close();
     super.dispose();
+  }
+}
+
+class _PausaItem extends StatelessWidget {
+  final Pausa pausa;
+  final int numero;
+  final DateFormat formatoHora;
+  final ValueChanged<Pausa> onEditar;
+
+  const _PausaItem({
+    required this.pausa,
+    required this.numero,
+    required this.formatoHora,
+    required this.onEditar,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fim = pausa.fim;
+    final tituloExibido = tituloExibicaoPausa(pausa.titulo, numero);
+    final intervalo = fim == null
+        ? '${formatoHora.format(pausa.inicio)} → em andamento'
+        : '${formatoHora.format(pausa.inicio)} → ${formatoHora.format(fim)} '
+              '· ${formatarDuracaoPausa(fim.difference(pausa.inicio))}';
+
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(tituloExibido),
+      subtitle: Text(intervalo),
+      trailing: IconButton(
+        tooltip: 'Editar título',
+        onPressed: () => onEditar(pausa),
+        icon: const Icon(Icons.edit),
+      ),
+    );
   }
 }

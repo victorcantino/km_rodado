@@ -1,38 +1,37 @@
-# Tarefa atual — Migração Drift do schema 1 para 2
+# Tarefa atual — Primeira entrega funcional de Pausas
 
 ## Objetivo
 
-Estabelecer a base de dados aprovada para Pausas e futuras leituras de ganhos,
-preservando instalações existentes.
+Implementar o ciclo completo de uma Pausa durante uma Jornada, sem alterar o
+schema 2 e sem iniciar o fluxo de ganhos.
 
 ## Escopo
 
-- simplificar a tabela `Pausas`;
-- substituir `Ganhos` por `LeiturasGanhos` e
-  `LeituraGanhoPlataforma`;
-- preservar `Plataformas`;
-- adicionar a forma obrigatória de registro de ganhos em `Plataformas`;
-- migrar plataformas legadas como `acumulado`;
-- migrar dados legados sem inferir agrupamentos;
-- gerar o código Drift;
-- testar migração, integridade e constraints;
-- atualizar a documentação do modelo.
+- iniciar e persistir Pausa imediatamente;
+- restaurar Pausa aberta após reinício;
+- impedir Pausas simultâneas na mesma Jornada;
+- mostrar início e duração derivada sem segundos;
+- editar título opcional com normalização;
+- finalizar Pausa e persistir o fim;
+- listar e numerar Pausas cronologicamente;
+- impedir o fechamento da Jornada com Pausa aberta;
+- integrar as ações na `JornadaPage`;
+- testar regras, persistência e formatação.
 
 ## Fora do escopo
 
-- interface e camadas funcionais de Pausas;
-- interface de leituras de ganhos;
-- viagens particulares;
-- tabela e fluxo de lançamentos individuais;
-- manutenção e abastecimento;
-- timeline;
-- regras automáticas de reset.
+- registro de ganhos ao pausar;
+- leituras inicial, parcial ou final;
+- lançamentos individuais;
+- categorias ou tags de Pausa;
+- redesign geral da Jornada;
+- alteração do schema 2.
 
 ## Pronto quando
 
-- schema 2 e migração preservadora estiverem implementados;
-- dinheiro estiver armazenado em centavos;
-- plataformas legadas forem preservadas como `acumulado`;
-- constraints e FKs estiverem testadas;
-- `build_runner`, análise e testes passarem;
-- documentação representar o modelo aprovado.
+- a Pausa sobreviver ao reinício do aplicativo;
+- somente uma Pausa puder permanecer aberta por Jornada;
+- duração e títulos derivados forem apresentados corretamente;
+- a Jornada só puder ser fechada após retomar;
+- análise e testes passarem;
+- documentação representar o fluxo implementado.
