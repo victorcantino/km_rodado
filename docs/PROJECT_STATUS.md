@@ -2,12 +2,12 @@
 
 ## Funcionalidade em desenvolvimento
 
-Base de dados para Pausas e futuras leituras de ganhos.
+Pausas durante a Jornada.
 
 ## Objetivo atual
 
-Migrar de forma preservadora o schema Drift 1 para 2, sem implementar ainda a
-interface ou as camadas funcionais de Pausas e leituras.
+Entregar o ciclo funcional de Pausas sobre o schema 2 existente, sem implementar
+ainda o registro de ganhos.
 
 ## Já implementado
 
@@ -46,14 +46,22 @@ interface ou as camadas funcionais de Pausas e leituras.
 - Valores monetários acumulados armazenados em centavos
 - Migração preservadora de Pausas e Ganhos legados
 - Testes específicos de migração com banco vazio e preenchido
+- PausaDao, PausaRepository, PausaService e PausaController
+- Início e finalização de Pausa durante Jornada aberta
+- Garantia transacional de uma única Pausa aberta por Jornada
+- Restauração de Pausa aberta e duração derivada após reinício
+- Título opcional editável e numeração automática por ordem cronológica
+- Lista de Pausas da Jornada integrada à JornadaPage
+- Fechamento de Jornada bloqueado na regra de negócio quando há Pausa aberta
+- Testes de ciclo de vida, persistência, títulos, duração e fechamento
 
 ## Em andamento
 
-- Validação final do schema 2 e de sua documentação
+- Validação final da primeira entrega funcional de Pausas
 
 ## Próximo passo
 
-Implementar a feature Pausas sobre o schema 2 após aprovação desta migração.
+Implementar o registro de ganhos associado às Pausas na próxima entrega.
 
 ## Decisões temporárias
 

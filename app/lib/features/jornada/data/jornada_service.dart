@@ -1,13 +1,15 @@
 import 'package:drift/drift.dart';
 import '../../../core/constants/enums/status_jornada.dart';
 import '../../../core/database/app_database.dart';
+import '../../pausa/data/pausa_repository.dart';
 
 import 'jornada_repository.dart';
 
 class JornadaService {
   final JornadaRepository _repository;
+  final PausaRepository _pausaRepository;
 
-  JornadaService(this._repository);
+  JornadaService(this._repository, this._pausaRepository);
 
   Future<Jornada?> jornadaAberta() {
     return _repository.buscarJornadaAberta();
@@ -59,6 +61,16 @@ class JornadaService {
 
     if (jornada == null) {
       throw Exception('Não existe jornada aberta.');
+    }
+
+    final pausaAberta = await _pausaRepository.buscarAbertaPorJornada(
+      jornada.id,
+    );
+
+    if (pausaAberta != null) {
+      throw Exception(
+        'A Jornada não pode ser finalizada enquanto houver uma Pausa aberta.',
+      );
     }
 
     if (odometroFim <= jornada.odometroInicio) {
