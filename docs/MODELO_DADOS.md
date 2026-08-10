@@ -95,14 +95,7 @@ Uma jornada pode conter:
 
 # 4. Pausa da Jornada
 
-Representa períodos sem operação dentro da jornada.
-
-Exemplos:
-
-* academia
-* almoço
-* descanso
-* estudo
+Pausa a atividade do motorista como um todo, não uma plataforma específica.
 
 ```
 PAUSA
@@ -114,66 +107,99 @@ jornada_id
 inicio
 fim
 
-motivo
+titulo
 
 observacao
+data_criacao
 ```
+
+`fim` e `titulo` são opcionais. Sem título, a interface pode apresentar
+`Pausa 1`, `Pausa 2` etc. A duração é derivada e não é persistida.
 
 ---
 
-# 5. Ganhos
+# 5. Leituras de ganhos
 
-Representa os valores informados das plataformas.
-
-> Pendência de modelagem: a documentação relaciona o ganho diretamente à
-> jornada, enquanto a tabela Drift atual exige uma pausa. A relação definitiva
-> entre Ganho, Jornada e Pausa será decidida em uma tarefa futura; este documento
-> não deve ser usado para alterar essas entidades antes dessa decisão.
-
-O registro pode ser parcial durante a jornada.
-
-Exemplo:
-
-10h:
-Uber mostrando R$80
-
-18h:
-Uber mostrando R$250
+Uma leitura representa uma única observação dos acumulados exibidos pelas
+plataformas naquele momento. Ela exige Jornada e pode estar associada a uma
+Pausa.
 
 ```
-GANHO
----------
+LEITURA_GANHOS
+--------------
 id
-
 jornada_id
-
+pausa_id (opcional)
 data_hora
-
-plataforma
-
-valor
-
-quantidade_corridas
-
-tipo_registro
+tipo
+data_criacao
 ```
 
-Plataformas:
+Tipos: `INICIAL`, `PARCIAL` e `FINAL_DA_JORNADA`. A leitura inicial estabelece
+a base, a parcial registra o estado durante a Jornada e a final antecede seu
+fechamento.
+
+Cada plataforma observada é um item da leitura:
 
 ```
-UBER
-99
-INDRIVE
-PARTICULAR
-OUTRO
+LEITURA_GANHO_PLATAFORMA
+------------------------
+id
+leitura_ganhos_id
+plataforma_id
+valor_acumulado_centavos
+quantidade_viagens_acumulada
 ```
 
-Tipo:
+Dinheiro é persistido em centavos. Valores e viagens do período são derivados
+da diferença entre leituras. Uma plataforma acumulada pode reaparecer sem
+mudança em outra leitura, mas somente uma vez dentro da mesma leitura.
+
+## 5.1 Plataforma e forma de registro
 
 ```
-PARCIAL
-FINAL
+PLATAFORMA
+----------
+id
+nome
+tipo_registro_ganhos
+icone
+cor
+ativa
+ordem
+data_criacao
 ```
+
+`tipo_registro_ganhos` pode ser `ACUMULADO` ou `INDIVIDUAL`. Uber, 99 e
+inDrive usam o mecanismo acumulado. Particular continua sendo plataforma e
+fonte de ganho, mas usa o mecanismo individual. Nenhuma regra depende do nome
+da plataforma.
+
+Plataformas individuais continuarão aparecendo com as demais em dashboards,
+pausas, fechamento e relatórios. A diferença é somente a fonte dos totais.
+
+## 5.2 Lançamento individual futuro
+
+```
+LANCAMENTO_GANHO_INDIVIDUAL
+---------------------------
+id
+plataforma_id
+jornada_id (opcional)
+quantidade_viagens
+valor_total_centavos
+observacao (opcional)
+data_criacao
+```
+
+Não haverá `data_hora` separado no fluxo normal: `data_criacao` será o momento
+operacional do lançamento. Um lançamento poderá representar uma ou várias
+viagens, sem inferir ou persistir valores individuais. Durante uma Jornada, os
+totais serão derivados por `SUM(valor_total_centavos)` e
+`SUM(quantidade_viagens)` para a plataforma e a Jornada correspondentes.
+
+Essa tabela ainda não integra o schema 2. Nenhum reset de plataforma é inferido
+automaticamente.
 
 ---
 
@@ -302,6 +328,7 @@ ABASTECIMENTO
 id
 
 veiculo_id
+jornada_id (opcional)
 
 data
 
@@ -340,6 +367,7 @@ MANUTENCAO
 id
 
 veiculo_id
+jornada_id (opcional)
 
 data
 
@@ -547,7 +575,9 @@ USUARIO
           |        |
           |        +---- PAUSA
           |        |
-          |        +---- GANHO
+          |        +---- LEITURA_GANHOS
+          |        |        |
+          |        |        +---- LEITURA_GANHO_PLATAFORMA
           |        |
           |        +---- CONTEXTO
           |        |
@@ -576,7 +606,7 @@ Responsável pela jornada:
 
 * quilômetros
 * pausas
-* ganhos
+* leituras de ganhos acumulados
 * produtividade
 
 ## Financeiro

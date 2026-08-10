@@ -2557,10 +2557,10 @@ class $PausasTable extends Pausas with TableInfo<$PausasTable, Pausa> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _motivoMeta = const VerificationMeta('motivo');
+  static const VerificationMeta _tituloMeta = const VerificationMeta('titulo');
   @override
-  late final GeneratedColumn<String> motivo = GeneratedColumn<String>(
-    'motivo',
+  late final GeneratedColumn<String> titulo = GeneratedColumn<String>(
+    'titulo',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -2589,47 +2589,15 @@ class $PausasTable extends Pausas with TableInfo<$PausasTable, Pausa> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
-  static const VerificationMeta _registrarGanhosMeta = const VerificationMeta(
-    'registrarGanhos',
-  );
-  @override
-  late final GeneratedColumn<bool> registrarGanhos = GeneratedColumn<bool>(
-    'registrar_ganhos',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("registrar_ganhos" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
-  );
-  static const VerificationMeta _concluidaMeta = const VerificationMeta(
-    'concluida',
-  );
-  @override
-  late final GeneratedColumn<bool> concluida = GeneratedColumn<bool>(
-    'concluida',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("concluida" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
-  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
     jornadaId,
     inicio,
     fim,
-    motivo,
+    titulo,
     observacao,
     dataCriacao,
-    registrarGanhos,
-    concluida,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2668,10 +2636,10 @@ class $PausasTable extends Pausas with TableInfo<$PausasTable, Pausa> {
         fim.isAcceptableOrUnknown(data['fim']!, _fimMeta),
       );
     }
-    if (data.containsKey('motivo')) {
+    if (data.containsKey('titulo')) {
       context.handle(
-        _motivoMeta,
-        motivo.isAcceptableOrUnknown(data['motivo']!, _motivoMeta),
+        _tituloMeta,
+        titulo.isAcceptableOrUnknown(data['titulo']!, _tituloMeta),
       );
     }
     if (data.containsKey('observacao')) {
@@ -2687,21 +2655,6 @@ class $PausasTable extends Pausas with TableInfo<$PausasTable, Pausa> {
           data['data_criacao']!,
           _dataCriacaoMeta,
         ),
-      );
-    }
-    if (data.containsKey('registrar_ganhos')) {
-      context.handle(
-        _registrarGanhosMeta,
-        registrarGanhos.isAcceptableOrUnknown(
-          data['registrar_ganhos']!,
-          _registrarGanhosMeta,
-        ),
-      );
-    }
-    if (data.containsKey('concluida')) {
-      context.handle(
-        _concluidaMeta,
-        concluida.isAcceptableOrUnknown(data['concluida']!, _concluidaMeta),
       );
     }
     return context;
@@ -2729,9 +2682,9 @@ class $PausasTable extends Pausas with TableInfo<$PausasTable, Pausa> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}fim'],
       ),
-      motivo: attachedDatabase.typeMapping.read(
+      titulo: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}motivo'],
+        data['${effectivePrefix}titulo'],
       ),
       observacao: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -2740,14 +2693,6 @@ class $PausasTable extends Pausas with TableInfo<$PausasTable, Pausa> {
       dataCriacao: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}data_criacao'],
-      )!,
-      registrarGanhos: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}registrar_ganhos'],
-      )!,
-      concluida: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}concluida'],
       )!,
     );
   }
@@ -2763,21 +2708,17 @@ class Pausa extends DataClass implements Insertable<Pausa> {
   final int jornadaId;
   final DateTime inicio;
   final DateTime? fim;
-  final String? motivo;
+  final String? titulo;
   final String? observacao;
   final DateTime dataCriacao;
-  final bool registrarGanhos;
-  final bool concluida;
   const Pausa({
     required this.id,
     required this.jornadaId,
     required this.inicio,
     this.fim,
-    this.motivo,
+    this.titulo,
     this.observacao,
     required this.dataCriacao,
-    required this.registrarGanhos,
-    required this.concluida,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2788,15 +2729,13 @@ class Pausa extends DataClass implements Insertable<Pausa> {
     if (!nullToAbsent || fim != null) {
       map['fim'] = Variable<DateTime>(fim);
     }
-    if (!nullToAbsent || motivo != null) {
-      map['motivo'] = Variable<String>(motivo);
+    if (!nullToAbsent || titulo != null) {
+      map['titulo'] = Variable<String>(titulo);
     }
     if (!nullToAbsent || observacao != null) {
       map['observacao'] = Variable<String>(observacao);
     }
     map['data_criacao'] = Variable<DateTime>(dataCriacao);
-    map['registrar_ganhos'] = Variable<bool>(registrarGanhos);
-    map['concluida'] = Variable<bool>(concluida);
     return map;
   }
 
@@ -2806,15 +2745,13 @@ class Pausa extends DataClass implements Insertable<Pausa> {
       jornadaId: Value(jornadaId),
       inicio: Value(inicio),
       fim: fim == null && nullToAbsent ? const Value.absent() : Value(fim),
-      motivo: motivo == null && nullToAbsent
+      titulo: titulo == null && nullToAbsent
           ? const Value.absent()
-          : Value(motivo),
+          : Value(titulo),
       observacao: observacao == null && nullToAbsent
           ? const Value.absent()
           : Value(observacao),
       dataCriacao: Value(dataCriacao),
-      registrarGanhos: Value(registrarGanhos),
-      concluida: Value(concluida),
     );
   }
 
@@ -2828,11 +2765,9 @@ class Pausa extends DataClass implements Insertable<Pausa> {
       jornadaId: serializer.fromJson<int>(json['jornadaId']),
       inicio: serializer.fromJson<DateTime>(json['inicio']),
       fim: serializer.fromJson<DateTime?>(json['fim']),
-      motivo: serializer.fromJson<String?>(json['motivo']),
+      titulo: serializer.fromJson<String?>(json['titulo']),
       observacao: serializer.fromJson<String?>(json['observacao']),
       dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
-      registrarGanhos: serializer.fromJson<bool>(json['registrarGanhos']),
-      concluida: serializer.fromJson<bool>(json['concluida']),
     );
   }
   @override
@@ -2843,11 +2778,9 @@ class Pausa extends DataClass implements Insertable<Pausa> {
       'jornadaId': serializer.toJson<int>(jornadaId),
       'inicio': serializer.toJson<DateTime>(inicio),
       'fim': serializer.toJson<DateTime?>(fim),
-      'motivo': serializer.toJson<String?>(motivo),
+      'titulo': serializer.toJson<String?>(titulo),
       'observacao': serializer.toJson<String?>(observacao),
       'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
-      'registrarGanhos': serializer.toJson<bool>(registrarGanhos),
-      'concluida': serializer.toJson<bool>(concluida),
     };
   }
 
@@ -2856,21 +2789,17 @@ class Pausa extends DataClass implements Insertable<Pausa> {
     int? jornadaId,
     DateTime? inicio,
     Value<DateTime?> fim = const Value.absent(),
-    Value<String?> motivo = const Value.absent(),
+    Value<String?> titulo = const Value.absent(),
     Value<String?> observacao = const Value.absent(),
     DateTime? dataCriacao,
-    bool? registrarGanhos,
-    bool? concluida,
   }) => Pausa(
     id: id ?? this.id,
     jornadaId: jornadaId ?? this.jornadaId,
     inicio: inicio ?? this.inicio,
     fim: fim.present ? fim.value : this.fim,
-    motivo: motivo.present ? motivo.value : this.motivo,
+    titulo: titulo.present ? titulo.value : this.titulo,
     observacao: observacao.present ? observacao.value : this.observacao,
     dataCriacao: dataCriacao ?? this.dataCriacao,
-    registrarGanhos: registrarGanhos ?? this.registrarGanhos,
-    concluida: concluida ?? this.concluida,
   );
   Pausa copyWithCompanion(PausasCompanion data) {
     return Pausa(
@@ -2878,17 +2807,13 @@ class Pausa extends DataClass implements Insertable<Pausa> {
       jornadaId: data.jornadaId.present ? data.jornadaId.value : this.jornadaId,
       inicio: data.inicio.present ? data.inicio.value : this.inicio,
       fim: data.fim.present ? data.fim.value : this.fim,
-      motivo: data.motivo.present ? data.motivo.value : this.motivo,
+      titulo: data.titulo.present ? data.titulo.value : this.titulo,
       observacao: data.observacao.present
           ? data.observacao.value
           : this.observacao,
       dataCriacao: data.dataCriacao.present
           ? data.dataCriacao.value
           : this.dataCriacao,
-      registrarGanhos: data.registrarGanhos.present
-          ? data.registrarGanhos.value
-          : this.registrarGanhos,
-      concluida: data.concluida.present ? data.concluida.value : this.concluida,
     );
   }
 
@@ -2899,27 +2824,16 @@ class Pausa extends DataClass implements Insertable<Pausa> {
           ..write('jornadaId: $jornadaId, ')
           ..write('inicio: $inicio, ')
           ..write('fim: $fim, ')
-          ..write('motivo: $motivo, ')
+          ..write('titulo: $titulo, ')
           ..write('observacao: $observacao, ')
-          ..write('dataCriacao: $dataCriacao, ')
-          ..write('registrarGanhos: $registrarGanhos, ')
-          ..write('concluida: $concluida')
+          ..write('dataCriacao: $dataCriacao')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-    id,
-    jornadaId,
-    inicio,
-    fim,
-    motivo,
-    observacao,
-    dataCriacao,
-    registrarGanhos,
-    concluida,
-  );
+  int get hashCode =>
+      Object.hash(id, jornadaId, inicio, fim, titulo, observacao, dataCriacao);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2928,11 +2842,9 @@ class Pausa extends DataClass implements Insertable<Pausa> {
           other.jornadaId == this.jornadaId &&
           other.inicio == this.inicio &&
           other.fim == this.fim &&
-          other.motivo == this.motivo &&
+          other.titulo == this.titulo &&
           other.observacao == this.observacao &&
-          other.dataCriacao == this.dataCriacao &&
-          other.registrarGanhos == this.registrarGanhos &&
-          other.concluida == this.concluida);
+          other.dataCriacao == this.dataCriacao);
 }
 
 class PausasCompanion extends UpdateCompanion<Pausa> {
@@ -2940,32 +2852,26 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
   final Value<int> jornadaId;
   final Value<DateTime> inicio;
   final Value<DateTime?> fim;
-  final Value<String?> motivo;
+  final Value<String?> titulo;
   final Value<String?> observacao;
   final Value<DateTime> dataCriacao;
-  final Value<bool> registrarGanhos;
-  final Value<bool> concluida;
   const PausasCompanion({
     this.id = const Value.absent(),
     this.jornadaId = const Value.absent(),
     this.inicio = const Value.absent(),
     this.fim = const Value.absent(),
-    this.motivo = const Value.absent(),
+    this.titulo = const Value.absent(),
     this.observacao = const Value.absent(),
     this.dataCriacao = const Value.absent(),
-    this.registrarGanhos = const Value.absent(),
-    this.concluida = const Value.absent(),
   });
   PausasCompanion.insert({
     this.id = const Value.absent(),
     required int jornadaId,
     required DateTime inicio,
     this.fim = const Value.absent(),
-    this.motivo = const Value.absent(),
+    this.titulo = const Value.absent(),
     this.observacao = const Value.absent(),
     this.dataCriacao = const Value.absent(),
-    this.registrarGanhos = const Value.absent(),
-    this.concluida = const Value.absent(),
   }) : jornadaId = Value(jornadaId),
        inicio = Value(inicio);
   static Insertable<Pausa> custom({
@@ -2973,22 +2879,18 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
     Expression<int>? jornadaId,
     Expression<DateTime>? inicio,
     Expression<DateTime>? fim,
-    Expression<String>? motivo,
+    Expression<String>? titulo,
     Expression<String>? observacao,
     Expression<DateTime>? dataCriacao,
-    Expression<bool>? registrarGanhos,
-    Expression<bool>? concluida,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (jornadaId != null) 'jornada_id': jornadaId,
       if (inicio != null) 'inicio': inicio,
       if (fim != null) 'fim': fim,
-      if (motivo != null) 'motivo': motivo,
+      if (titulo != null) 'titulo': titulo,
       if (observacao != null) 'observacao': observacao,
       if (dataCriacao != null) 'data_criacao': dataCriacao,
-      if (registrarGanhos != null) 'registrar_ganhos': registrarGanhos,
-      if (concluida != null) 'concluida': concluida,
     });
   }
 
@@ -2997,22 +2899,18 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
     Value<int>? jornadaId,
     Value<DateTime>? inicio,
     Value<DateTime?>? fim,
-    Value<String?>? motivo,
+    Value<String?>? titulo,
     Value<String?>? observacao,
     Value<DateTime>? dataCriacao,
-    Value<bool>? registrarGanhos,
-    Value<bool>? concluida,
   }) {
     return PausasCompanion(
       id: id ?? this.id,
       jornadaId: jornadaId ?? this.jornadaId,
       inicio: inicio ?? this.inicio,
       fim: fim ?? this.fim,
-      motivo: motivo ?? this.motivo,
+      titulo: titulo ?? this.titulo,
       observacao: observacao ?? this.observacao,
       dataCriacao: dataCriacao ?? this.dataCriacao,
-      registrarGanhos: registrarGanhos ?? this.registrarGanhos,
-      concluida: concluida ?? this.concluida,
     );
   }
 
@@ -3031,20 +2929,14 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
     if (fim.present) {
       map['fim'] = Variable<DateTime>(fim.value);
     }
-    if (motivo.present) {
-      map['motivo'] = Variable<String>(motivo.value);
+    if (titulo.present) {
+      map['titulo'] = Variable<String>(titulo.value);
     }
     if (observacao.present) {
       map['observacao'] = Variable<String>(observacao.value);
     }
     if (dataCriacao.present) {
       map['data_criacao'] = Variable<DateTime>(dataCriacao.value);
-    }
-    if (registrarGanhos.present) {
-      map['registrar_ganhos'] = Variable<bool>(registrarGanhos.value);
-    }
-    if (concluida.present) {
-      map['concluida'] = Variable<bool>(concluida.value);
     }
     return map;
   }
@@ -3056,11 +2948,9 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
           ..write('jornadaId: $jornadaId, ')
           ..write('inicio: $inicio, ')
           ..write('fim: $fim, ')
-          ..write('motivo: $motivo, ')
+          ..write('titulo: $titulo, ')
           ..write('observacao: $observacao, ')
-          ..write('dataCriacao: $dataCriacao, ')
-          ..write('registrarGanhos: $registrarGanhos, ')
-          ..write('concluida: $concluida')
+          ..write('dataCriacao: $dataCriacao')
           ..write(')'))
         .toString();
   }
@@ -3094,6 +2984,18 @@ class $PlataformasTable extends Plataformas
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  @override
+  late final GeneratedColumnWithTypeConverter<TipoRegistroGanhos, String>
+  tipoRegistroGanhos =
+      GeneratedColumn<String>(
+        'tipo_registro_ganhos',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<TipoRegistroGanhos>(
+        $PlataformasTable.$convertertipoRegistroGanhos,
+      );
   static const VerificationMeta _iconeMeta = const VerificationMeta('icone');
   @override
   late final GeneratedColumn<String> icone = GeneratedColumn<String>(
@@ -3151,6 +3053,7 @@ class $PlataformasTable extends Plataformas
   List<GeneratedColumn> get $columns => [
     id,
     nome,
+    tipoRegistroGanhos,
     icone,
     cor,
     ativa,
@@ -3230,6 +3133,13 @@ class $PlataformasTable extends Plataformas
         DriftSqlType.string,
         data['${effectivePrefix}nome'],
       )!,
+      tipoRegistroGanhos: $PlataformasTable.$convertertipoRegistroGanhos
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.string,
+              data['${effectivePrefix}tipo_registro_ganhos'],
+            )!,
+          ),
       icone: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}icone'],
@@ -3257,11 +3167,17 @@ class $PlataformasTable extends Plataformas
   $PlataformasTable createAlias(String alias) {
     return $PlataformasTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<TipoRegistroGanhos, String, String>
+  $convertertipoRegistroGanhos = const EnumNameConverter<TipoRegistroGanhos>(
+    TipoRegistroGanhos.values,
+  );
 }
 
 class Plataforma extends DataClass implements Insertable<Plataforma> {
   final int id;
   final String nome;
+  final TipoRegistroGanhos tipoRegistroGanhos;
   final String? icone;
   final String? cor;
   final bool ativa;
@@ -3270,6 +3186,7 @@ class Plataforma extends DataClass implements Insertable<Plataforma> {
   const Plataforma({
     required this.id,
     required this.nome,
+    required this.tipoRegistroGanhos,
     this.icone,
     this.cor,
     required this.ativa,
@@ -3281,6 +3198,13 @@ class Plataforma extends DataClass implements Insertable<Plataforma> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['nome'] = Variable<String>(nome);
+    {
+      map['tipo_registro_ganhos'] = Variable<String>(
+        $PlataformasTable.$convertertipoRegistroGanhos.toSql(
+          tipoRegistroGanhos,
+        ),
+      );
+    }
     if (!nullToAbsent || icone != null) {
       map['icone'] = Variable<String>(icone);
     }
@@ -3297,6 +3221,7 @@ class Plataforma extends DataClass implements Insertable<Plataforma> {
     return PlataformasCompanion(
       id: Value(id),
       nome: Value(nome),
+      tipoRegistroGanhos: Value(tipoRegistroGanhos),
       icone: icone == null && nullToAbsent
           ? const Value.absent()
           : Value(icone),
@@ -3315,6 +3240,8 @@ class Plataforma extends DataClass implements Insertable<Plataforma> {
     return Plataforma(
       id: serializer.fromJson<int>(json['id']),
       nome: serializer.fromJson<String>(json['nome']),
+      tipoRegistroGanhos: $PlataformasTable.$convertertipoRegistroGanhos
+          .fromJson(serializer.fromJson<String>(json['tipoRegistroGanhos'])),
       icone: serializer.fromJson<String?>(json['icone']),
       cor: serializer.fromJson<String?>(json['cor']),
       ativa: serializer.fromJson<bool>(json['ativa']),
@@ -3328,6 +3255,11 @@ class Plataforma extends DataClass implements Insertable<Plataforma> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'nome': serializer.toJson<String>(nome),
+      'tipoRegistroGanhos': serializer.toJson<String>(
+        $PlataformasTable.$convertertipoRegistroGanhos.toJson(
+          tipoRegistroGanhos,
+        ),
+      ),
       'icone': serializer.toJson<String?>(icone),
       'cor': serializer.toJson<String?>(cor),
       'ativa': serializer.toJson<bool>(ativa),
@@ -3339,6 +3271,7 @@ class Plataforma extends DataClass implements Insertable<Plataforma> {
   Plataforma copyWith({
     int? id,
     String? nome,
+    TipoRegistroGanhos? tipoRegistroGanhos,
     Value<String?> icone = const Value.absent(),
     Value<String?> cor = const Value.absent(),
     bool? ativa,
@@ -3347,6 +3280,7 @@ class Plataforma extends DataClass implements Insertable<Plataforma> {
   }) => Plataforma(
     id: id ?? this.id,
     nome: nome ?? this.nome,
+    tipoRegistroGanhos: tipoRegistroGanhos ?? this.tipoRegistroGanhos,
     icone: icone.present ? icone.value : this.icone,
     cor: cor.present ? cor.value : this.cor,
     ativa: ativa ?? this.ativa,
@@ -3357,6 +3291,9 @@ class Plataforma extends DataClass implements Insertable<Plataforma> {
     return Plataforma(
       id: data.id.present ? data.id.value : this.id,
       nome: data.nome.present ? data.nome.value : this.nome,
+      tipoRegistroGanhos: data.tipoRegistroGanhos.present
+          ? data.tipoRegistroGanhos.value
+          : this.tipoRegistroGanhos,
       icone: data.icone.present ? data.icone.value : this.icone,
       cor: data.cor.present ? data.cor.value : this.cor,
       ativa: data.ativa.present ? data.ativa.value : this.ativa,
@@ -3372,6 +3309,7 @@ class Plataforma extends DataClass implements Insertable<Plataforma> {
     return (StringBuffer('Plataforma(')
           ..write('id: $id, ')
           ..write('nome: $nome, ')
+          ..write('tipoRegistroGanhos: $tipoRegistroGanhos, ')
           ..write('icone: $icone, ')
           ..write('cor: $cor, ')
           ..write('ativa: $ativa, ')
@@ -3382,14 +3320,23 @@ class Plataforma extends DataClass implements Insertable<Plataforma> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, nome, icone, cor, ativa, ordem, dataCriacao);
+  int get hashCode => Object.hash(
+    id,
+    nome,
+    tipoRegistroGanhos,
+    icone,
+    cor,
+    ativa,
+    ordem,
+    dataCriacao,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Plataforma &&
           other.id == this.id &&
           other.nome == this.nome &&
+          other.tipoRegistroGanhos == this.tipoRegistroGanhos &&
           other.icone == this.icone &&
           other.cor == this.cor &&
           other.ativa == this.ativa &&
@@ -3400,6 +3347,7 @@ class Plataforma extends DataClass implements Insertable<Plataforma> {
 class PlataformasCompanion extends UpdateCompanion<Plataforma> {
   final Value<int> id;
   final Value<String> nome;
+  final Value<TipoRegistroGanhos> tipoRegistroGanhos;
   final Value<String?> icone;
   final Value<String?> cor;
   final Value<bool> ativa;
@@ -3408,6 +3356,7 @@ class PlataformasCompanion extends UpdateCompanion<Plataforma> {
   const PlataformasCompanion({
     this.id = const Value.absent(),
     this.nome = const Value.absent(),
+    this.tipoRegistroGanhos = const Value.absent(),
     this.icone = const Value.absent(),
     this.cor = const Value.absent(),
     this.ativa = const Value.absent(),
@@ -3417,15 +3366,18 @@ class PlataformasCompanion extends UpdateCompanion<Plataforma> {
   PlataformasCompanion.insert({
     this.id = const Value.absent(),
     required String nome,
+    required TipoRegistroGanhos tipoRegistroGanhos,
     this.icone = const Value.absent(),
     this.cor = const Value.absent(),
     this.ativa = const Value.absent(),
     this.ordem = const Value.absent(),
     this.dataCriacao = const Value.absent(),
-  }) : nome = Value(nome);
+  }) : nome = Value(nome),
+       tipoRegistroGanhos = Value(tipoRegistroGanhos);
   static Insertable<Plataforma> custom({
     Expression<int>? id,
     Expression<String>? nome,
+    Expression<String>? tipoRegistroGanhos,
     Expression<String>? icone,
     Expression<String>? cor,
     Expression<bool>? ativa,
@@ -3435,6 +3387,8 @@ class PlataformasCompanion extends UpdateCompanion<Plataforma> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (nome != null) 'nome': nome,
+      if (tipoRegistroGanhos != null)
+        'tipo_registro_ganhos': tipoRegistroGanhos,
       if (icone != null) 'icone': icone,
       if (cor != null) 'cor': cor,
       if (ativa != null) 'ativa': ativa,
@@ -3446,6 +3400,7 @@ class PlataformasCompanion extends UpdateCompanion<Plataforma> {
   PlataformasCompanion copyWith({
     Value<int>? id,
     Value<String>? nome,
+    Value<TipoRegistroGanhos>? tipoRegistroGanhos,
     Value<String?>? icone,
     Value<String?>? cor,
     Value<bool>? ativa,
@@ -3455,6 +3410,7 @@ class PlataformasCompanion extends UpdateCompanion<Plataforma> {
     return PlataformasCompanion(
       id: id ?? this.id,
       nome: nome ?? this.nome,
+      tipoRegistroGanhos: tipoRegistroGanhos ?? this.tipoRegistroGanhos,
       icone: icone ?? this.icone,
       cor: cor ?? this.cor,
       ativa: ativa ?? this.ativa,
@@ -3471,6 +3427,13 @@ class PlataformasCompanion extends UpdateCompanion<Plataforma> {
     }
     if (nome.present) {
       map['nome'] = Variable<String>(nome.value);
+    }
+    if (tipoRegistroGanhos.present) {
+      map['tipo_registro_ganhos'] = Variable<String>(
+        $PlataformasTable.$convertertipoRegistroGanhos.toSql(
+          tipoRegistroGanhos.value,
+        ),
+      );
     }
     if (icone.present) {
       map['icone'] = Variable<String>(icone.value);
@@ -3495,6 +3458,7 @@ class PlataformasCompanion extends UpdateCompanion<Plataforma> {
     return (StringBuffer('PlataformasCompanion(')
           ..write('id: $id, ')
           ..write('nome: $nome, ')
+          ..write('tipoRegistroGanhos: $tipoRegistroGanhos, ')
           ..write('icone: $icone, ')
           ..write('cor: $cor, ')
           ..write('ativa: $ativa, ')
@@ -3505,11 +3469,12 @@ class PlataformasCompanion extends UpdateCompanion<Plataforma> {
   }
 }
 
-class $GanhosTable extends Ganhos with TableInfo<$GanhosTable, Ganho> {
+class $LeiturasGanhosTable extends LeiturasGanhos
+    with TableInfo<$LeiturasGanhosTable, LeiturasGanho> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $GanhosTable(this.attachedDatabase, [this._alias]);
+  $LeiturasGanhosTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -3523,6 +3488,20 @@ class $GanhosTable extends Ganhos with TableInfo<$GanhosTable, Ganho> {
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
+  static const VerificationMeta _jornadaIdMeta = const VerificationMeta(
+    'jornadaId',
+  );
+  @override
+  late final GeneratedColumn<int> jornadaId = GeneratedColumn<int>(
+    'jornada_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES jornadas (id)',
+    ),
+  );
   static const VerificationMeta _pausaIdMeta = const VerificationMeta(
     'pausaId',
   );
@@ -3530,62 +3509,33 @@ class $GanhosTable extends Ganhos with TableInfo<$GanhosTable, Ganho> {
   late final GeneratedColumn<int> pausaId = GeneratedColumn<int>(
     'pausa_id',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES pausas (id)',
     ),
   );
-  static const VerificationMeta _plataformaIdMeta = const VerificationMeta(
-    'plataformaId',
+  static const VerificationMeta _dataHoraMeta = const VerificationMeta(
+    'dataHora',
   );
   @override
-  late final GeneratedColumn<int> plataformaId = GeneratedColumn<int>(
-    'plataforma_id',
+  late final GeneratedColumn<DateTime> dataHora = GeneratedColumn<DateTime>(
+    'data_hora',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES plataformas (id)',
-    ),
-  );
-  static const VerificationMeta _valorMeta = const VerificationMeta('valor');
-  @override
-  late final GeneratedColumn<double> valor = GeneratedColumn<double>(
-    'valor',
-    aliasedName,
-    false,
-    type: DriftSqlType.double,
+    type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _quantidadeCorridasMeta =
-      const VerificationMeta('quantidadeCorridas');
   @override
-  late final GeneratedColumn<int> quantidadeCorridas = GeneratedColumn<int>(
-    'quantidade_corridas',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _registroFinalMeta = const VerificationMeta(
-    'registroFinal',
-  );
-  @override
-  late final GeneratedColumn<bool> registroFinal = GeneratedColumn<bool>(
-    'registro_final',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("registro_final" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
-  );
+  late final GeneratedColumnWithTypeConverter<TipoLeituraGanhos, String> tipo =
+      GeneratedColumn<String>(
+        'tipo',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<TipoLeituraGanhos>($LeiturasGanhosTable.$convertertipo);
   static const VerificationMeta _dataCriacaoMeta = const VerificationMeta(
     'dataCriacao',
   );
@@ -3601,21 +3551,20 @@ class $GanhosTable extends Ganhos with TableInfo<$GanhosTable, Ganho> {
   @override
   List<GeneratedColumn> get $columns => [
     id,
+    jornadaId,
     pausaId,
-    plataformaId,
-    valor,
-    quantidadeCorridas,
-    registroFinal,
+    dataHora,
+    tipo,
     dataCriacao,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'ganhos';
+  static const String $name = 'leituras_ganhos';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Ganho> instance, {
+    Insertable<LeiturasGanho> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -3623,50 +3572,27 @@ class $GanhosTable extends Ganhos with TableInfo<$GanhosTable, Ganho> {
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
+    if (data.containsKey('jornada_id')) {
+      context.handle(
+        _jornadaIdMeta,
+        jornadaId.isAcceptableOrUnknown(data['jornada_id']!, _jornadaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_jornadaIdMeta);
+    }
     if (data.containsKey('pausa_id')) {
       context.handle(
         _pausaIdMeta,
         pausaId.isAcceptableOrUnknown(data['pausa_id']!, _pausaIdMeta),
       );
-    } else if (isInserting) {
-      context.missing(_pausaIdMeta);
     }
-    if (data.containsKey('plataforma_id')) {
+    if (data.containsKey('data_hora')) {
       context.handle(
-        _plataformaIdMeta,
-        plataformaId.isAcceptableOrUnknown(
-          data['plataforma_id']!,
-          _plataformaIdMeta,
-        ),
+        _dataHoraMeta,
+        dataHora.isAcceptableOrUnknown(data['data_hora']!, _dataHoraMeta),
       );
     } else if (isInserting) {
-      context.missing(_plataformaIdMeta);
-    }
-    if (data.containsKey('valor')) {
-      context.handle(
-        _valorMeta,
-        valor.isAcceptableOrUnknown(data['valor']!, _valorMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_valorMeta);
-    }
-    if (data.containsKey('quantidade_corridas')) {
-      context.handle(
-        _quantidadeCorridasMeta,
-        quantidadeCorridas.isAcceptableOrUnknown(
-          data['quantidade_corridas']!,
-          _quantidadeCorridasMeta,
-        ),
-      );
-    }
-    if (data.containsKey('registro_final')) {
-      context.handle(
-        _registroFinalMeta,
-        registroFinal.isAcceptableOrUnknown(
-          data['registro_final']!,
-          _registroFinalMeta,
-        ),
-      );
+      context.missing(_dataHoraMeta);
     }
     if (data.containsKey('data_criacao')) {
       context.handle(
@@ -3683,33 +3609,31 @@ class $GanhosTable extends Ganhos with TableInfo<$GanhosTable, Ganho> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Ganho map(Map<String, dynamic> data, {String? tablePrefix}) {
+  LeiturasGanho map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Ganho(
+    return LeiturasGanho(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
+      jornadaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}jornada_id'],
+      )!,
       pausaId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}pausa_id'],
+      ),
+      dataHora: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_hora'],
       )!,
-      plataformaId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}plataforma_id'],
-      )!,
-      valor: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}valor'],
-      )!,
-      quantidadeCorridas: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}quantidade_corridas'],
-      )!,
-      registroFinal: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}registro_final'],
-      )!,
+      tipo: $LeiturasGanhosTable.$convertertipo.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}tipo'],
+        )!,
+      ),
       dataCriacao: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}data_criacao'],
@@ -3718,65 +3642,73 @@ class $GanhosTable extends Ganhos with TableInfo<$GanhosTable, Ganho> {
   }
 
   @override
-  $GanhosTable createAlias(String alias) {
-    return $GanhosTable(attachedDatabase, alias);
+  $LeiturasGanhosTable createAlias(String alias) {
+    return $LeiturasGanhosTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<TipoLeituraGanhos, String, String> $convertertipo =
+      const EnumNameConverter<TipoLeituraGanhos>(TipoLeituraGanhos.values);
 }
 
-class Ganho extends DataClass implements Insertable<Ganho> {
+class LeiturasGanho extends DataClass implements Insertable<LeiturasGanho> {
   final int id;
-  final int pausaId;
-  final int plataformaId;
-  final double valor;
-  final int quantidadeCorridas;
-  final bool registroFinal;
+  final int jornadaId;
+  final int? pausaId;
+  final DateTime dataHora;
+  final TipoLeituraGanhos tipo;
   final DateTime dataCriacao;
-  const Ganho({
+  const LeiturasGanho({
     required this.id,
-    required this.pausaId,
-    required this.plataformaId,
-    required this.valor,
-    required this.quantidadeCorridas,
-    required this.registroFinal,
+    required this.jornadaId,
+    this.pausaId,
+    required this.dataHora,
+    required this.tipo,
     required this.dataCriacao,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['pausa_id'] = Variable<int>(pausaId);
-    map['plataforma_id'] = Variable<int>(plataformaId);
-    map['valor'] = Variable<double>(valor);
-    map['quantidade_corridas'] = Variable<int>(quantidadeCorridas);
-    map['registro_final'] = Variable<bool>(registroFinal);
+    map['jornada_id'] = Variable<int>(jornadaId);
+    if (!nullToAbsent || pausaId != null) {
+      map['pausa_id'] = Variable<int>(pausaId);
+    }
+    map['data_hora'] = Variable<DateTime>(dataHora);
+    {
+      map['tipo'] = Variable<String>(
+        $LeiturasGanhosTable.$convertertipo.toSql(tipo),
+      );
+    }
     map['data_criacao'] = Variable<DateTime>(dataCriacao);
     return map;
   }
 
-  GanhosCompanion toCompanion(bool nullToAbsent) {
-    return GanhosCompanion(
+  LeiturasGanhosCompanion toCompanion(bool nullToAbsent) {
+    return LeiturasGanhosCompanion(
       id: Value(id),
-      pausaId: Value(pausaId),
-      plataformaId: Value(plataformaId),
-      valor: Value(valor),
-      quantidadeCorridas: Value(quantidadeCorridas),
-      registroFinal: Value(registroFinal),
+      jornadaId: Value(jornadaId),
+      pausaId: pausaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pausaId),
+      dataHora: Value(dataHora),
+      tipo: Value(tipo),
       dataCriacao: Value(dataCriacao),
     );
   }
 
-  factory Ganho.fromJson(
+  factory LeiturasGanho.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Ganho(
+    return LeiturasGanho(
       id: serializer.fromJson<int>(json['id']),
-      pausaId: serializer.fromJson<int>(json['pausaId']),
-      plataformaId: serializer.fromJson<int>(json['plataformaId']),
-      valor: serializer.fromJson<double>(json['valor']),
-      quantidadeCorridas: serializer.fromJson<int>(json['quantidadeCorridas']),
-      registroFinal: serializer.fromJson<bool>(json['registroFinal']),
+      jornadaId: serializer.fromJson<int>(json['jornadaId']),
+      pausaId: serializer.fromJson<int?>(json['pausaId']),
+      dataHora: serializer.fromJson<DateTime>(json['dataHora']),
+      tipo: $LeiturasGanhosTable.$convertertipo.fromJson(
+        serializer.fromJson<String>(json['tipo']),
+      ),
       dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
     );
   }
@@ -3785,46 +3717,38 @@ class Ganho extends DataClass implements Insertable<Ganho> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'pausaId': serializer.toJson<int>(pausaId),
-      'plataformaId': serializer.toJson<int>(plataformaId),
-      'valor': serializer.toJson<double>(valor),
-      'quantidadeCorridas': serializer.toJson<int>(quantidadeCorridas),
-      'registroFinal': serializer.toJson<bool>(registroFinal),
+      'jornadaId': serializer.toJson<int>(jornadaId),
+      'pausaId': serializer.toJson<int?>(pausaId),
+      'dataHora': serializer.toJson<DateTime>(dataHora),
+      'tipo': serializer.toJson<String>(
+        $LeiturasGanhosTable.$convertertipo.toJson(tipo),
+      ),
       'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
     };
   }
 
-  Ganho copyWith({
+  LeiturasGanho copyWith({
     int? id,
-    int? pausaId,
-    int? plataformaId,
-    double? valor,
-    int? quantidadeCorridas,
-    bool? registroFinal,
+    int? jornadaId,
+    Value<int?> pausaId = const Value.absent(),
+    DateTime? dataHora,
+    TipoLeituraGanhos? tipo,
     DateTime? dataCriacao,
-  }) => Ganho(
+  }) => LeiturasGanho(
     id: id ?? this.id,
-    pausaId: pausaId ?? this.pausaId,
-    plataformaId: plataformaId ?? this.plataformaId,
-    valor: valor ?? this.valor,
-    quantidadeCorridas: quantidadeCorridas ?? this.quantidadeCorridas,
-    registroFinal: registroFinal ?? this.registroFinal,
+    jornadaId: jornadaId ?? this.jornadaId,
+    pausaId: pausaId.present ? pausaId.value : this.pausaId,
+    dataHora: dataHora ?? this.dataHora,
+    tipo: tipo ?? this.tipo,
     dataCriacao: dataCriacao ?? this.dataCriacao,
   );
-  Ganho copyWithCompanion(GanhosCompanion data) {
-    return Ganho(
+  LeiturasGanho copyWithCompanion(LeiturasGanhosCompanion data) {
+    return LeiturasGanho(
       id: data.id.present ? data.id.value : this.id,
+      jornadaId: data.jornadaId.present ? data.jornadaId.value : this.jornadaId,
       pausaId: data.pausaId.present ? data.pausaId.value : this.pausaId,
-      plataformaId: data.plataformaId.present
-          ? data.plataformaId.value
-          : this.plataformaId,
-      valor: data.valor.present ? data.valor.value : this.valor,
-      quantidadeCorridas: data.quantidadeCorridas.present
-          ? data.quantidadeCorridas.value
-          : this.quantidadeCorridas,
-      registroFinal: data.registroFinal.present
-          ? data.registroFinal.value
-          : this.registroFinal,
+      dataHora: data.dataHora.present ? data.dataHora.value : this.dataHora,
+      tipo: data.tipo.present ? data.tipo.value : this.tipo,
       dataCriacao: data.dataCriacao.present
           ? data.dataCriacao.value
           : this.dataCriacao,
@@ -3833,105 +3757,89 @@ class Ganho extends DataClass implements Insertable<Ganho> {
 
   @override
   String toString() {
-    return (StringBuffer('Ganho(')
+    return (StringBuffer('LeiturasGanho(')
           ..write('id: $id, ')
+          ..write('jornadaId: $jornadaId, ')
           ..write('pausaId: $pausaId, ')
-          ..write('plataformaId: $plataformaId, ')
-          ..write('valor: $valor, ')
-          ..write('quantidadeCorridas: $quantidadeCorridas, ')
-          ..write('registroFinal: $registroFinal, ')
+          ..write('dataHora: $dataHora, ')
+          ..write('tipo: $tipo, ')
           ..write('dataCriacao: $dataCriacao')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-    id,
-    pausaId,
-    plataformaId,
-    valor,
-    quantidadeCorridas,
-    registroFinal,
-    dataCriacao,
-  );
+  int get hashCode =>
+      Object.hash(id, jornadaId, pausaId, dataHora, tipo, dataCriacao);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Ganho &&
+      (other is LeiturasGanho &&
           other.id == this.id &&
+          other.jornadaId == this.jornadaId &&
           other.pausaId == this.pausaId &&
-          other.plataformaId == this.plataformaId &&
-          other.valor == this.valor &&
-          other.quantidadeCorridas == this.quantidadeCorridas &&
-          other.registroFinal == this.registroFinal &&
+          other.dataHora == this.dataHora &&
+          other.tipo == this.tipo &&
           other.dataCriacao == this.dataCriacao);
 }
 
-class GanhosCompanion extends UpdateCompanion<Ganho> {
+class LeiturasGanhosCompanion extends UpdateCompanion<LeiturasGanho> {
   final Value<int> id;
-  final Value<int> pausaId;
-  final Value<int> plataformaId;
-  final Value<double> valor;
-  final Value<int> quantidadeCorridas;
-  final Value<bool> registroFinal;
+  final Value<int> jornadaId;
+  final Value<int?> pausaId;
+  final Value<DateTime> dataHora;
+  final Value<TipoLeituraGanhos> tipo;
   final Value<DateTime> dataCriacao;
-  const GanhosCompanion({
+  const LeiturasGanhosCompanion({
     this.id = const Value.absent(),
+    this.jornadaId = const Value.absent(),
     this.pausaId = const Value.absent(),
-    this.plataformaId = const Value.absent(),
-    this.valor = const Value.absent(),
-    this.quantidadeCorridas = const Value.absent(),
-    this.registroFinal = const Value.absent(),
+    this.dataHora = const Value.absent(),
+    this.tipo = const Value.absent(),
     this.dataCriacao = const Value.absent(),
   });
-  GanhosCompanion.insert({
+  LeiturasGanhosCompanion.insert({
     this.id = const Value.absent(),
-    required int pausaId,
-    required int plataformaId,
-    required double valor,
-    this.quantidadeCorridas = const Value.absent(),
-    this.registroFinal = const Value.absent(),
+    required int jornadaId,
+    this.pausaId = const Value.absent(),
+    required DateTime dataHora,
+    required TipoLeituraGanhos tipo,
     this.dataCriacao = const Value.absent(),
-  }) : pausaId = Value(pausaId),
-       plataformaId = Value(plataformaId),
-       valor = Value(valor);
-  static Insertable<Ganho> custom({
+  }) : jornadaId = Value(jornadaId),
+       dataHora = Value(dataHora),
+       tipo = Value(tipo);
+  static Insertable<LeiturasGanho> custom({
     Expression<int>? id,
+    Expression<int>? jornadaId,
     Expression<int>? pausaId,
-    Expression<int>? plataformaId,
-    Expression<double>? valor,
-    Expression<int>? quantidadeCorridas,
-    Expression<bool>? registroFinal,
+    Expression<DateTime>? dataHora,
+    Expression<String>? tipo,
     Expression<DateTime>? dataCriacao,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (jornadaId != null) 'jornada_id': jornadaId,
       if (pausaId != null) 'pausa_id': pausaId,
-      if (plataformaId != null) 'plataforma_id': plataformaId,
-      if (valor != null) 'valor': valor,
-      if (quantidadeCorridas != null) 'quantidade_corridas': quantidadeCorridas,
-      if (registroFinal != null) 'registro_final': registroFinal,
+      if (dataHora != null) 'data_hora': dataHora,
+      if (tipo != null) 'tipo': tipo,
       if (dataCriacao != null) 'data_criacao': dataCriacao,
     });
   }
 
-  GanhosCompanion copyWith({
+  LeiturasGanhosCompanion copyWith({
     Value<int>? id,
-    Value<int>? pausaId,
-    Value<int>? plataformaId,
-    Value<double>? valor,
-    Value<int>? quantidadeCorridas,
-    Value<bool>? registroFinal,
+    Value<int>? jornadaId,
+    Value<int?>? pausaId,
+    Value<DateTime>? dataHora,
+    Value<TipoLeituraGanhos>? tipo,
     Value<DateTime>? dataCriacao,
   }) {
-    return GanhosCompanion(
+    return LeiturasGanhosCompanion(
       id: id ?? this.id,
+      jornadaId: jornadaId ?? this.jornadaId,
       pausaId: pausaId ?? this.pausaId,
-      plataformaId: plataformaId ?? this.plataformaId,
-      valor: valor ?? this.valor,
-      quantidadeCorridas: quantidadeCorridas ?? this.quantidadeCorridas,
-      registroFinal: registroFinal ?? this.registroFinal,
+      dataHora: dataHora ?? this.dataHora,
+      tipo: tipo ?? this.tipo,
       dataCriacao: dataCriacao ?? this.dataCriacao,
     );
   }
@@ -3942,20 +3850,19 @@ class GanhosCompanion extends UpdateCompanion<Ganho> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
+    if (jornadaId.present) {
+      map['jornada_id'] = Variable<int>(jornadaId.value);
+    }
     if (pausaId.present) {
       map['pausa_id'] = Variable<int>(pausaId.value);
     }
-    if (plataformaId.present) {
-      map['plataforma_id'] = Variable<int>(plataformaId.value);
+    if (dataHora.present) {
+      map['data_hora'] = Variable<DateTime>(dataHora.value);
     }
-    if (valor.present) {
-      map['valor'] = Variable<double>(valor.value);
-    }
-    if (quantidadeCorridas.present) {
-      map['quantidade_corridas'] = Variable<int>(quantidadeCorridas.value);
-    }
-    if (registroFinal.present) {
-      map['registro_final'] = Variable<bool>(registroFinal.value);
+    if (tipo.present) {
+      map['tipo'] = Variable<String>(
+        $LeiturasGanhosTable.$convertertipo.toSql(tipo.value),
+      );
     }
     if (dataCriacao.present) {
       map['data_criacao'] = Variable<DateTime>(dataCriacao.value);
@@ -3965,14 +3872,425 @@ class GanhosCompanion extends UpdateCompanion<Ganho> {
 
   @override
   String toString() {
-    return (StringBuffer('GanhosCompanion(')
+    return (StringBuffer('LeiturasGanhosCompanion(')
           ..write('id: $id, ')
+          ..write('jornadaId: $jornadaId, ')
           ..write('pausaId: $pausaId, ')
-          ..write('plataformaId: $plataformaId, ')
-          ..write('valor: $valor, ')
-          ..write('quantidadeCorridas: $quantidadeCorridas, ')
-          ..write('registroFinal: $registroFinal, ')
+          ..write('dataHora: $dataHora, ')
+          ..write('tipo: $tipo, ')
           ..write('dataCriacao: $dataCriacao')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LeiturasGanhoPlataformaTable extends LeiturasGanhoPlataforma
+    with TableInfo<$LeiturasGanhoPlataformaTable, LeiturasGanhoPlataformaData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LeiturasGanhoPlataformaTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _leituraGanhosIdMeta = const VerificationMeta(
+    'leituraGanhosId',
+  );
+  @override
+  late final GeneratedColumn<int> leituraGanhosId = GeneratedColumn<int>(
+    'leitura_ganhos_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES leituras_ganhos (id)',
+    ),
+  );
+  static const VerificationMeta _plataformaIdMeta = const VerificationMeta(
+    'plataformaId',
+  );
+  @override
+  late final GeneratedColumn<int> plataformaId = GeneratedColumn<int>(
+    'plataforma_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES plataformas (id)',
+    ),
+  );
+  static const VerificationMeta _valorAcumuladoCentavosMeta =
+      const VerificationMeta('valorAcumuladoCentavos');
+  @override
+  late final GeneratedColumn<int> valorAcumuladoCentavos = GeneratedColumn<int>(
+    'valor_acumulado_centavos',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _quantidadeViagensAcumuladaMeta =
+      const VerificationMeta('quantidadeViagensAcumulada');
+  @override
+  late final GeneratedColumn<int> quantidadeViagensAcumulada =
+      GeneratedColumn<int>(
+        'quantidade_viagens_acumulada',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    leituraGanhosId,
+    plataformaId,
+    valorAcumuladoCentavos,
+    quantidadeViagensAcumulada,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'leituras_ganho_plataforma';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LeiturasGanhoPlataformaData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('leitura_ganhos_id')) {
+      context.handle(
+        _leituraGanhosIdMeta,
+        leituraGanhosId.isAcceptableOrUnknown(
+          data['leitura_ganhos_id']!,
+          _leituraGanhosIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_leituraGanhosIdMeta);
+    }
+    if (data.containsKey('plataforma_id')) {
+      context.handle(
+        _plataformaIdMeta,
+        plataformaId.isAcceptableOrUnknown(
+          data['plataforma_id']!,
+          _plataformaIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_plataformaIdMeta);
+    }
+    if (data.containsKey('valor_acumulado_centavos')) {
+      context.handle(
+        _valorAcumuladoCentavosMeta,
+        valorAcumuladoCentavos.isAcceptableOrUnknown(
+          data['valor_acumulado_centavos']!,
+          _valorAcumuladoCentavosMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_valorAcumuladoCentavosMeta);
+    }
+    if (data.containsKey('quantidade_viagens_acumulada')) {
+      context.handle(
+        _quantidadeViagensAcumuladaMeta,
+        quantidadeViagensAcumulada.isAcceptableOrUnknown(
+          data['quantidade_viagens_acumulada']!,
+          _quantidadeViagensAcumuladaMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_quantidadeViagensAcumuladaMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {leituraGanhosId, plataformaId},
+  ];
+  @override
+  LeiturasGanhoPlataformaData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LeiturasGanhoPlataformaData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      leituraGanhosId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}leitura_ganhos_id'],
+      )!,
+      plataformaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}plataforma_id'],
+      )!,
+      valorAcumuladoCentavos: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_acumulado_centavos'],
+      )!,
+      quantidadeViagensAcumulada: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quantidade_viagens_acumulada'],
+      )!,
+    );
+  }
+
+  @override
+  $LeiturasGanhoPlataformaTable createAlias(String alias) {
+    return $LeiturasGanhoPlataformaTable(attachedDatabase, alias);
+  }
+}
+
+class LeiturasGanhoPlataformaData extends DataClass
+    implements Insertable<LeiturasGanhoPlataformaData> {
+  final int id;
+  final int leituraGanhosId;
+  final int plataformaId;
+  final int valorAcumuladoCentavos;
+  final int quantidadeViagensAcumulada;
+  const LeiturasGanhoPlataformaData({
+    required this.id,
+    required this.leituraGanhosId,
+    required this.plataformaId,
+    required this.valorAcumuladoCentavos,
+    required this.quantidadeViagensAcumulada,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['leitura_ganhos_id'] = Variable<int>(leituraGanhosId);
+    map['plataforma_id'] = Variable<int>(plataformaId);
+    map['valor_acumulado_centavos'] = Variable<int>(valorAcumuladoCentavos);
+    map['quantidade_viagens_acumulada'] = Variable<int>(
+      quantidadeViagensAcumulada,
+    );
+    return map;
+  }
+
+  LeiturasGanhoPlataformaCompanion toCompanion(bool nullToAbsent) {
+    return LeiturasGanhoPlataformaCompanion(
+      id: Value(id),
+      leituraGanhosId: Value(leituraGanhosId),
+      plataformaId: Value(plataformaId),
+      valorAcumuladoCentavos: Value(valorAcumuladoCentavos),
+      quantidadeViagensAcumulada: Value(quantidadeViagensAcumulada),
+    );
+  }
+
+  factory LeiturasGanhoPlataformaData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LeiturasGanhoPlataformaData(
+      id: serializer.fromJson<int>(json['id']),
+      leituraGanhosId: serializer.fromJson<int>(json['leituraGanhosId']),
+      plataformaId: serializer.fromJson<int>(json['plataformaId']),
+      valorAcumuladoCentavos: serializer.fromJson<int>(
+        json['valorAcumuladoCentavos'],
+      ),
+      quantidadeViagensAcumulada: serializer.fromJson<int>(
+        json['quantidadeViagensAcumulada'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'leituraGanhosId': serializer.toJson<int>(leituraGanhosId),
+      'plataformaId': serializer.toJson<int>(plataformaId),
+      'valorAcumuladoCentavos': serializer.toJson<int>(valorAcumuladoCentavos),
+      'quantidadeViagensAcumulada': serializer.toJson<int>(
+        quantidadeViagensAcumulada,
+      ),
+    };
+  }
+
+  LeiturasGanhoPlataformaData copyWith({
+    int? id,
+    int? leituraGanhosId,
+    int? plataformaId,
+    int? valorAcumuladoCentavos,
+    int? quantidadeViagensAcumulada,
+  }) => LeiturasGanhoPlataformaData(
+    id: id ?? this.id,
+    leituraGanhosId: leituraGanhosId ?? this.leituraGanhosId,
+    plataformaId: plataformaId ?? this.plataformaId,
+    valorAcumuladoCentavos:
+        valorAcumuladoCentavos ?? this.valorAcumuladoCentavos,
+    quantidadeViagensAcumulada:
+        quantidadeViagensAcumulada ?? this.quantidadeViagensAcumulada,
+  );
+  LeiturasGanhoPlataformaData copyWithCompanion(
+    LeiturasGanhoPlataformaCompanion data,
+  ) {
+    return LeiturasGanhoPlataformaData(
+      id: data.id.present ? data.id.value : this.id,
+      leituraGanhosId: data.leituraGanhosId.present
+          ? data.leituraGanhosId.value
+          : this.leituraGanhosId,
+      plataformaId: data.plataformaId.present
+          ? data.plataformaId.value
+          : this.plataformaId,
+      valorAcumuladoCentavos: data.valorAcumuladoCentavos.present
+          ? data.valorAcumuladoCentavos.value
+          : this.valorAcumuladoCentavos,
+      quantidadeViagensAcumulada: data.quantidadeViagensAcumulada.present
+          ? data.quantidadeViagensAcumulada.value
+          : this.quantidadeViagensAcumulada,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LeiturasGanhoPlataformaData(')
+          ..write('id: $id, ')
+          ..write('leituraGanhosId: $leituraGanhosId, ')
+          ..write('plataformaId: $plataformaId, ')
+          ..write('valorAcumuladoCentavos: $valorAcumuladoCentavos, ')
+          ..write('quantidadeViagensAcumulada: $quantidadeViagensAcumulada')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    leituraGanhosId,
+    plataformaId,
+    valorAcumuladoCentavos,
+    quantidadeViagensAcumulada,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LeiturasGanhoPlataformaData &&
+          other.id == this.id &&
+          other.leituraGanhosId == this.leituraGanhosId &&
+          other.plataformaId == this.plataformaId &&
+          other.valorAcumuladoCentavos == this.valorAcumuladoCentavos &&
+          other.quantidadeViagensAcumulada == this.quantidadeViagensAcumulada);
+}
+
+class LeiturasGanhoPlataformaCompanion
+    extends UpdateCompanion<LeiturasGanhoPlataformaData> {
+  final Value<int> id;
+  final Value<int> leituraGanhosId;
+  final Value<int> plataformaId;
+  final Value<int> valorAcumuladoCentavos;
+  final Value<int> quantidadeViagensAcumulada;
+  const LeiturasGanhoPlataformaCompanion({
+    this.id = const Value.absent(),
+    this.leituraGanhosId = const Value.absent(),
+    this.plataformaId = const Value.absent(),
+    this.valorAcumuladoCentavos = const Value.absent(),
+    this.quantidadeViagensAcumulada = const Value.absent(),
+  });
+  LeiturasGanhoPlataformaCompanion.insert({
+    this.id = const Value.absent(),
+    required int leituraGanhosId,
+    required int plataformaId,
+    required int valorAcumuladoCentavos,
+    required int quantidadeViagensAcumulada,
+  }) : leituraGanhosId = Value(leituraGanhosId),
+       plataformaId = Value(plataformaId),
+       valorAcumuladoCentavos = Value(valorAcumuladoCentavos),
+       quantidadeViagensAcumulada = Value(quantidadeViagensAcumulada);
+  static Insertable<LeiturasGanhoPlataformaData> custom({
+    Expression<int>? id,
+    Expression<int>? leituraGanhosId,
+    Expression<int>? plataformaId,
+    Expression<int>? valorAcumuladoCentavos,
+    Expression<int>? quantidadeViagensAcumulada,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (leituraGanhosId != null) 'leitura_ganhos_id': leituraGanhosId,
+      if (plataformaId != null) 'plataforma_id': plataformaId,
+      if (valorAcumuladoCentavos != null)
+        'valor_acumulado_centavos': valorAcumuladoCentavos,
+      if (quantidadeViagensAcumulada != null)
+        'quantidade_viagens_acumulada': quantidadeViagensAcumulada,
+    });
+  }
+
+  LeiturasGanhoPlataformaCompanion copyWith({
+    Value<int>? id,
+    Value<int>? leituraGanhosId,
+    Value<int>? plataformaId,
+    Value<int>? valorAcumuladoCentavos,
+    Value<int>? quantidadeViagensAcumulada,
+  }) {
+    return LeiturasGanhoPlataformaCompanion(
+      id: id ?? this.id,
+      leituraGanhosId: leituraGanhosId ?? this.leituraGanhosId,
+      plataformaId: plataformaId ?? this.plataformaId,
+      valorAcumuladoCentavos:
+          valorAcumuladoCentavos ?? this.valorAcumuladoCentavos,
+      quantidadeViagensAcumulada:
+          quantidadeViagensAcumulada ?? this.quantidadeViagensAcumulada,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (leituraGanhosId.present) {
+      map['leitura_ganhos_id'] = Variable<int>(leituraGanhosId.value);
+    }
+    if (plataformaId.present) {
+      map['plataforma_id'] = Variable<int>(plataformaId.value);
+    }
+    if (valorAcumuladoCentavos.present) {
+      map['valor_acumulado_centavos'] = Variable<int>(
+        valorAcumuladoCentavos.value,
+      );
+    }
+    if (quantidadeViagensAcumulada.present) {
+      map['quantidade_viagens_acumulada'] = Variable<int>(
+        quantidadeViagensAcumulada.value,
+      );
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LeiturasGanhoPlataformaCompanion(')
+          ..write('id: $id, ')
+          ..write('leituraGanhosId: $leituraGanhosId, ')
+          ..write('plataformaId: $plataformaId, ')
+          ..write('valorAcumuladoCentavos: $valorAcumuladoCentavos, ')
+          ..write('quantidadeViagensAcumulada: $quantidadeViagensAcumulada')
           ..write(')'))
         .toString();
   }
@@ -3987,7 +4305,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $JornadasTable jornadas = $JornadasTable(this);
   late final $PausasTable pausas = $PausasTable(this);
   late final $PlataformasTable plataformas = $PlataformasTable(this);
-  late final $GanhosTable ganhos = $GanhosTable(this);
+  late final $LeiturasGanhosTable leiturasGanhos = $LeiturasGanhosTable(this);
+  late final $LeiturasGanhoPlataformaTable leiturasGanhoPlataforma =
+      $LeiturasGanhoPlataformaTable(this);
   late final JornadaDao jornadaDao = JornadaDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -4000,7 +4320,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     jornadas,
     pausas,
     plataformas,
-    ganhos,
+    leiturasGanhos,
+    leiturasGanhoPlataforma,
   ];
 }
 
@@ -5077,6 +5398,24 @@ final class $$JornadasTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$LeiturasGanhosTable, List<LeiturasGanho>>
+  _leiturasGanhosRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.leiturasGanhos,
+    aliasName: 'jornadas__id__leituras_ganhos__jornada_id',
+  );
+
+  $$LeiturasGanhosTableProcessedTableManager get leiturasGanhosRefs {
+    final manager = $$LeiturasGanhosTableTableManager(
+      $_db,
+      $_db.leiturasGanhos,
+    ).filter((f) => f.jornadaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_leiturasGanhosRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$JornadasTableFilterComposer
@@ -5216,6 +5555,31 @@ class $$JornadasTableFilterComposer
           }) => $$PausasTableFilterComposer(
             $db: $db,
             $table: $db.pausas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> leiturasGanhosRefs(
+    Expression<bool> Function($$LeiturasGanhosTableFilterComposer f) f,
+  ) {
+    final $$LeiturasGanhosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.leiturasGanhos,
+      getReferencedColumn: (t) => t.jornadaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LeiturasGanhosTableFilterComposer(
+            $db: $db,
+            $table: $db.leiturasGanhos,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5487,6 +5851,31 @@ class $$JornadasTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> leiturasGanhosRefs<T extends Object>(
+    Expression<T> Function($$LeiturasGanhosTableAnnotationComposer a) f,
+  ) {
+    final $$LeiturasGanhosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.leiturasGanhos,
+      getReferencedColumn: (t) => t.jornadaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LeiturasGanhosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.leiturasGanhos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$JornadasTableTableManager
@@ -5506,6 +5895,7 @@ class $$JornadasTableTableManager
             bool usuarioId,
             bool veiculoId,
             bool pausasRefs,
+            bool leiturasGanhosRefs,
           })
         > {
   $$JornadasTableTableManager(_$AppDatabase db, $JornadasTable table)
@@ -5596,10 +5986,18 @@ class $$JornadasTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({usuarioId = false, veiculoId = false, pausasRefs = false}) {
+              ({
+                usuarioId = false,
+                veiculoId = false,
+                pausasRefs = false,
+                leiturasGanhosRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
-                  explicitlyWatchedTables: [if (pausasRefs) db.pausas],
+                  explicitlyWatchedTables: [
+                    if (pausasRefs) db.pausas,
+                    if (leiturasGanhosRefs) db.leiturasGanhos,
+                  ],
                   addJoins:
                       <
                         T extends TableManagerState<
@@ -5668,6 +6066,27 @@ class $$JornadasTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (leiturasGanhosRefs)
+                        await $_getPrefetchedData<
+                          Jornada,
+                          $JornadasTable,
+                          LeiturasGanho
+                        >(
+                          currentTable: table,
+                          referencedTable: $$JornadasTableReferences
+                              ._leiturasGanhosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$JornadasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).leiturasGanhosRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.jornadaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -5688,7 +6107,12 @@ typedef $$JornadasTableProcessedTableManager =
       $$JornadasTableUpdateCompanionBuilder,
       (Jornada, $$JornadasTableReferences),
       Jornada,
-      PrefetchHooks Function({bool usuarioId, bool veiculoId, bool pausasRefs})
+      PrefetchHooks Function({
+        bool usuarioId,
+        bool veiculoId,
+        bool pausasRefs,
+        bool leiturasGanhosRefs,
+      })
     >;
 typedef $$PausasTableCreateCompanionBuilder =
     PausasCompanion Function({
@@ -5696,11 +6120,9 @@ typedef $$PausasTableCreateCompanionBuilder =
       required int jornadaId,
       required DateTime inicio,
       Value<DateTime?> fim,
-      Value<String?> motivo,
+      Value<String?> titulo,
       Value<String?> observacao,
       Value<DateTime> dataCriacao,
-      Value<bool> registrarGanhos,
-      Value<bool> concluida,
     });
 typedef $$PausasTableUpdateCompanionBuilder =
     PausasCompanion Function({
@@ -5708,11 +6130,9 @@ typedef $$PausasTableUpdateCompanionBuilder =
       Value<int> jornadaId,
       Value<DateTime> inicio,
       Value<DateTime?> fim,
-      Value<String?> motivo,
+      Value<String?> titulo,
       Value<String?> observacao,
       Value<DateTime> dataCriacao,
-      Value<bool> registrarGanhos,
-      Value<bool> concluida,
     });
 
 final class $$PausasTableReferences
@@ -5736,20 +6156,19 @@ final class $$PausasTableReferences
     );
   }
 
-  static MultiTypedResultKey<$GanhosTable, List<Ganho>> _ganhosRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.ganhos,
-    aliasName: 'pausas__id__ganhos__pausa_id',
+  static MultiTypedResultKey<$LeiturasGanhosTable, List<LeiturasGanho>>
+  _leiturasGanhosRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.leiturasGanhos,
+    aliasName: 'pausas__id__leituras_ganhos__pausa_id',
   );
 
-  $$GanhosTableProcessedTableManager get ganhosRefs {
-    final manager = $$GanhosTableTableManager(
+  $$LeiturasGanhosTableProcessedTableManager get leiturasGanhosRefs {
+    final manager = $$LeiturasGanhosTableTableManager(
       $_db,
-      $_db.ganhos,
+      $_db.leiturasGanhos,
     ).filter((f) => f.pausaId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_ganhosRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(_leiturasGanhosRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -5780,8 +6199,8 @@ class $$PausasTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get motivo => $composableBuilder(
-    column: $table.motivo,
+  ColumnFilters<String> get titulo => $composableBuilder(
+    column: $table.titulo,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5792,16 +6211,6 @@ class $$PausasTableFilterComposer
 
   ColumnFilters<DateTime> get dataCriacao => $composableBuilder(
     column: $table.dataCriacao,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get registrarGanhos => $composableBuilder(
-    column: $table.registrarGanhos,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get concluida => $composableBuilder(
-    column: $table.concluida,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5828,22 +6237,22 @@ class $$PausasTableFilterComposer
     return composer;
   }
 
-  Expression<bool> ganhosRefs(
-    Expression<bool> Function($$GanhosTableFilterComposer f) f,
+  Expression<bool> leiturasGanhosRefs(
+    Expression<bool> Function($$LeiturasGanhosTableFilterComposer f) f,
   ) {
-    final $$GanhosTableFilterComposer composer = $composerBuilder(
+    final $$LeiturasGanhosTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.ganhos,
+      referencedTable: $db.leiturasGanhos,
       getReferencedColumn: (t) => t.pausaId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$GanhosTableFilterComposer(
+          }) => $$LeiturasGanhosTableFilterComposer(
             $db: $db,
-            $table: $db.ganhos,
+            $table: $db.leiturasGanhos,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5878,8 +6287,8 @@ class $$PausasTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get motivo => $composableBuilder(
-    column: $table.motivo,
+  ColumnOrderings<String> get titulo => $composableBuilder(
+    column: $table.titulo,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -5890,16 +6299,6 @@ class $$PausasTableOrderingComposer
 
   ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
     column: $table.dataCriacao,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get registrarGanhos => $composableBuilder(
-    column: $table.registrarGanhos,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get concluida => $composableBuilder(
-    column: $table.concluida,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -5945,8 +6344,8 @@ class $$PausasTableAnnotationComposer
   GeneratedColumn<DateTime> get fim =>
       $composableBuilder(column: $table.fim, builder: (column) => column);
 
-  GeneratedColumn<String> get motivo =>
-      $composableBuilder(column: $table.motivo, builder: (column) => column);
+  GeneratedColumn<String> get titulo =>
+      $composableBuilder(column: $table.titulo, builder: (column) => column);
 
   GeneratedColumn<String> get observacao => $composableBuilder(
     column: $table.observacao,
@@ -5957,14 +6356,6 @@ class $$PausasTableAnnotationComposer
     column: $table.dataCriacao,
     builder: (column) => column,
   );
-
-  GeneratedColumn<bool> get registrarGanhos => $composableBuilder(
-    column: $table.registrarGanhos,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<bool> get concluida =>
-      $composableBuilder(column: $table.concluida, builder: (column) => column);
 
   $$JornadasTableAnnotationComposer get jornadaId {
     final $$JornadasTableAnnotationComposer composer = $composerBuilder(
@@ -5989,22 +6380,22 @@ class $$PausasTableAnnotationComposer
     return composer;
   }
 
-  Expression<T> ganhosRefs<T extends Object>(
-    Expression<T> Function($$GanhosTableAnnotationComposer a) f,
+  Expression<T> leiturasGanhosRefs<T extends Object>(
+    Expression<T> Function($$LeiturasGanhosTableAnnotationComposer a) f,
   ) {
-    final $$GanhosTableAnnotationComposer composer = $composerBuilder(
+    final $$LeiturasGanhosTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.ganhos,
+      referencedTable: $db.leiturasGanhos,
       getReferencedColumn: (t) => t.pausaId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$GanhosTableAnnotationComposer(
+          }) => $$LeiturasGanhosTableAnnotationComposer(
             $db: $db,
-            $table: $db.ganhos,
+            $table: $db.leiturasGanhos,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -6028,7 +6419,7 @@ class $$PausasTableTableManager
           $$PausasTableUpdateCompanionBuilder,
           (Pausa, $$PausasTableReferences),
           Pausa,
-          PrefetchHooks Function({bool jornadaId, bool ganhosRefs})
+          PrefetchHooks Function({bool jornadaId, bool leiturasGanhosRefs})
         > {
   $$PausasTableTableManager(_$AppDatabase db, $PausasTable table)
     : super(
@@ -6047,21 +6438,17 @@ class $$PausasTableTableManager
                 Value<int> jornadaId = const Value.absent(),
                 Value<DateTime> inicio = const Value.absent(),
                 Value<DateTime?> fim = const Value.absent(),
-                Value<String?> motivo = const Value.absent(),
+                Value<String?> titulo = const Value.absent(),
                 Value<String?> observacao = const Value.absent(),
                 Value<DateTime> dataCriacao = const Value.absent(),
-                Value<bool> registrarGanhos = const Value.absent(),
-                Value<bool> concluida = const Value.absent(),
               }) => PausasCompanion(
                 id: id,
                 jornadaId: jornadaId,
                 inicio: inicio,
                 fim: fim,
-                motivo: motivo,
+                titulo: titulo,
                 observacao: observacao,
                 dataCriacao: dataCriacao,
-                registrarGanhos: registrarGanhos,
-                concluida: concluida,
               ),
           createCompanionCallback:
               ({
@@ -6069,21 +6456,17 @@ class $$PausasTableTableManager
                 required int jornadaId,
                 required DateTime inicio,
                 Value<DateTime?> fim = const Value.absent(),
-                Value<String?> motivo = const Value.absent(),
+                Value<String?> titulo = const Value.absent(),
                 Value<String?> observacao = const Value.absent(),
                 Value<DateTime> dataCriacao = const Value.absent(),
-                Value<bool> registrarGanhos = const Value.absent(),
-                Value<bool> concluida = const Value.absent(),
               }) => PausasCompanion.insert(
                 id: id,
                 jornadaId: jornadaId,
                 inicio: inicio,
                 fim: fim,
-                motivo: motivo,
+                titulo: titulo,
                 observacao: observacao,
                 dataCriacao: dataCriacao,
-                registrarGanhos: registrarGanhos,
-                concluida: concluida,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -6091,60 +6474,72 @@ class $$PausasTableTableManager
                     (e.readTable(table), $$PausasTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({jornadaId = false, ganhosRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (ganhosRefs) db.ganhos],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (jornadaId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.jornadaId,
-                                referencedTable: $$PausasTableReferences
-                                    ._jornadaIdTable(db),
-                                referencedColumn: $$PausasTableReferences
-                                    ._jornadaIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({jornadaId = false, leiturasGanhosRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (leiturasGanhosRefs) db.leiturasGanhos,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (jornadaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.jornadaId,
+                                    referencedTable: $$PausasTableReferences
+                                        ._jornadaIdTable(db),
+                                    referencedColumn: $$PausasTableReferences
+                                        ._jornadaIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (leiturasGanhosRefs)
+                        await $_getPrefetchedData<
+                          Pausa,
+                          $PausasTable,
+                          LeiturasGanho
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PausasTableReferences
+                              ._leiturasGanhosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PausasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).leiturasGanhosRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.pausaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (ganhosRefs)
-                    await $_getPrefetchedData<Pausa, $PausasTable, Ganho>(
-                      currentTable: table,
-                      referencedTable: $$PausasTableReferences._ganhosRefsTable(
-                        db,
-                      ),
-                      managerFromTypedResult: (p0) =>
-                          $$PausasTableReferences(db, table, p0).ganhosRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.pausaId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -6161,12 +6556,13 @@ typedef $$PausasTableProcessedTableManager =
       $$PausasTableUpdateCompanionBuilder,
       (Pausa, $$PausasTableReferences),
       Pausa,
-      PrefetchHooks Function({bool jornadaId, bool ganhosRefs})
+      PrefetchHooks Function({bool jornadaId, bool leiturasGanhosRefs})
     >;
 typedef $$PlataformasTableCreateCompanionBuilder =
     PlataformasCompanion Function({
       Value<int> id,
       required String nome,
+      required TipoRegistroGanhos tipoRegistroGanhos,
       Value<String?> icone,
       Value<String?> cor,
       Value<bool> ativa,
@@ -6177,6 +6573,7 @@ typedef $$PlataformasTableUpdateCompanionBuilder =
     PlataformasCompanion Function({
       Value<int> id,
       Value<String> nome,
+      Value<TipoRegistroGanhos> tipoRegistroGanhos,
       Value<String?> icone,
       Value<String?> cor,
       Value<bool> ativa,
@@ -6188,20 +6585,26 @@ final class $$PlataformasTableReferences
     extends BaseReferences<_$AppDatabase, $PlataformasTable, Plataforma> {
   $$PlataformasTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$GanhosTable, List<Ganho>> _ganhosRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.ganhos,
-    aliasName: 'plataformas__id__ganhos__plataforma_id',
-  );
+  static MultiTypedResultKey<
+    $LeiturasGanhoPlataformaTable,
+    List<LeiturasGanhoPlataformaData>
+  >
+  _leiturasGanhoPlataformaRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.leiturasGanhoPlataforma,
+        aliasName: 'plataformas__id__leituras_ganho_plataforma__plataforma_id',
+      );
 
-  $$GanhosTableProcessedTableManager get ganhosRefs {
-    final manager = $$GanhosTableTableManager(
+  $$LeiturasGanhoPlataformaTableProcessedTableManager
+  get leiturasGanhoPlataformaRefs {
+    final manager = $$LeiturasGanhoPlataformaTableTableManager(
       $_db,
-      $_db.ganhos,
+      $_db.leiturasGanhoPlataforma,
     ).filter((f) => f.plataformaId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_ganhosRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(
+      _leiturasGanhoPlataformaRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -6225,6 +6628,12 @@ class $$PlataformasTableFilterComposer
   ColumnFilters<String> get nome => $composableBuilder(
     column: $table.nome,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<TipoRegistroGanhos, TipoRegistroGanhos, String>
+  get tipoRegistroGanhos => $composableBuilder(
+    column: $table.tipoRegistroGanhos,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<String> get icone => $composableBuilder(
@@ -6252,28 +6661,29 @@ class $$PlataformasTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  Expression<bool> ganhosRefs(
-    Expression<bool> Function($$GanhosTableFilterComposer f) f,
+  Expression<bool> leiturasGanhoPlataformaRefs(
+    Expression<bool> Function($$LeiturasGanhoPlataformaTableFilterComposer f) f,
   ) {
-    final $$GanhosTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.ganhos,
-      getReferencedColumn: (t) => t.plataformaId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$GanhosTableFilterComposer(
-            $db: $db,
-            $table: $db.ganhos,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
+    final $$LeiturasGanhoPlataformaTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.leiturasGanhoPlataforma,
+          getReferencedColumn: (t) => t.plataformaId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer,
-          ),
-    );
+              }) => $$LeiturasGanhoPlataformaTableFilterComposer(
+                $db: $db,
+                $table: $db.leiturasGanhoPlataforma,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -6294,6 +6704,11 @@ class $$PlataformasTableOrderingComposer
 
   ColumnOrderings<String> get nome => $composableBuilder(
     column: $table.nome,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tipoRegistroGanhos => $composableBuilder(
+    column: $table.tipoRegistroGanhos,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -6338,6 +6753,12 @@ class $$PlataformasTableAnnotationComposer
   GeneratedColumn<String> get nome =>
       $composableBuilder(column: $table.nome, builder: (column) => column);
 
+  GeneratedColumnWithTypeConverter<TipoRegistroGanhos, String>
+  get tipoRegistroGanhos => $composableBuilder(
+    column: $table.tipoRegistroGanhos,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get icone =>
       $composableBuilder(column: $table.icone, builder: (column) => column);
 
@@ -6355,28 +6776,30 @@ class $$PlataformasTableAnnotationComposer
     builder: (column) => column,
   );
 
-  Expression<T> ganhosRefs<T extends Object>(
-    Expression<T> Function($$GanhosTableAnnotationComposer a) f,
+  Expression<T> leiturasGanhoPlataformaRefs<T extends Object>(
+    Expression<T> Function($$LeiturasGanhoPlataformaTableAnnotationComposer a)
+    f,
   ) {
-    final $$GanhosTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.ganhos,
-      getReferencedColumn: (t) => t.plataformaId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$GanhosTableAnnotationComposer(
-            $db: $db,
-            $table: $db.ganhos,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
+    final $$LeiturasGanhoPlataformaTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.leiturasGanhoPlataforma,
+          getReferencedColumn: (t) => t.plataformaId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer,
-          ),
-    );
+              }) => $$LeiturasGanhoPlataformaTableAnnotationComposer(
+                $db: $db,
+                $table: $db.leiturasGanhoPlataforma,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -6394,7 +6817,7 @@ class $$PlataformasTableTableManager
           $$PlataformasTableUpdateCompanionBuilder,
           (Plataforma, $$PlataformasTableReferences),
           Plataforma,
-          PrefetchHooks Function({bool ganhosRefs})
+          PrefetchHooks Function({bool leiturasGanhoPlataformaRefs})
         > {
   $$PlataformasTableTableManager(_$AppDatabase db, $PlataformasTable table)
     : super(
@@ -6411,6 +6834,8 @@ class $$PlataformasTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> nome = const Value.absent(),
+                Value<TipoRegistroGanhos> tipoRegistroGanhos =
+                    const Value.absent(),
                 Value<String?> icone = const Value.absent(),
                 Value<String?> cor = const Value.absent(),
                 Value<bool> ativa = const Value.absent(),
@@ -6419,6 +6844,7 @@ class $$PlataformasTableTableManager
               }) => PlataformasCompanion(
                 id: id,
                 nome: nome,
+                tipoRegistroGanhos: tipoRegistroGanhos,
                 icone: icone,
                 cor: cor,
                 ativa: ativa,
@@ -6429,6 +6855,7 @@ class $$PlataformasTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required String nome,
+                required TipoRegistroGanhos tipoRegistroGanhos,
                 Value<String?> icone = const Value.absent(),
                 Value<String?> cor = const Value.absent(),
                 Value<bool> ativa = const Value.absent(),
@@ -6437,6 +6864,7 @@ class $$PlataformasTableTableManager
               }) => PlataformasCompanion.insert(
                 id: id,
                 nome: nome,
+                tipoRegistroGanhos: tipoRegistroGanhos,
                 icone: icone,
                 cor: cor,
                 ativa: ativa,
@@ -6451,28 +6879,30 @@ class $$PlataformasTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({ganhosRefs = false}) {
+          prefetchHooksCallback: ({leiturasGanhoPlataformaRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (ganhosRefs) db.ganhos],
+              explicitlyWatchedTables: [
+                if (leiturasGanhoPlataformaRefs) db.leiturasGanhoPlataforma,
+              ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
-                  if (ganhosRefs)
+                  if (leiturasGanhoPlataformaRefs)
                     await $_getPrefetchedData<
                       Plataforma,
                       $PlataformasTable,
-                      Ganho
+                      LeiturasGanhoPlataformaData
                     >(
                       currentTable: table,
                       referencedTable: $$PlataformasTableReferences
-                          ._ganhosRefsTable(db),
+                          ._leiturasGanhoPlataformaRefsTable(db),
                       managerFromTypedResult: (p0) =>
                           $$PlataformasTableReferences(
                             db,
                             table,
                             p0,
-                          ).ganhosRefs,
+                          ).leiturasGanhoPlataformaRefs,
                       referencedItemsForCurrentItem: (item, referencedItems) =>
                           referencedItems.where(
                             (e) => e.plataformaId == item.id,
@@ -6499,39 +6929,58 @@ typedef $$PlataformasTableProcessedTableManager =
       $$PlataformasTableUpdateCompanionBuilder,
       (Plataforma, $$PlataformasTableReferences),
       Plataforma,
-      PrefetchHooks Function({bool ganhosRefs})
+      PrefetchHooks Function({bool leiturasGanhoPlataformaRefs})
     >;
-typedef $$GanhosTableCreateCompanionBuilder =
-    GanhosCompanion Function({
+typedef $$LeiturasGanhosTableCreateCompanionBuilder =
+    LeiturasGanhosCompanion Function({
       Value<int> id,
-      required int pausaId,
-      required int plataformaId,
-      required double valor,
-      Value<int> quantidadeCorridas,
-      Value<bool> registroFinal,
+      required int jornadaId,
+      Value<int?> pausaId,
+      required DateTime dataHora,
+      required TipoLeituraGanhos tipo,
       Value<DateTime> dataCriacao,
     });
-typedef $$GanhosTableUpdateCompanionBuilder =
-    GanhosCompanion Function({
+typedef $$LeiturasGanhosTableUpdateCompanionBuilder =
+    LeiturasGanhosCompanion Function({
       Value<int> id,
-      Value<int> pausaId,
-      Value<int> plataformaId,
-      Value<double> valor,
-      Value<int> quantidadeCorridas,
-      Value<bool> registroFinal,
+      Value<int> jornadaId,
+      Value<int?> pausaId,
+      Value<DateTime> dataHora,
+      Value<TipoLeituraGanhos> tipo,
       Value<DateTime> dataCriacao,
     });
 
-final class $$GanhosTableReferences
-    extends BaseReferences<_$AppDatabase, $GanhosTable, Ganho> {
-  $$GanhosTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$LeiturasGanhosTableReferences
+    extends BaseReferences<_$AppDatabase, $LeiturasGanhosTable, LeiturasGanho> {
+  $$LeiturasGanhosTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $JornadasTable _jornadaIdTable(_$AppDatabase db) =>
+      db.jornadas.createAlias('leituras_ganhos__jornada_id__jornadas__id');
+
+  $$JornadasTableProcessedTableManager get jornadaId {
+    final $_column = $_itemColumn<int>('jornada_id')!;
+
+    final manager = $$JornadasTableTableManager(
+      $_db,
+      $_db.jornadas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_jornadaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
 
   static $PausasTable _pausaIdTable(_$AppDatabase db) =>
-      db.pausas.createAlias('ganhos__pausa_id__pausas__id');
+      db.pausas.createAlias('leituras_ganhos__pausa_id__pausas__id');
 
-  $$PausasTableProcessedTableManager get pausaId {
-    final $_column = $_itemColumn<int>('pausa_id')!;
-
+  $$PausasTableProcessedTableManager? get pausaId {
+    final $_column = $_itemColumn<int>('pausa_id');
+    if ($_column == null) return null;
     final manager = $$PausasTableTableManager(
       $_db,
       $_db.pausas,
@@ -6543,8 +6992,542 @@ final class $$GanhosTableReferences
     );
   }
 
-  static $PlataformasTable _plataformaIdTable(_$AppDatabase db) =>
-      db.plataformas.createAlias('ganhos__plataforma_id__plataformas__id');
+  static MultiTypedResultKey<
+    $LeiturasGanhoPlataformaTable,
+    List<LeiturasGanhoPlataformaData>
+  >
+  _leiturasGanhoPlataformaRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.leiturasGanhoPlataforma,
+        aliasName:
+            'leituras_ganhos__id__leituras_ganho_plataforma__leitura_ganhos_id',
+      );
+
+  $$LeiturasGanhoPlataformaTableProcessedTableManager
+  get leiturasGanhoPlataformaRefs {
+    final manager = $$LeiturasGanhoPlataformaTableTableManager(
+      $_db,
+      $_db.leiturasGanhoPlataforma,
+    ).filter((f) => f.leituraGanhosId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _leiturasGanhoPlataformaRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$LeiturasGanhosTableFilterComposer
+    extends Composer<_$AppDatabase, $LeiturasGanhosTable> {
+  $$LeiturasGanhosTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<TipoLeituraGanhos, TipoLeituraGanhos, String>
+  get tipo => $composableBuilder(
+    column: $table.tipo,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$JornadasTableFilterComposer get jornadaId {
+    final $$JornadasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableFilterComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PausasTableFilterComposer get pausaId {
+    final $$PausasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.pausaId,
+      referencedTable: $db.pausas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PausasTableFilterComposer(
+            $db: $db,
+            $table: $db.pausas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> leiturasGanhoPlataformaRefs(
+    Expression<bool> Function($$LeiturasGanhoPlataformaTableFilterComposer f) f,
+  ) {
+    final $$LeiturasGanhoPlataformaTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.leiturasGanhoPlataforma,
+          getReferencedColumn: (t) => t.leituraGanhosId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LeiturasGanhoPlataformaTableFilterComposer(
+                $db: $db,
+                $table: $db.leiturasGanhoPlataforma,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$LeiturasGanhosTableOrderingComposer
+    extends Composer<_$AppDatabase, $LeiturasGanhosTable> {
+  $$LeiturasGanhosTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tipo => $composableBuilder(
+    column: $table.tipo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$JornadasTableOrderingComposer get jornadaId {
+    final $$JornadasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableOrderingComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PausasTableOrderingComposer get pausaId {
+    final $$PausasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.pausaId,
+      referencedTable: $db.pausas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PausasTableOrderingComposer(
+            $db: $db,
+            $table: $db.pausas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LeiturasGanhosTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LeiturasGanhosTable> {
+  $$LeiturasGanhosTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dataHora =>
+      $composableBuilder(column: $table.dataHora, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<TipoLeituraGanhos, String> get tipo =>
+      $composableBuilder(column: $table.tipo, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => column,
+  );
+
+  $$JornadasTableAnnotationComposer get jornadaId {
+    final $$JornadasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PausasTableAnnotationComposer get pausaId {
+    final $$PausasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.pausaId,
+      referencedTable: $db.pausas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PausasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.pausas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> leiturasGanhoPlataformaRefs<T extends Object>(
+    Expression<T> Function($$LeiturasGanhoPlataformaTableAnnotationComposer a)
+    f,
+  ) {
+    final $$LeiturasGanhoPlataformaTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.leiturasGanhoPlataforma,
+          getReferencedColumn: (t) => t.leituraGanhosId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LeiturasGanhoPlataformaTableAnnotationComposer(
+                $db: $db,
+                $table: $db.leiturasGanhoPlataforma,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$LeiturasGanhosTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LeiturasGanhosTable,
+          LeiturasGanho,
+          $$LeiturasGanhosTableFilterComposer,
+          $$LeiturasGanhosTableOrderingComposer,
+          $$LeiturasGanhosTableAnnotationComposer,
+          $$LeiturasGanhosTableCreateCompanionBuilder,
+          $$LeiturasGanhosTableUpdateCompanionBuilder,
+          (LeiturasGanho, $$LeiturasGanhosTableReferences),
+          LeiturasGanho,
+          PrefetchHooks Function({
+            bool jornadaId,
+            bool pausaId,
+            bool leiturasGanhoPlataformaRefs,
+          })
+        > {
+  $$LeiturasGanhosTableTableManager(
+    _$AppDatabase db,
+    $LeiturasGanhosTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LeiturasGanhosTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LeiturasGanhosTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LeiturasGanhosTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> jornadaId = const Value.absent(),
+                Value<int?> pausaId = const Value.absent(),
+                Value<DateTime> dataHora = const Value.absent(),
+                Value<TipoLeituraGanhos> tipo = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+              }) => LeiturasGanhosCompanion(
+                id: id,
+                jornadaId: jornadaId,
+                pausaId: pausaId,
+                dataHora: dataHora,
+                tipo: tipo,
+                dataCriacao: dataCriacao,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int jornadaId,
+                Value<int?> pausaId = const Value.absent(),
+                required DateTime dataHora,
+                required TipoLeituraGanhos tipo,
+                Value<DateTime> dataCriacao = const Value.absent(),
+              }) => LeiturasGanhosCompanion.insert(
+                id: id,
+                jornadaId: jornadaId,
+                pausaId: pausaId,
+                dataHora: dataHora,
+                tipo: tipo,
+                dataCriacao: dataCriacao,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$LeiturasGanhosTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                jornadaId = false,
+                pausaId = false,
+                leiturasGanhoPlataformaRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (leiturasGanhoPlataformaRefs) db.leiturasGanhoPlataforma,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (jornadaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.jornadaId,
+                                    referencedTable:
+                                        $$LeiturasGanhosTableReferences
+                                            ._jornadaIdTable(db),
+                                    referencedColumn:
+                                        $$LeiturasGanhosTableReferences
+                                            ._jornadaIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (pausaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.pausaId,
+                                    referencedTable:
+                                        $$LeiturasGanhosTableReferences
+                                            ._pausaIdTable(db),
+                                    referencedColumn:
+                                        $$LeiturasGanhosTableReferences
+                                            ._pausaIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (leiturasGanhoPlataformaRefs)
+                        await $_getPrefetchedData<
+                          LeiturasGanho,
+                          $LeiturasGanhosTable,
+                          LeiturasGanhoPlataformaData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$LeiturasGanhosTableReferences
+                              ._leiturasGanhoPlataformaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$LeiturasGanhosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).leiturasGanhoPlataformaRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.leituraGanhosId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$LeiturasGanhosTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LeiturasGanhosTable,
+      LeiturasGanho,
+      $$LeiturasGanhosTableFilterComposer,
+      $$LeiturasGanhosTableOrderingComposer,
+      $$LeiturasGanhosTableAnnotationComposer,
+      $$LeiturasGanhosTableCreateCompanionBuilder,
+      $$LeiturasGanhosTableUpdateCompanionBuilder,
+      (LeiturasGanho, $$LeiturasGanhosTableReferences),
+      LeiturasGanho,
+      PrefetchHooks Function({
+        bool jornadaId,
+        bool pausaId,
+        bool leiturasGanhoPlataformaRefs,
+      })
+    >;
+typedef $$LeiturasGanhoPlataformaTableCreateCompanionBuilder =
+    LeiturasGanhoPlataformaCompanion Function({
+      Value<int> id,
+      required int leituraGanhosId,
+      required int plataformaId,
+      required int valorAcumuladoCentavos,
+      required int quantidadeViagensAcumulada,
+    });
+typedef $$LeiturasGanhoPlataformaTableUpdateCompanionBuilder =
+    LeiturasGanhoPlataformaCompanion Function({
+      Value<int> id,
+      Value<int> leituraGanhosId,
+      Value<int> plataformaId,
+      Value<int> valorAcumuladoCentavos,
+      Value<int> quantidadeViagensAcumulada,
+    });
+
+final class $$LeiturasGanhoPlataformaTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $LeiturasGanhoPlataformaTable,
+          LeiturasGanhoPlataformaData
+        > {
+  $$LeiturasGanhoPlataformaTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $LeiturasGanhosTable _leituraGanhosIdTable(_$AppDatabase db) =>
+      db.leiturasGanhos.createAlias(
+        'leituras_ganho_plataforma__leitura_ganhos_id__leituras_ganhos__id',
+      );
+
+  $$LeiturasGanhosTableProcessedTableManager get leituraGanhosId {
+    final $_column = $_itemColumn<int>('leitura_ganhos_id')!;
+
+    final manager = $$LeiturasGanhosTableTableManager(
+      $_db,
+      $_db.leiturasGanhos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_leituraGanhosIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PlataformasTable _plataformaIdTable(_$AppDatabase db) => db
+      .plataformas
+      .createAlias('leituras_ganho_plataforma__plataforma_id__plataformas__id');
 
   $$PlataformasTableProcessedTableManager get plataformaId {
     final $_column = $_itemColumn<int>('plataforma_id')!;
@@ -6561,9 +7544,9 @@ final class $$GanhosTableReferences
   }
 }
 
-class $$GanhosTableFilterComposer
-    extends Composer<_$AppDatabase, $GanhosTable> {
-  $$GanhosTableFilterComposer({
+class $$LeiturasGanhoPlataformaTableFilterComposer
+    extends Composer<_$AppDatabase, $LeiturasGanhoPlataformaTable> {
+  $$LeiturasGanhoPlataformaTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -6575,40 +7558,30 @@ class $$GanhosTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<double> get valor => $composableBuilder(
-    column: $table.valor,
+  ColumnFilters<int> get valorAcumuladoCentavos => $composableBuilder(
+    column: $table.valorAcumuladoCentavos,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get quantidadeCorridas => $composableBuilder(
-    column: $table.quantidadeCorridas,
+  ColumnFilters<int> get quantidadeViagensAcumulada => $composableBuilder(
+    column: $table.quantidadeViagensAcumulada,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get registroFinal => $composableBuilder(
-    column: $table.registroFinal,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get dataCriacao => $composableBuilder(
-    column: $table.dataCriacao,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  $$PausasTableFilterComposer get pausaId {
-    final $$PausasTableFilterComposer composer = $composerBuilder(
+  $$LeiturasGanhosTableFilterComposer get leituraGanhosId {
+    final $$LeiturasGanhosTableFilterComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.pausaId,
-      referencedTable: $db.pausas,
+      getCurrentColumn: (t) => t.leituraGanhosId,
+      referencedTable: $db.leiturasGanhos,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$PausasTableFilterComposer(
+          }) => $$LeiturasGanhosTableFilterComposer(
             $db: $db,
-            $table: $db.pausas,
+            $table: $db.leiturasGanhos,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -6642,9 +7615,9 @@ class $$GanhosTableFilterComposer
   }
 }
 
-class $$GanhosTableOrderingComposer
-    extends Composer<_$AppDatabase, $GanhosTable> {
-  $$GanhosTableOrderingComposer({
+class $$LeiturasGanhoPlataformaTableOrderingComposer
+    extends Composer<_$AppDatabase, $LeiturasGanhoPlataformaTable> {
+  $$LeiturasGanhoPlataformaTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -6656,40 +7629,30 @@ class $$GanhosTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get valor => $composableBuilder(
-    column: $table.valor,
+  ColumnOrderings<int> get valorAcumuladoCentavos => $composableBuilder(
+    column: $table.valorAcumuladoCentavos,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get quantidadeCorridas => $composableBuilder(
-    column: $table.quantidadeCorridas,
+  ColumnOrderings<int> get quantidadeViagensAcumulada => $composableBuilder(
+    column: $table.quantidadeViagensAcumulada,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get registroFinal => $composableBuilder(
-    column: $table.registroFinal,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
-    column: $table.dataCriacao,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  $$PausasTableOrderingComposer get pausaId {
-    final $$PausasTableOrderingComposer composer = $composerBuilder(
+  $$LeiturasGanhosTableOrderingComposer get leituraGanhosId {
+    final $$LeiturasGanhosTableOrderingComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.pausaId,
-      referencedTable: $db.pausas,
+      getCurrentColumn: (t) => t.leituraGanhosId,
+      referencedTable: $db.leiturasGanhos,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$PausasTableOrderingComposer(
+          }) => $$LeiturasGanhosTableOrderingComposer(
             $db: $db,
-            $table: $db.pausas,
+            $table: $db.leiturasGanhos,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -6723,9 +7686,9 @@ class $$GanhosTableOrderingComposer
   }
 }
 
-class $$GanhosTableAnnotationComposer
-    extends Composer<_$AppDatabase, $GanhosTable> {
-  $$GanhosTableAnnotationComposer({
+class $$LeiturasGanhoPlataformaTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LeiturasGanhoPlataformaTable> {
+  $$LeiturasGanhoPlataformaTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -6735,38 +7698,30 @@ class $$GanhosTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<double> get valor =>
-      $composableBuilder(column: $table.valor, builder: (column) => column);
-
-  GeneratedColumn<int> get quantidadeCorridas => $composableBuilder(
-    column: $table.quantidadeCorridas,
+  GeneratedColumn<int> get valorAcumuladoCentavos => $composableBuilder(
+    column: $table.valorAcumuladoCentavos,
     builder: (column) => column,
   );
 
-  GeneratedColumn<bool> get registroFinal => $composableBuilder(
-    column: $table.registroFinal,
+  GeneratedColumn<int> get quantidadeViagensAcumulada => $composableBuilder(
+    column: $table.quantidadeViagensAcumulada,
     builder: (column) => column,
   );
 
-  GeneratedColumn<DateTime> get dataCriacao => $composableBuilder(
-    column: $table.dataCriacao,
-    builder: (column) => column,
-  );
-
-  $$PausasTableAnnotationComposer get pausaId {
-    final $$PausasTableAnnotationComposer composer = $composerBuilder(
+  $$LeiturasGanhosTableAnnotationComposer get leituraGanhosId {
+    final $$LeiturasGanhosTableAnnotationComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.pausaId,
-      referencedTable: $db.pausas,
+      getCurrentColumn: (t) => t.leituraGanhosId,
+      referencedTable: $db.leiturasGanhos,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$PausasTableAnnotationComposer(
+          }) => $$LeiturasGanhosTableAnnotationComposer(
             $db: $db,
-            $table: $db.pausas,
+            $table: $db.leiturasGanhos,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -6800,145 +7755,158 @@ class $$GanhosTableAnnotationComposer
   }
 }
 
-class $$GanhosTableTableManager
+class $$LeiturasGanhoPlataformaTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $GanhosTable,
-          Ganho,
-          $$GanhosTableFilterComposer,
-          $$GanhosTableOrderingComposer,
-          $$GanhosTableAnnotationComposer,
-          $$GanhosTableCreateCompanionBuilder,
-          $$GanhosTableUpdateCompanionBuilder,
-          (Ganho, $$GanhosTableReferences),
-          Ganho,
-          PrefetchHooks Function({bool pausaId, bool plataformaId})
+          $LeiturasGanhoPlataformaTable,
+          LeiturasGanhoPlataformaData,
+          $$LeiturasGanhoPlataformaTableFilterComposer,
+          $$LeiturasGanhoPlataformaTableOrderingComposer,
+          $$LeiturasGanhoPlataformaTableAnnotationComposer,
+          $$LeiturasGanhoPlataformaTableCreateCompanionBuilder,
+          $$LeiturasGanhoPlataformaTableUpdateCompanionBuilder,
+          (
+            LeiturasGanhoPlataformaData,
+            $$LeiturasGanhoPlataformaTableReferences,
+          ),
+          LeiturasGanhoPlataformaData,
+          PrefetchHooks Function({bool leituraGanhosId, bool plataformaId})
         > {
-  $$GanhosTableTableManager(_$AppDatabase db, $GanhosTable table)
-    : super(
+  $$LeiturasGanhoPlataformaTableTableManager(
+    _$AppDatabase db,
+    $LeiturasGanhoPlataformaTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$GanhosTableFilterComposer($db: db, $table: table),
+              $$LeiturasGanhoPlataformaTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
           createOrderingComposer: () =>
-              $$GanhosTableOrderingComposer($db: db, $table: table),
+              $$LeiturasGanhoPlataformaTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
           createComputedFieldComposer: () =>
-              $$GanhosTableAnnotationComposer($db: db, $table: table),
+              $$LeiturasGanhoPlataformaTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<int> pausaId = const Value.absent(),
+                Value<int> leituraGanhosId = const Value.absent(),
                 Value<int> plataformaId = const Value.absent(),
-                Value<double> valor = const Value.absent(),
-                Value<int> quantidadeCorridas = const Value.absent(),
-                Value<bool> registroFinal = const Value.absent(),
-                Value<DateTime> dataCriacao = const Value.absent(),
-              }) => GanhosCompanion(
+                Value<int> valorAcumuladoCentavos = const Value.absent(),
+                Value<int> quantidadeViagensAcumulada = const Value.absent(),
+              }) => LeiturasGanhoPlataformaCompanion(
                 id: id,
-                pausaId: pausaId,
+                leituraGanhosId: leituraGanhosId,
                 plataformaId: plataformaId,
-                valor: valor,
-                quantidadeCorridas: quantidadeCorridas,
-                registroFinal: registroFinal,
-                dataCriacao: dataCriacao,
+                valorAcumuladoCentavos: valorAcumuladoCentavos,
+                quantidadeViagensAcumulada: quantidadeViagensAcumulada,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                required int pausaId,
+                required int leituraGanhosId,
                 required int plataformaId,
-                required double valor,
-                Value<int> quantidadeCorridas = const Value.absent(),
-                Value<bool> registroFinal = const Value.absent(),
-                Value<DateTime> dataCriacao = const Value.absent(),
-              }) => GanhosCompanion.insert(
+                required int valorAcumuladoCentavos,
+                required int quantidadeViagensAcumulada,
+              }) => LeiturasGanhoPlataformaCompanion.insert(
                 id: id,
-                pausaId: pausaId,
+                leituraGanhosId: leituraGanhosId,
                 plataformaId: plataformaId,
-                valor: valor,
-                quantidadeCorridas: quantidadeCorridas,
-                registroFinal: registroFinal,
-                dataCriacao: dataCriacao,
+                valorAcumuladoCentavos: valorAcumuladoCentavos,
+                quantidadeViagensAcumulada: quantidadeViagensAcumulada,
               ),
           withReferenceMapper: (p0) => p0
               .map(
-                (e) =>
-                    (e.readTable(table), $$GanhosTableReferences(db, table, e)),
+                (e) => (
+                  e.readTable(table),
+                  $$LeiturasGanhoPlataformaTableReferences(db, table, e),
+                ),
               )
               .toList(),
-          prefetchHooksCallback: ({pausaId = false, plataformaId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (pausaId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.pausaId,
-                                referencedTable: $$GanhosTableReferences
-                                    ._pausaIdTable(db),
-                                referencedColumn: $$GanhosTableReferences
-                                    ._pausaIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
-                    if (plataformaId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.plataformaId,
-                                referencedTable: $$GanhosTableReferences
-                                    ._plataformaIdTable(db),
-                                referencedColumn: $$GanhosTableReferences
-                                    ._plataformaIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({leituraGanhosId = false, plataformaId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (leituraGanhosId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.leituraGanhosId,
+                                    referencedTable:
+                                        $$LeiturasGanhoPlataformaTableReferences
+                                            ._leituraGanhosIdTable(db),
+                                    referencedColumn:
+                                        $$LeiturasGanhoPlataformaTableReferences
+                                            ._leituraGanhosIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (plataformaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.plataformaId,
+                                    referencedTable:
+                                        $$LeiturasGanhoPlataformaTableReferences
+                                            ._plataformaIdTable(db),
+                                    referencedColumn:
+                                        $$LeiturasGanhoPlataformaTableReferences
+                                            ._plataformaIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
 
-typedef $$GanhosTableProcessedTableManager =
+typedef $$LeiturasGanhoPlataformaTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $GanhosTable,
-      Ganho,
-      $$GanhosTableFilterComposer,
-      $$GanhosTableOrderingComposer,
-      $$GanhosTableAnnotationComposer,
-      $$GanhosTableCreateCompanionBuilder,
-      $$GanhosTableUpdateCompanionBuilder,
-      (Ganho, $$GanhosTableReferences),
-      Ganho,
-      PrefetchHooks Function({bool pausaId, bool plataformaId})
+      $LeiturasGanhoPlataformaTable,
+      LeiturasGanhoPlataformaData,
+      $$LeiturasGanhoPlataformaTableFilterComposer,
+      $$LeiturasGanhoPlataformaTableOrderingComposer,
+      $$LeiturasGanhoPlataformaTableAnnotationComposer,
+      $$LeiturasGanhoPlataformaTableCreateCompanionBuilder,
+      $$LeiturasGanhoPlataformaTableUpdateCompanionBuilder,
+      (LeiturasGanhoPlataformaData, $$LeiturasGanhoPlataformaTableReferences),
+      LeiturasGanhoPlataformaData,
+      PrefetchHooks Function({bool leituraGanhosId, bool plataformaId})
     >;
 
 class $AppDatabaseManager {
@@ -6956,6 +7924,11 @@ class $AppDatabaseManager {
       $$PausasTableTableManager(_db, _db.pausas);
   $$PlataformasTableTableManager get plataformas =>
       $$PlataformasTableTableManager(_db, _db.plataformas);
-  $$GanhosTableTableManager get ganhos =>
-      $$GanhosTableTableManager(_db, _db.ganhos);
+  $$LeiturasGanhosTableTableManager get leiturasGanhos =>
+      $$LeiturasGanhosTableTableManager(_db, _db.leiturasGanhos);
+  $$LeiturasGanhoPlataformaTableTableManager get leiturasGanhoPlataforma =>
+      $$LeiturasGanhoPlataformaTableTableManager(
+        _db,
+        _db.leiturasGanhoPlataforma,
+      );
 }

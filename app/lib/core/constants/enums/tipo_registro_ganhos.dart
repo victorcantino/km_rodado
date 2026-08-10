@@ -1,0 +1,1 @@
+enum TipoRegistroGanhos { acumulado, individual }

@@ -1,5 +1,1 @@
-enum StatusJornada {
-  aberta,
-  pausada,
-  finalizada,
-}
+enum StatusJornada { aberta, pausada, finalizada }

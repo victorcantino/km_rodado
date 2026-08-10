@@ -2,12 +2,12 @@
 
 ## Funcionalidade em desenvolvimento
 
-Jornada.
+Base de dados para Pausas e futuras leituras de ganhos.
 
 ## Objetivo atual
 
-Concluir a limpeza estrutural após a primeira feature completa, preservando o
-comportamento validado da Jornada e o schema atual do banco.
+Migrar de forma preservadora o schema Drift 1 para 2, sem implementar ainda a
+interface ou as camadas funcionais de Pausas e leituras.
 
 ## Já implementado
 
@@ -40,14 +40,20 @@ comportamento validado da Jornada e o schema atual do banco.
 - Progressão do odômetro protegida na abertura pela interface e pelo service
 - Scaffolding vazio e estruturas arquiteturais concorrentes removidos
 - Estrutura física reduzida a core ativo e feature Jornada
+- Schema Drift 2 com Pausa simplificada
+- Leituras de ganhos separadas dos itens acumulados por plataforma
+- Plataforma classificada por registro acumulado ou individual
+- Valores monetários acumulados armazenados em centavos
+- Migração preservadora de Pausas e Ganhos legados
+- Testes específicos de migração com banco vazio e preenchido
 
 ## Em andamento
 
-- Validação automatizada após a limpeza estrutural
+- Validação final do schema 2 e de sua documentação
 
 ## Próximo passo
 
-Confirmar análise e testes após a limpeza antes de iniciar outra feature.
+Implementar a feature Pausas sobre o schema 2 após aprovação desta migração.
 
 ## Decisões temporárias
 
@@ -60,6 +66,8 @@ Confirmar análise e testes após a limpeza antes de iniciar outra feature.
 ## Problemas conhecidos
 
 - O tratamento visual de erros ainda é genérico e restrito à abertura
-- A relação de Ganho com Jornada e Pausa depende de decisão futura de modelagem
-- Configuração, Pausa, Plataforma e Ganho permanecem no schema e serão avaliados
-  nas respectivas features
+- A consistência entre a Jornada da leitura e a Jornada de sua Pausa opcional
+  deverá ser protegida na futura camada de negócio
+- Regras de reset das plataformas ainda não são conhecidas e não são inferidas
+- Lançamentos individuais permanecem futuros; Particular continua sendo
+  plataforma e seus totais serão derivados desses lançamentos
