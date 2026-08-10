@@ -5,8 +5,14 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/daos/jornada_dao.dart';
+import '../../../../core/database/daos/leitura_ganhos_dao.dart';
 import '../../../../core/database/daos/pausa_dao.dart';
 import '../../../../core/database/seeds/seed.dart';
+import '../../../../core/database/seeds/plataformas_seed.dart';
+import '../../../leitura_ganhos/data/leitura_ganhos_repository.dart';
+import '../../../leitura_ganhos/data/leitura_ganhos_service.dart';
+import '../../../leitura_ganhos/presentation/controllers/leitura_ganhos_controller.dart';
+import '../../../leitura_ganhos/presentation/widgets/leitura_ganhos_dialog.dart';
 import '../../../pausa/data/pausa_repository.dart';
 import '../../../pausa/data/pausa_service.dart';
 import '../../../pausa/presentation/controllers/pausa_controller.dart';
@@ -26,6 +32,7 @@ class JornadaPage extends StatefulWidget {
 
 class _JornadaPageState extends State<JornadaPage> {
   JornadaController? controller;
+  LeituraGanhosController? leituraGanhosController;
   PausaController? pausaController;
   late final AppDatabase database;
   Timer? atualizadorDuracao;
@@ -45,6 +52,7 @@ class _JornadaPageState extends State<JornadaPage> {
 
   Future<void> _inicializar() async {
     await garantirDadosTemporarios(database);
+    await garantirPlataformasPadrao(database);
 
     if (!mounted) {
       return;
@@ -54,13 +62,24 @@ class _JornadaPageState extends State<JornadaPage> {
     final repository = JornadaRepository(dao);
     final pausaDao = PausaDao(database);
     final pausaRepository = PausaRepository(pausaDao);
+    final leituraGanhosRepository = LeituraGanhosRepository(
+      LeituraGanhosDao(database),
+    );
     final service = JornadaService(repository, pausaRepository);
     final pausaService = PausaService(pausaRepository, repository);
+    final leituraGanhosService = LeituraGanhosService(
+      leituraGanhosRepository,
+      repository,
+    );
     final novoController = JornadaController(service);
+    final novoLeituraGanhosController = LeituraGanhosController(
+      leituraGanhosService,
+    );
     final novoPausaController = PausaController(pausaService);
 
     setState(() {
       controller = novoController;
+      leituraGanhosController = novoLeituraGanhosController;
       pausaController = novoPausaController;
     });
 
@@ -119,6 +138,11 @@ class _JornadaPageState extends State<JornadaPage> {
 
     try {
       await pausaController.iniciar(jornadaId);
+      final pausa = pausaController.pausaAberta;
+
+      if (pausa != null && mounted) {
+        await _registrarGanhos(pausa);
+      }
     } catch (_) {
       if (!mounted) {
         return;
@@ -126,6 +150,62 @@ class _JornadaPageState extends State<JornadaPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Não foi possível iniciar a Pausa.')),
+      );
+    }
+  }
+
+  Future<void> _registrarGanhos(Pausa pausa) async {
+    final jornadaId = controller?.jornadaAtual?.id;
+    final leituraController = leituraGanhosController;
+
+    if (jornadaId == null || leituraController == null) {
+      return;
+    }
+
+    try {
+      await leituraController.preparar(jornadaId);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não foi possível carregar as plataformas.'),
+        ),
+      );
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    final resultado = await showDialog<LeituraGanhosResultado>(
+      context: context,
+      builder: (context) => LeituraGanhosDialog(
+        plataformas: leituraController.plataformas,
+        sugestoes: leituraController.sugestoes,
+      ),
+    );
+
+    if (!mounted || resultado == null) {
+      return;
+    }
+
+    try {
+      await leituraController.salvar(
+        jornadaId: jornadaId,
+        pausaId: pausa.id,
+        itens: resultado,
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível salvar a leitura.')),
       );
     }
   }
@@ -266,18 +346,27 @@ class _JornadaPageState extends State<JornadaPage> {
   @override
   Widget build(BuildContext context) {
     final controller = this.controller;
+    final leituraGanhosController = this.leituraGanhosController;
     final pausaController = this.pausaController;
 
-    if (controller == null || pausaController == null) {
+    if (controller == null ||
+        leituraGanhosController == null ||
+        pausaController == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Jornada')),
       body: AnimatedBuilder(
-        animation: Listenable.merge([controller, pausaController]),
+        animation: Listenable.merge([
+          controller,
+          pausaController,
+          leituraGanhosController,
+        ]),
         builder: (context, _) {
-          if (controller.carregando || pausaController.carregando) {
+          if (controller.carregando ||
+              pausaController.carregando ||
+              leituraGanhosController.carregando) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -345,6 +434,10 @@ class _JornadaPageState extends State<JornadaPage> {
                   ElevatedButton(
                     onPressed: _finalizarPausa,
                     child: const Text('Retomar Jornada'),
+                  ),
+                  TextButton(
+                    onPressed: () => _registrarGanhos(pausaAberta),
+                    child: const Text('Registrar ganhos'),
                   ),
                 ],
 
@@ -444,6 +537,7 @@ class _JornadaPageState extends State<JornadaPage> {
   @override
   void dispose() {
     atualizadorDuracao?.cancel();
+    leituraGanhosController?.dispose();
     pausaController?.dispose();
     controller?.dispose();
     database.close();

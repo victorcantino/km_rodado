@@ -18,6 +18,7 @@ import 'tables/leitura_ganhos.dart';
 import 'tables/leitura_ganho_plataforma.dart';
 
 import 'daos/jornada_dao.dart';
+import 'daos/leitura_ganhos_dao.dart';
 import 'daos/pausa_dao.dart';
 
 part 'app_database.g.dart';
@@ -33,7 +34,7 @@ part 'app_database.g.dart';
     LeiturasGanhos,
     LeiturasGanhoPlataforma,
   ],
-  daos: [JornadaDao, PausaDao],
+  daos: [JornadaDao, PausaDao, LeituraGanhosDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
