@@ -2,12 +2,12 @@
 
 ## Funcionalidade em desenvolvimento
 
-Pausas durante a Jornada.
+Leituras parciais de ganhos durante Pausas.
 
 ## Objetivo atual
 
-Entregar o ciclo funcional de Pausas sobre o schema 2 existente, sem implementar
-ainda o registro de ganhos.
+Registrar snapshots das plataformas acumuladas após iniciar uma Pausa, sem
+alterar o schema 2 e sem implementar lançamentos individuais.
 
 ## Já implementado
 
@@ -54,14 +54,27 @@ ainda o registro de ganhos.
 - Lista de Pausas da Jornada integrada à JornadaPage
 - Fechamento de Jornada bloqueado na regra de negócio quando há Pausa aberta
 - Testes de ciclo de vida, persistência, títulos, duração e fechamento
+- LeituraGanhosDao, LeituraGanhosRepository, LeituraGanhosService e controller
+- Diálogo de leitura parcial integrado ao início da Pausa
+- Pausa persistida antes da abertura do diálogo de ganhos
+- Plataformas ativas filtradas por tipo de registro
+- Snapshot bruto de valor e viagens para plataformas acumuladas
+- Sugestão do último snapshot da plataforma na Jornada
+- Salvamento transacional do cabeçalho e dos itens da leitura
+- Cancelamento e salvamento sem encerrar ou apagar a Pausa
+- Plataformas individuais exibidas sem criar itens acumulados artificiais
+- Testes de regras, sugestões, persistência e controles do diálogo
+- Seed idempotente de Uber, 99, inDrive e Particular
+- Plataformas padrão criadas sem IDs fixos e sem sobrescrever registros existentes
 
 ## Em andamento
 
-- Validação final da primeira entrega funcional de Pausas
+- Validação final da primeira leitura parcial de ganhos
 
 ## Próximo passo
 
-Implementar o registro de ganhos associado às Pausas na próxima entrega.
+Implementar leitura inicial e leitura final, além dos lançamentos individuais,
+em entregas futuras.
 
 ## Decisões temporárias
 
@@ -74,8 +87,7 @@ Implementar o registro de ganhos associado às Pausas na próxima entrega.
 ## Problemas conhecidos
 
 - O tratamento visual de erros ainda é genérico e restrito à abertura
-- A consistência entre a Jornada da leitura e a Jornada de sua Pausa opcional
-  deverá ser protegida na futura camada de negócio
+- A consistência entre Jornada e Pausa da leitura é protegida pelo service
 - Regras de reset das plataformas ainda não são conhecidas e não são inferidas
 - Lançamentos individuais permanecem futuros; Particular continua sendo
   plataforma e seus totais serão derivados desses lançamentos

@@ -177,20 +177,12 @@ Pausas são listadas pela ordem de início e, em caso de empate, pelo ID. O tít
 Uma Jornada não pode ser finalizada enquanto existir uma Pausa aberta. O
 motorista deve primeiro retomar a Jornada.
 
-Antes de finalizar a pausa:
+Ao iniciar uma Pausa, o início deve ser persistido antes da abertura do registro
+de ganhos. Em seguida, o sistema apresenta imediatamente a leitura parcial. O
+usuário também pode abrir novamente essa ação enquanto a Pausa estiver aberta.
 
-O sistema deve sugerir o registro dos ganhos.
-
-Exemplo:
-
-```
-Deseja registrar os ganhos deste período?
-```
-
-O preenchimento não deve ser obrigatório.
-
-O registro de ganhos associado à Pausa pertence à próxima entrega funcional e
-ainda não está disponível na interface.
+Salvar ou cancelar a leitura não encerra nem remove a Pausa. Cancelar não cria
+uma leitura vazia.
 
 Caso não seja informado:
 
@@ -220,6 +212,18 @@ São registrados acumulados brutos, não diferenças. Uma plataforma pode ser
 registrada novamente sem mudança. Diferenças de valor e viagens são derivadas
 entre leituras e não são persistidas.
 
+Na leitura parcial associada a uma Pausa:
+
+* a Jornada deve estar aberta;
+* a Pausa deve pertencer à mesma Jornada;
+* o momento observado é registrado ao salvar;
+* cabeçalho e itens são persistidos na mesma transação;
+* cada plataforma cadastrada, ativa e acumulada gera exatamente um item.
+
+Os últimos acumulados de cada plataforma na Jornada são sugeridos na leitura
+seguinte. O usuário pode salvar novamente os mesmos valores quando o visor não
+tiver mudado.
+
 ---
 
 # 5.2 Plataformas
@@ -239,6 +243,14 @@ Cada plataforma define sua forma de captura, sem regras baseadas no nome:
 
 Particular continua sendo plataforma e fonte de ganho. Ela aparece com as
 demais em dashboards, pausas, fechamento e relatórios.
+
+Uma instalação nova deve disponibilizar Uber, 99, inDrive e Particular como
+plataformas padrão ativas. O seed identifica plataformas pelo nome normalizado,
+não depende de IDs fixos e preserva integralmente registros já existentes.
+
+Nesta primeira entrega, plataformas individuais aparecem na leitura apenas com
+a indicação de que seus totais virão de lançamentos futuros. Elas não são
+editáveis e não geram `LeituraGanhoPlataforma` artificial.
 
 ---
 

@@ -4310,6 +4310,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $LeiturasGanhoPlataformaTable(this);
   late final JornadaDao jornadaDao = JornadaDao(this as AppDatabase);
   late final PausaDao pausaDao = PausaDao(this as AppDatabase);
+  late final LeituraGanhosDao leituraGanhosDao = LeituraGanhosDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

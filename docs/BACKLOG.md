@@ -2,8 +2,8 @@
 
 # Depois
 
-- Pausas
-- Interface e fluxo de leituras de ganhos
+- Leitura inicial de ganhos ao abrir a Jornada
+- Leitura final de ganhos antes de fechar a Jornada
 - Plataformas
 - Lançamentos individuais por plataforma: quantidade de viagens, valor total
   em centavos, observação opcional, Jornada opcional e `dataCriacao` como
