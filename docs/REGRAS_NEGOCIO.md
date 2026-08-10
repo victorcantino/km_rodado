@@ -150,14 +150,18 @@ O motorista encerrou a operação.
 
 # 4. Pausas
 
-Uma pausa pertence a uma jornada.
+Uma pausa pertence obrigatoriamente a uma Jornada e interrompe a atividade do
+motorista como um todo, não uma plataforma específica.
 
 Ao iniciar uma pausa:
 
 O sistema deve registrar:
 
 * horário inicial;
-* motivo opcional.
+* título opcional.
+
+Sem título, a interface pode apresentar `Pausa 1`, `Pausa 2` etc. A duração é
+derivada de início e fim e não deve ser persistida.
 
 Antes de finalizar a pausa:
 
@@ -181,27 +185,23 @@ Período sem registro de ganhos.
 
 ---
 
-# 5. Registro de Ganhos
+# 5. Leituras de ganhos
 
 ## 5.1 Conceito
 
-O ganho não representa uma corrida individual.
-
-Ele representa uma leitura da plataforma em determinado momento.
+Uma leitura representa uma única ação do motorista ao observar os acumulados
+exibidos pelas plataformas naquele momento.
 
 Exemplo:
 
-10:00
+```
+Uber: R$ 50 e 5 viagens
+99: R$ 30 e 4 viagens
+```
 
-Uber mostra:
-
-R$80
-
-18:00
-
-Uber mostra:
-
-R$250
+São registrados acumulados brutos, não diferenças. Uma plataforma pode ser
+registrada novamente sem mudança. Diferenças de valor e viagens são derivadas
+entre leituras e não são persistidas.
 
 ---
 
@@ -215,34 +215,41 @@ O sistema deve permitir:
 * Particular;
 * outras plataformas futuras.
 
----
+Cada plataforma define sua forma de captura, sem regras baseadas no nome:
 
-# 5.3 Registro Parcial
+* acumulado: Uber, 99 e inDrive;
+* individual: Particular.
 
-Durante a jornada o usuário pode registrar ganhos várias vezes.
-
-Exemplo:
-
-```
-Pausa almoço
-
-Uber:
-R$120
-
-99:
-R$80
-
-Corridas:
-15
-```
+Particular continua sendo plataforma e fonte de ganho. Ela aparece com as
+demais em dashboards, pausas, fechamento e relatórios.
 
 ---
 
-# 5.4 Registro Final
+# 5.3 Tipos de leitura
 
-Ao finalizar a jornada:
+* inicial: estabelece a base no início da Jornada;
+* parcial: registra o estado durante a Jornada, normalmente em uma Pausa;
+* final da Jornada: registra o estado antes do fechamento.
 
-O usuário deve informar os ganhos finais das plataformas utilizadas.
+Uma leitura exige Jornada e pode ter Pausa. Quando houver Pausa, ela deverá
+pertencer à mesma Jornada da leitura.
+
+---
+
+# 5.4 Valores e leitura final
+
+Valores monetários acumulados são armazenados em centavos inteiros. Quantidade
+acumulada de viagens também é inteira e não negativa. Cada plataforma aparece
+no máximo uma vez na mesma leitura.
+
+Antes de finalizar a Jornada, o usuário deve realizar a leitura final das
+plataformas utilizadas. Ela não depende da existência de uma Pausa.
+
+Na apresentação durante pausas e fechamento, plataformas acumuladas exibem os
+valores e quantidades observados pelo usuário. Plataformas individuais exibem
+os totais derivados dos lançamentos já registrados e oferecem uma ação rápida
+para adicionar novo lançamento. A interface pode ser uniforme, mas não deve
+criar `LeituraGanhoPlataforma` artificial para uma plataforma individual.
 
 Caso nenhuma plataforma seja informada:
 
@@ -250,6 +257,26 @@ Gerar alerta:
 
 ```
 Jornada finalizada sem registro de ganhos.
+```
+
+# 5.5 Lançamentos individuais futuros
+
+Um lançamento individual terá quantidade de viagens maior ou igual a 1 e valor
+total em centavos maior ou igual a zero. Poderá representar uma ou várias
+viagens. Quando representar várias, o sistema não inferirá nem persistirá
+valores individuais.
+
+No fluxo normal, `dataCriacao` preenchida automaticamente será o momento
+operacional; não haverá outro campo `dataHora`. Quando registrado durante uma
+Jornada, `jornadaId` será preenchido automaticamente, mas continuará opcional
+para permitir lançamentos fora de Jornada.
+
+Os acumulados apresentados durante uma Jornada serão calculados, por plataforma
+e Jornada, com:
+
+```
+SUM(valorTotalCentavos)
+SUM(quantidadeViagens)
 ```
 
 ---
@@ -573,7 +600,9 @@ Motivo:
 * Uber e 99 possuem comportamentos diferentes de fechamento;
 * o motorista pode continuar trabalhando após meia-noite.
 
-A data do ganho deve ser baseada no momento em que o registro foi feito.
+A data da leitura deve representar o instante observado pelo usuário. Como as
+plataformas podem se comportar de formas diferentes, nenhum reset deve ser
+inferido automaticamente.
 
 ---
 

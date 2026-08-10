@@ -1,9 +1,13 @@
 import 'package:drift/drift.dart';
 
+import '../../constants/enums/tipo_registro_ganhos.dart';
+
 class Plataformas extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   TextColumn get nome => text()();
+
+  TextColumn get tipoRegistroGanhos => textEnum<TipoRegistroGanhos>()();
 
   TextColumn get icone => text().nullable()();
 

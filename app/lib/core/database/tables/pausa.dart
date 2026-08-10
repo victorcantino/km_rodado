@@ -11,15 +11,10 @@ class Pausas extends Table {
 
   DateTimeColumn get fim => dateTime().nullable()();
 
-  TextColumn get motivo => text().nullable()();
+  TextColumn get titulo => text().nullable()();
 
   TextColumn get observacao => text().nullable()();
 
   DateTimeColumn get dataCriacao =>
       dateTime().withDefault(currentDateAndTime)();
-
-  BoolColumn get registrarGanhos =>
-      boolean().withDefault(const Constant(false))();
-
-  BoolColumn get concluida => boolean().withDefault(const Constant(false))();
 }
