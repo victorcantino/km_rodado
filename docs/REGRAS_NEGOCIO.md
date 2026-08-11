@@ -224,6 +224,13 @@ Os últimos acumulados de cada plataforma na Jornada são sugeridos na leitura
 seguinte. O usuário pode salvar novamente os mesmos valores quando o visor não
 tiver mudado.
 
+A leitura inicial é registrada logo após a abertura e estabelece a base da
+Jornada. Ela não possui Pausa e não herda automaticamente dados da Jornada
+anterior: o motorista informa exatamente o acumulado visível naquele momento.
+Se o registro for interrompido, a Jornada permanece aberta com os ganhos
+iniciais pendentes, sem criar leitura vazia ou inventar valores. Leituras
+parciais e finais exigem essa base inicial.
+
 ---
 
 # 5.2 Plataformas
@@ -263,6 +270,9 @@ editáveis e não geram `LeituraGanhoPlataforma` artificial.
 Uma leitura exige Jornada e pode ter Pausa. Quando houver Pausa, ela deverá
 pertencer à mesma Jornada da leitura.
 
+Cada Jornada pode possuir no máximo uma leitura inicial e uma leitura final.
+Leituras parciais continuam permitidas em diferentes Pausas após a inicial.
+
 ---
 
 # 5.4 Valores e leitura final
@@ -271,8 +281,17 @@ Valores monetários acumulados são armazenados em centavos inteiros. Quantidade
 acumulada de viagens também é inteira e não negativa. Cada plataforma aparece
 no máximo uma vez na mesma leitura.
 
+Valor acumulado igual a zero e quantidade acumulada igual a zero são válidos.
+Uma Jornada sem corridas pode ser encerrada normalmente após registrar sua
+leitura final.
+
 Antes de finalizar a Jornada, o usuário deve realizar a leitura final das
 plataformas utilizadas. Ela não depende da existência de uma Pausa.
+
+A leitura final sugere a última leitura da própria Jornada e aceita acumulados
+iguais. Seus dados e o fechamento da Jornada são persistidos atomicamente: uma
+falha em qualquer parte desfaz toda a operação. Cancelar os dados de fechamento
+ou a leitura final mantém a Jornada aberta e não cria leitura final.
 
 Na apresentação durante pausas e fechamento, plataformas acumuladas exibem os
 valores e quantidades observados pelo usuário. Plataformas individuais exibem

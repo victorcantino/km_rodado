@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart' hide isNotNull;
+import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,6 +14,7 @@ import 'package:km_rodado/features/jornada/data/jornada_repository.dart';
 import 'package:km_rodado/features/jornada/data/jornada_service.dart';
 import 'package:km_rodado/features/leitura_ganhos/data/leitura_ganhos_repository.dart';
 import 'package:km_rodado/features/leitura_ganhos/data/leitura_ganhos_service.dart';
+import 'package:km_rodado/features/leitura_ganhos/presentation/controllers/leitura_ganhos_controller.dart';
 import 'package:km_rodado/features/leitura_ganhos/presentation/widgets/leitura_ganhos_dialog.dart';
 import 'package:km_rodado/features/pausa/data/pausa_repository.dart';
 import 'package:km_rodado/features/pausa/data/pausa_service.dart';
@@ -39,6 +40,7 @@ void main() {
     leituraService = LeituraGanhosService(
       leituraRepository,
       jornadaRepository,
+      pausaRepository,
       agora: () => instanteLeitura,
     );
   });
@@ -81,6 +83,13 @@ void main() {
     quantidadeViagensAcumulada: viagens,
   );
 
+  Future<void> registrarInicial(Jornada jornada, List<int> plataformas) async {
+    await leituraService.salvarLeituraInicial(
+      jornadaId: jornada.id,
+      itens: [for (final plataformaId in plataformas) item(plataformaId)],
+    );
+  }
+
   test('leitura parcial exige Jornada aberta', () async {
     await expectLater(
       leituraService.salvarLeituraParcial(
@@ -92,6 +101,336 @@ void main() {
     );
   });
 
+  test('cria leitura inicial sem Pausa e impede duplicidade', () async {
+    final jornada = await abrirJornada();
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+
+    final leituraId = await leituraService.salvarLeituraInicial(
+      jornadaId: jornada.id,
+      itens: [item(uberId, valor: 1234, viagens: 2)],
+    );
+    final leitura = await leituraService.buscarLeitura(leituraId);
+
+    expect(leitura!.tipo, TipoLeituraGanhos.inicial);
+    expect(leitura.pausaId, isNull);
+    await expectLater(
+      leituraService.salvarLeituraInicial(
+        jornadaId: jornada.id,
+        itens: [item(uberId)],
+      ),
+      throwsException,
+    );
+  });
+
+  test('leitura inicial não herda valores de Jornada anterior', () async {
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+    final jornadaAnteriorId = await database
+        .into(database.jornadas)
+        .insert(
+          JornadasCompanion.insert(
+            usuarioId: 1,
+            veiculoId: 1,
+            dataHoraInicio: DateTime(2026, 8, 9, 8),
+            odometroInicio: 50,
+            cidadeOrigem: 'Curitiba',
+            status: StatusJornada.finalizada,
+            dataHoraFim: Value(DateTime(2026, 8, 9, 18)),
+            odometroFim: const Value(100),
+          ),
+        );
+    final leituraAnteriorId = await database
+        .into(database.leiturasGanhos)
+        .insert(
+          LeiturasGanhosCompanion.insert(
+            jornadaId: jornadaAnteriorId,
+            dataHora: DateTime(2026, 8, 9, 18),
+            tipo: TipoLeituraGanhos.finalDaJornada,
+          ),
+        );
+    await database
+        .into(database.leiturasGanhoPlataforma)
+        .insert(
+          LeiturasGanhoPlataformaCompanion.insert(
+            leituraGanhosId: leituraAnteriorId,
+            plataformaId: uberId,
+            valorAcumuladoCentavos: 9999,
+            quantidadeViagensAcumulada: 20,
+          ),
+        );
+
+    final jornada = await abrirJornada();
+    final leituraId = await leituraService.salvarLeituraInicial(
+      jornadaId: jornada.id,
+      itens: [item(uberId, valor: 100, viagens: 1)],
+    );
+    final itens = await leituraService.listarItens(leituraId);
+
+    expect(itens.single.valorAcumuladoCentavos, 100);
+    expect(itens.single.quantidadeViagensAcumulada, 1);
+  });
+
+  test('impede leitura parcial enquanto a inicial estiver pendente', () async {
+    final jornada = await abrirJornada();
+    final pausaId = await pausaService.iniciarPausa();
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+
+    await expectLater(
+      leituraService.salvarLeituraParcial(
+        jornadaId: jornada.id,
+        pausaId: pausaId,
+        itens: [item(uberId)],
+      ),
+      throwsException,
+    );
+  });
+
+  test('restaura o estado de leitura inicial pendente ou concluída', () async {
+    final jornada = await abrirJornada();
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+    final novoService = LeituraGanhosService(
+      LeituraGanhosRepository(LeituraGanhosDao(database)),
+      jornadaRepository,
+      pausaRepository,
+    );
+
+    final controller = LeituraGanhosController(novoService);
+    addTearDown(controller.dispose);
+
+    await controller.carregarEstado(jornada.id);
+    expect(controller.leituraInicialConcluida, isFalse);
+    await registrarInicial(jornada, [uberId]);
+    await controller.carregarEstado(jornada.id);
+    expect(controller.leituraInicialConcluida, isTrue);
+  });
+
+  test('leitura final usa a última leitura da Jornada como sugestão', () async {
+    final jornada = await abrirJornada();
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+    await leituraService.salvarLeituraInicial(
+      jornadaId: jornada.id,
+      itens: [item(uberId, valor: 1520, viagens: 3)],
+    );
+
+    final sugestoes = await leituraService.buscarSugestoes(jornada.id);
+    expect(sugestoes[uberId]!.valorAcumuladoCentavos, 1520);
+    expect(sugestoes[uberId]!.quantidadeViagensAcumulada, 3);
+  });
+
+  test(
+    'final persiste sem Pausa, aceita valores iguais e fecha Jornada',
+    () async {
+      final jornada = await abrirJornada();
+      final uberId = await inserirPlataforma(
+        'Uber',
+        TipoRegistroGanhos.acumulado,
+      );
+      final snapshot = item(uberId, valor: 2500, viagens: 4);
+      await leituraService.salvarLeituraInicial(
+        jornadaId: jornada.id,
+        itens: [snapshot],
+      );
+
+      final leituraId = await leituraService.finalizarJornada(
+        jornadaId: jornada.id,
+        odometroFim: 110,
+        itens: [snapshot],
+      );
+      final leitura = await leituraService.buscarLeitura(leituraId);
+      final jornadaPersistida = await (database.select(
+        database.jornadas,
+      )..where((registro) => registro.id.equals(jornada.id))).getSingle();
+
+      expect(leitura!.tipo, TipoLeituraGanhos.finalDaJornada);
+      expect(leitura.pausaId, isNull);
+      expect(jornadaPersistida.status, StatusJornada.finalizada);
+      expect(await leituraService.buscarLeituraFinal(jornada.id), isNotNull);
+
+      await expectLater(
+        leituraService.finalizarJornada(
+          jornadaId: jornada.id,
+          odometroFim: 111,
+          itens: [snapshot],
+        ),
+        throwsException,
+      );
+      final finais =
+          await (database.select(database.leiturasGanhos)..where(
+                (registro) =>
+                    registro.jornadaId.equals(jornada.id) &
+                    registro.tipo.equalsValue(TipoLeituraGanhos.finalDaJornada),
+              ))
+              .get();
+      expect(finais, hasLength(1));
+    },
+  );
+
+  test(
+    'cenário legado parcial, inicial e final encerra com valores zero',
+    () async {
+      final jornada = await abrirJornada();
+      final uberId = await inserirPlataforma(
+        'Uber',
+        TipoRegistroGanhos.acumulado,
+      );
+      final pausaId = await database
+          .into(database.pausas)
+          .insert(
+            PausasCompanion.insert(
+              jornadaId: jornada.id,
+              inicio: DateTime(2026, 8, 10, 10),
+              fim: Value(DateTime(2026, 8, 10, 10, 15)),
+            ),
+          );
+      final parcialId = await database
+          .into(database.leiturasGanhos)
+          .insert(
+            LeiturasGanhosCompanion.insert(
+              jornadaId: jornada.id,
+              pausaId: Value(pausaId),
+              dataHora: DateTime(2026, 8, 10, 10, 5),
+              tipo: TipoLeituraGanhos.parcial,
+            ),
+          );
+      await database
+          .into(database.leiturasGanhoPlataforma)
+          .insert(
+            LeiturasGanhoPlataformaCompanion.insert(
+              leituraGanhosId: parcialId,
+              plataformaId: uberId,
+              valorAcumuladoCentavos: 0,
+              quantidadeViagensAcumulada: 0,
+            ),
+          );
+
+      final zero = item(uberId, valor: 0, viagens: 0);
+      await leituraService.salvarLeituraInicial(
+        jornadaId: jornada.id,
+        itens: [zero],
+      );
+      await leituraService.finalizarJornada(
+        jornadaId: jornada.id,
+        odometroFim: jornada.odometroInicio + 1,
+        itens: [zero],
+      );
+
+      final jornadaFinalizada = await (database.select(
+        database.jornadas,
+      )..where((registro) => registro.id.equals(jornada.id))).getSingle();
+      final leituras =
+          await (database.select(database.leiturasGanhos)
+                ..where((registro) => registro.jornadaId.equals(jornada.id))
+                ..orderBy([(registro) => OrderingTerm.asc(registro.id)]))
+              .get();
+      final finais = leituras
+          .where((leitura) => leitura.tipo == TipoLeituraGanhos.finalDaJornada)
+          .toList();
+      final itensFinais = await leituraService.listarItens(finais.single.id);
+
+      expect(leituras.map((leitura) => leitura.tipo), [
+        TipoLeituraGanhos.parcial,
+        TipoLeituraGanhos.inicial,
+        TipoLeituraGanhos.finalDaJornada,
+      ]);
+      expect(finais, hasLength(1));
+      expect(itensFinais.single.valorAcumuladoCentavos, 0);
+      expect(itensFinais.single.quantidadeViagensAcumulada, 0);
+      expect(jornadaFinalizada.status, StatusJornada.finalizada);
+      expect(jornadaFinalizada.odometroFim, jornada.odometroInicio + 1);
+    },
+  );
+
+  test('impede leitura final com Pausa aberta', () async {
+    final jornada = await abrirJornada();
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+    await registrarInicial(jornada, [uberId]);
+    await pausaService.iniciarPausa();
+
+    await expectLater(
+      leituraService.finalizarJornada(
+        jornadaId: jornada.id,
+        odometroFim: 110,
+        itens: [item(uberId)],
+      ),
+      throwsException,
+    );
+    expect(await jornadaService.jornadaAberta(), isNotNull);
+    expect(await leituraService.buscarLeituraFinal(jornada.id), isNull);
+  });
+
+  test('falha ao inserir leitura final não fecha Jornada', () async {
+    final jornada = await abrirJornada();
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+    await registrarInicial(jornada, [uberId]);
+    await database.customStatement('''
+      CREATE TRIGGER falhar_leitura_final
+      BEFORE INSERT ON leituras_ganhos
+      WHEN NEW.tipo = 'finalDaJornada'
+      BEGIN
+        SELECT RAISE(ABORT, 'falha controlada');
+      END
+    ''');
+
+    await expectLater(
+      leituraService.finalizarJornada(
+        jornadaId: jornada.id,
+        odometroFim: 110,
+        itens: [item(uberId)],
+      ),
+      throwsException,
+    );
+    expect(await jornadaService.jornadaAberta(), isNotNull);
+    expect(await leituraService.buscarLeituraFinal(jornada.id), isNull);
+  });
+
+  test('falha ao fechar Jornada reverte a leitura final', () async {
+    final jornada = await abrirJornada();
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+    await registrarInicial(jornada, [uberId]);
+    await database.customStatement('''
+      CREATE TRIGGER falhar_fechamento
+      BEFORE UPDATE ON jornadas
+      WHEN NEW.status = 'finalizada'
+      BEGIN
+        SELECT RAISE(ABORT, 'falha controlada');
+      END
+    ''');
+
+    await expectLater(
+      leituraService.finalizarJornada(
+        jornadaId: jornada.id,
+        odometroFim: 110,
+        itens: [item(uberId)],
+      ),
+      throwsException,
+    );
+    expect(await jornadaService.jornadaAberta(), isNotNull);
+    expect(await leituraService.buscarLeituraFinal(jornada.id), isNull);
+  });
+
   test('salva leitura parcial na Pausa e mantém a Pausa aberta', () async {
     final jornada = await abrirJornada();
     final pausaId = await pausaService.iniciarPausa();
@@ -99,6 +438,7 @@ void main() {
       'Uber',
       TipoRegistroGanhos.acumulado,
     );
+    await registrarInicial(jornada, [uberId]);
     final leituraId = await leituraService.salvarLeituraParcial(
       jornadaId: jornada.id,
       pausaId: pausaId,
@@ -176,6 +516,7 @@ void main() {
         TipoRegistroGanhos.acumulado,
         ativa: false,
       );
+      await registrarInicial(jornada, [uberId, noventaNoveId]);
 
       Future<int> salvar(List<ItemLeituraGanhosEntrada> itens) {
         return leituraService.salvarLeituraParcial(
@@ -197,7 +538,10 @@ void main() {
         salvar([item(uberId, viagens: -1), item(noventaNoveId)]),
         throwsException,
       );
-      expect(await database.select(database.leiturasGanhos).get(), isEmpty);
+      expect(
+        await database.select(database.leiturasGanhos).get(),
+        hasLength(1),
+      );
     },
   );
 
@@ -208,6 +552,7 @@ void main() {
       'Uber',
       TipoRegistroGanhos.acumulado,
     );
+    await registrarInicial(jornada, [uberId]);
     final snapshot = item(uberId, valor: 5025, viagens: 5);
 
     await leituraService.salvarLeituraParcial(
@@ -239,6 +584,7 @@ void main() {
       'Uber',
       TipoRegistroGanhos.acumulado,
     );
+    await registrarInicial(jornada, [uberId]);
     final leituraId = await leituraService.salvarLeituraParcial(
       jornadaId: jornada.id,
       pausaId: pausaId,
@@ -247,6 +593,7 @@ void main() {
     final novoService = LeituraGanhosService(
       LeituraGanhosRepository(LeituraGanhosDao(database)),
       jornadaRepository,
+      pausaRepository,
     );
 
     expect(await novoService.buscarLeitura(leituraId), isNotNull);

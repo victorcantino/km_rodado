@@ -47,3 +47,13 @@ Motivo: plataformas acumuladas usam leituras do visor, enquanto plataformas
 individuais usam a soma de lançamentos. Particular continua sendo plataforma;
 nenhuma regra de negócio depende de seu nome. A apresentação pode ser uniforme
 sem compartilhar artificialmente a mesma fonte de verdade.
+
+## ADR-008 — Encerramento atômico da Jornada
+
+Decisão: coletar primeiro os dados de fechamento e da leitura final e, somente
+após ambas as confirmações, persistir a leitura final e a atualização da
+Jornada em uma única transação Drift específica desse fluxo.
+
+Motivo: a leitura final faz parte do encerramento. Uma transação impede tanto
+uma Jornada finalizada sem a leitura obrigatória quanto uma leitura final órfã
+em uma Jornada ainda aberta, sem introduzir uma camada arquitetural genérica.
