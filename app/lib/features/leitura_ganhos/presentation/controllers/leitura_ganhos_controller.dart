@@ -12,16 +12,47 @@ class LeituraGanhosController extends ChangeNotifier {
   Map<int, LeiturasGanhoPlataformaData> sugestoes = const {};
   LeiturasGanho? ultimaLeituraSalva;
   List<LeiturasGanhoPlataformaData> ultimosItensSalvos = const [];
+  bool leituraInicialConcluida = false;
   bool carregando = false;
 
-  Future<void> preparar(int jornadaId) async {
+  Future<void> carregarEstado(int? jornadaId) async {
+    if (jornadaId == null) {
+      leituraInicialConcluida = false;
+      sugestoes = const {};
+      notifyListeners();
+      return;
+    }
+
     await _executar(() async {
-      plataformas = await _service.listarPlataformasAtivas();
-      sugestoes = await _service.buscarSugestoes(jornadaId);
+      leituraInicialConcluida =
+          await _service.buscarLeituraInicial(jornadaId) != null;
     });
   }
 
-  Future<void> salvar({
+  Future<void> preparar(int jornadaId, {required bool usarSugestoes}) async {
+    await _executar(() async {
+      plataformas = await _service.listarPlataformasAtivas();
+      sugestoes = usarSugestoes
+          ? await _service.buscarSugestoes(jornadaId)
+          : const {};
+    });
+  }
+
+  Future<void> salvarInicial({
+    required int jornadaId,
+    required List<ItemLeituraGanhosEntrada> itens,
+  }) async {
+    await _executar(() async {
+      final leituraId = await _service.salvarLeituraInicial(
+        jornadaId: jornadaId,
+        itens: itens,
+      );
+      await _carregarLeituraSalva(leituraId, jornadaId);
+      leituraInicialConcluida = true;
+    });
+  }
+
+  Future<void> salvarParcial({
     required int jornadaId,
     required int pausaId,
     required List<ItemLeituraGanhosEntrada> itens,
@@ -32,10 +63,36 @@ class LeituraGanhosController extends ChangeNotifier {
         pausaId: pausaId,
         itens: itens,
       );
+      await _carregarLeituraSalva(leituraId, jornadaId);
+    });
+  }
+
+  Future<void> finalizarJornada({
+    required int jornadaId,
+    required int odometroFim,
+    required List<ItemLeituraGanhosEntrada> itens,
+    String? cidadeDestino,
+    String? observacoes,
+  }) async {
+    await _executar(() async {
+      final leituraId = await _service.finalizarJornada(
+        jornadaId: jornadaId,
+        odometroFim: odometroFim,
+        cidadeDestino: cidadeDestino,
+        observacoes: observacoes,
+        itens: itens,
+      );
       ultimaLeituraSalva = await _service.buscarLeitura(leituraId);
       ultimosItensSalvos = await _service.listarItens(leituraId);
-      sugestoes = await _service.buscarSugestoes(jornadaId);
+      sugestoes = const {};
+      leituraInicialConcluida = false;
     });
+  }
+
+  Future<void> _carregarLeituraSalva(int leituraId, int jornadaId) async {
+    ultimaLeituraSalva = await _service.buscarLeitura(leituraId);
+    ultimosItensSalvos = await _service.listarItens(leituraId);
+    sugestoes = await _service.buscarSugestoes(jornadaId);
   }
 
   Future<void> _executar(Future<void> Function() operacao) async {

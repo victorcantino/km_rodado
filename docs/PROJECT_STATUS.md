@@ -2,12 +2,12 @@
 
 ## Funcionalidade em desenvolvimento
 
-Leituras parciais de ganhos durante Pausas.
+Leituras inicial e final de ganhos da Jornada.
 
 ## Objetivo atual
 
-Registrar snapshots das plataformas acumuladas após iniciar uma Pausa, sem
-alterar o schema 2 e sem implementar lançamentos individuais.
+Completar o ciclo de Leituras de Ganhos com base inicial obrigatória e leitura
+final integrada atomicamente ao fechamento, sem alterar o schema 2.
 
 ## Já implementado
 
@@ -66,15 +66,20 @@ alterar o schema 2 e sem implementar lançamentos individuais.
 - Testes de regras, sugestões, persistência e controles do diálogo
 - Seed idempotente de Uber, 99, inDrive e Particular
 - Plataformas padrão criadas sem IDs fixos e sem sobrescrever registros existentes
+- Leitura inicial solicitada após a abertura da Jornada, sem herdar a Jornada anterior
+- Estado de ganhos iniciais pendentes restaurado após reinício
+- Leituras parciais e final bloqueadas enquanto a inicial estiver pendente
+- Leitura final sugerida pela última leitura da própria Jornada
+- Persistência atômica da leitura final e do fechamento da Jornada
+- Unicidade de leituras inicial e final protegida na camada de negócio
 
 ## Em andamento
 
-- Validação final da primeira leitura parcial de ganhos
+- Validação da leitura inicial e final em instalação real
 
 ## Próximo passo
 
-Implementar leitura inicial e leitura final, além dos lançamentos individuais,
-em entregas futuras.
+Implementar lançamentos individuais em entrega futura.
 
 ## Decisões temporárias
 

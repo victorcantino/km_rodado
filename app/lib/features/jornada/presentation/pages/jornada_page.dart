@@ -70,6 +70,7 @@ class _JornadaPageState extends State<JornadaPage> {
     final leituraGanhosService = LeituraGanhosService(
       leituraGanhosRepository,
       repository,
+      pausaRepository,
     );
     final novoController = JornadaController(service);
     final novoLeituraGanhosController = LeituraGanhosController(
@@ -85,6 +86,9 @@ class _JornadaPageState extends State<JornadaPage> {
 
     await novoController.carregarJornadaAberta();
     await novoPausaController.carregar(novoController.jornadaAtual?.id);
+    await novoLeituraGanhosController.carregarEstado(
+      novoController.jornadaAtual?.id,
+    );
   }
 
   Future<void> _abrirJornada() async {
@@ -115,15 +119,20 @@ class _JornadaPageState extends State<JornadaPage> {
         cidadeOrigem: resultado.cidadeOrigem,
       );
       await pausaController?.carregar(controller.jornadaAtual?.id);
-    } catch (_) {
+      final jornadaId = controller.jornadaAtual?.id;
+      if (jornadaId != null && mounted) {
+        await _registrarLeituraInicial(jornadaId);
+      }
+    } catch (error, stackTrace) {
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Não foi possível abrir a jornada. Tente novamente.'),
-        ),
+      _apresentarErro(
+        operacao: 'abrir a Jornada',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível abrir a jornada. Tente novamente.',
       );
     }
   }
@@ -141,20 +150,93 @@ class _JornadaPageState extends State<JornadaPage> {
       final pausa = pausaController.pausaAberta;
 
       if (pausa != null && mounted) {
-        await _registrarGanhos(pausa);
+        await _registrarLeituraParcial(pausa);
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Não foi possível iniciar a Pausa.')),
+      _apresentarErro(
+        operacao: 'iniciar a Pausa',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível iniciar a Pausa.',
       );
     }
   }
 
-  Future<void> _registrarGanhos(Pausa pausa) async {
+  Future<LeituraGanhosResultado?> _coletarLeitura({
+    required int jornadaId,
+    required String titulo,
+    required bool usarSugestoes,
+  }) async {
+    final leituraController = leituraGanhosController;
+    if (leituraController == null) {
+      return null;
+    }
+
+    try {
+      await leituraController.preparar(jornadaId, usarSugestoes: usarSugestoes);
+    } catch (error, stackTrace) {
+      if (mounted) {
+        _apresentarErro(
+          operacao: 'carregar as plataformas',
+          error: error,
+          stackTrace: stackTrace,
+          mensagemPadrao: 'Não foi possível carregar as plataformas.',
+        );
+      }
+      return null;
+    }
+
+    if (!mounted) {
+      return null;
+    }
+
+    return showDialog<LeituraGanhosResultado>(
+      context: context,
+      builder: (context) => LeituraGanhosDialog(
+        plataformas: leituraController.plataformas,
+        sugestoes: leituraController.sugestoes,
+        titulo: titulo,
+      ),
+    );
+  }
+
+  Future<void> _registrarLeituraInicial(int jornadaId) async {
+    final leituraController = leituraGanhosController;
+    if (leituraController == null) {
+      return;
+    }
+
+    final resultado = await _coletarLeitura(
+      jornadaId: jornadaId,
+      titulo: 'Registrar ganhos iniciais',
+      usarSugestoes: false,
+    );
+    if (resultado == null || !mounted) {
+      return;
+    }
+
+    try {
+      await leituraController.salvarInicial(
+        jornadaId: jornadaId,
+        itens: resultado,
+      );
+    } catch (error, stackTrace) {
+      if (mounted) {
+        _apresentarErro(
+          operacao: 'salvar os ganhos iniciais',
+          error: error,
+          stackTrace: stackTrace,
+          mensagemPadrao: 'Não foi possível salvar os ganhos iniciais.',
+        );
+      }
+    }
+  }
+
+  Future<void> _registrarLeituraParcial(Pausa pausa) async {
     final jornadaId = controller?.jornadaAtual?.id;
     final leituraController = leituraGanhosController;
 
@@ -162,31 +244,10 @@ class _JornadaPageState extends State<JornadaPage> {
       return;
     }
 
-    try {
-      await leituraController.preparar(jornadaId);
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Não foi possível carregar as plataformas.'),
-        ),
-      );
-      return;
-    }
-
-    if (!mounted) {
-      return;
-    }
-
-    final resultado = await showDialog<LeituraGanhosResultado>(
-      context: context,
-      builder: (context) => LeituraGanhosDialog(
-        plataformas: leituraController.plataformas,
-        sugestoes: leituraController.sugestoes,
-      ),
+    final resultado = await _coletarLeitura(
+      jornadaId: jornadaId,
+      titulo: 'Registrar ganhos',
+      usarSugestoes: true,
     );
 
     if (!mounted || resultado == null) {
@@ -194,18 +255,21 @@ class _JornadaPageState extends State<JornadaPage> {
     }
 
     try {
-      await leituraController.salvar(
+      await leituraController.salvarParcial(
         jornadaId: jornadaId,
         pausaId: pausa.id,
         itens: resultado,
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Não foi possível salvar a leitura.')),
+      _apresentarErro(
+        operacao: 'salvar a leitura parcial',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível salvar a leitura.',
       );
     }
   }
@@ -220,13 +284,16 @@ class _JornadaPageState extends State<JornadaPage> {
 
     try {
       await pausaController.finalizar(jornadaId);
-    } catch (_) {
+    } catch (error, stackTrace) {
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Não foi possível finalizar a Pausa.')),
+      _apresentarErro(
+        operacao: 'finalizar a Pausa',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível finalizar a Pausa.',
       );
     }
   }
@@ -262,13 +329,16 @@ class _JornadaPageState extends State<JornadaPage> {
 
     try {
       await pausaController?.editarTitulo(pausa, titulo);
-    } catch (_) {
+    } catch (error, stackTrace) {
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Não foi possível editar a Pausa.')),
+      _apresentarErro(
+        operacao: 'editar a Pausa',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível editar a Pausa.',
       );
     }
   }
@@ -293,23 +363,75 @@ class _JornadaPageState extends State<JornadaPage> {
       return;
     }
 
+    final leituraFinal = await _coletarLeitura(
+      jornadaId: jornada.id,
+      titulo: 'Registrar ganhos finais',
+      usarSugestoes: true,
+    );
+
+    if (!mounted || leituraFinal == null) {
+      return;
+    }
+
     try {
-      await controller.fecharJornada(
+      await leituraGanhosController?.finalizarJornada(
+        jornadaId: jornada.id,
         odometroFim: resultado.odometroFim,
         cidadeDestino: resultado.cidadeDestino,
         observacoes: resultado.observacoes,
+        itens: leituraFinal,
       );
-    } catch (_) {
+      await controller.carregarJornadaAberta();
+      await pausaController?.carregar(null);
+    } catch (error, stackTrace) {
       if (!mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Não foi possível fechar a jornada. Tente novamente.'),
-        ),
+      _apresentarErro(
+        operacao: 'fechar a Jornada',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível fechar a jornada. Tente novamente.',
       );
     }
+  }
+
+  void _apresentarErro({
+    required String operacao,
+    required Object error,
+    required StackTrace stackTrace,
+    required String mensagemPadrao,
+  }) {
+    debugPrint('Erro ao $operacao: $error\n$stackTrace');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(_mensagemDeNegocio(error) ?? mensagemPadrao)),
+    );
+  }
+
+  String? _mensagemDeNegocio(Object error) {
+    final mensagem = error.toString().replaceFirst(
+      RegExp(r'^(Exception|Bad state):\s*'),
+      '',
+    );
+    const iniciosConhecidos = [
+      'Já existe',
+      'Não existe',
+      'O odômetro',
+      'O fim',
+      'A Jornada',
+      'A jornada',
+      'A Pausa',
+      'A leitura',
+      'Os ganhos',
+      'Registre',
+      'Informe',
+      'Uma plataforma',
+      'O valor',
+      'A quantidade',
+    ];
+
+    return iniciosConhecidos.any(mensagem.startsWith) ? mensagem : null;
   }
 
   String _formatarDuracao(Duration duracao, NumberFormat numeros) {
@@ -384,6 +506,8 @@ class _JornadaPageState extends State<JornadaPage> {
 
             final pausaAberta = pausaController.pausaAberta;
             final formatoHora = DateFormat.Hm(locale);
+            final inicialConcluida =
+                leituraGanhosController.leituraInicialConcluida;
 
             return ListView(
               padding: const EdgeInsets.all(16),
@@ -403,43 +527,58 @@ class _JornadaPageState extends State<JornadaPage> {
 
                 const SizedBox(height: 24),
 
-                if (pausaAberta == null)
-                  ElevatedButton(
-                    onPressed: _iniciarPausa,
-                    child: const Text('Pausar'),
-                  )
-                else ...[
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Pausa em andamento',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                      IconButton(
-                        tooltip: 'Editar título',
-                        onPressed: () => _editarTituloPausa(pausaAberta),
-                        icon: const Icon(Icons.edit),
-                      ),
-                    ],
-                  ),
-                  Text('Iniciada às ${formatoHora.format(pausaAberta.inicio)}'),
+                if (!inicialConcluida) ...[
                   Text(
-                    formatarDuracaoPausa(
-                      DateTime.now().difference(pausaAberta.inicio),
-                    ),
+                    'Ganhos iniciais pendentes',
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
                   ElevatedButton(
-                    onPressed: _finalizarPausa,
-                    child: const Text('Retomar Jornada'),
-                  ),
-                  TextButton(
-                    onPressed: () => _registrarGanhos(pausaAberta),
-                    child: const Text('Registrar ganhos'),
+                    onPressed: () => _registrarLeituraInicial(jornada.id),
+                    child: const Text('Registrar ganhos iniciais'),
                   ),
                 ],
+
+                if (inicialConcluida)
+                  if (pausaAberta == null)
+                    ElevatedButton(
+                      onPressed: _iniciarPausa,
+                      child: const Text('Pausar'),
+                    )
+                  else ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Pausa em andamento',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: 'Editar título',
+                          onPressed: () => _editarTituloPausa(pausaAberta),
+                          icon: const Icon(Icons.edit),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      'Iniciada às ${formatoHora.format(pausaAberta.inicio)}',
+                    ),
+                    Text(
+                      formatarDuracaoPausa(
+                        DateTime.now().difference(pausaAberta.inicio),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: _finalizarPausa,
+                      child: const Text('Retomar Jornada'),
+                    ),
+                    TextButton(
+                      onPressed: () => _registrarLeituraParcial(pausaAberta),
+                      child: const Text('Registrar ganhos'),
+                    ),
+                  ],
 
                 if (pausaController.pausas.any(
                   (pausa) => pausa.fim != null,
@@ -464,7 +603,7 @@ class _JornadaPageState extends State<JornadaPage> {
                       ),
                 ],
 
-                if (pausaAberta == null) ...[
+                if (inicialConcluida && pausaAberta == null) ...[
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: _fecharJornada,

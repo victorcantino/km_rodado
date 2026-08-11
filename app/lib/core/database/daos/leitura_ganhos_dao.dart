@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../../constants/enums/tipo_leitura_ganhos.dart';
 import '../app_database.dart';
 import '../tables/jornada.dart';
 import '../tables/leitura_ganho_plataforma.dart';
@@ -69,6 +70,29 @@ class LeituraGanhosDao extends DatabaseAccessor<AppDatabase>
     return ultimos;
   }
 
+  Future<LeiturasGanho?> buscarPorTipo(int jornadaId, TipoLeituraGanhos tipo) {
+    return (select(leiturasGanhos)
+          ..where(
+            (leitura) =>
+                leitura.jornadaId.equals(jornadaId) &
+                leitura.tipo.equalsValue(tipo),
+          )
+          ..orderBy([(leitura) => OrderingTerm.desc(leitura.id)])
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
+  Future<LeiturasGanho?> buscarUltimaLeitura(int jornadaId) {
+    return (select(leiturasGanhos)
+          ..where((leitura) => leitura.jornadaId.equals(jornadaId))
+          ..orderBy([
+            (leitura) => OrderingTerm.desc(leitura.dataHora),
+            (leitura) => OrderingTerm.desc(leitura.id),
+          ])
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
   Future<int> salvarLeitura(
     LeiturasGanhosCompanion leitura,
     List<LeiturasGanhoPlataformaCompanion> Function(int leituraId) criarItens,
@@ -80,6 +104,52 @@ class LeituraGanhosDao extends DatabaseAccessor<AppDatabase>
       await batch((batch) {
         batch.insertAll(leiturasGanhoPlataforma, itens);
       });
+
+      return leituraId;
+    });
+  }
+
+  Future<int> salvarLeituraUnica(
+    LeiturasGanhosCompanion leitura,
+    TipoLeituraGanhos tipo,
+    List<LeiturasGanhoPlataformaCompanion> Function(int leituraId) criarItens,
+  ) {
+    return transaction(() async {
+      if (await buscarPorTipo(leitura.jornadaId.value, tipo) != null) {
+        throw StateError('Esta leitura já foi registrada para a Jornada.');
+      }
+
+      final leituraId = await into(leiturasGanhos).insert(leitura);
+      await batch((batch) {
+        batch.insertAll(leiturasGanhoPlataforma, criarItens(leituraId));
+      });
+      return leituraId;
+    });
+  }
+
+  Future<int> salvarLeituraFinalEFecharJornada(
+    LeiturasGanhosCompanion leitura,
+    List<LeiturasGanhoPlataformaCompanion> Function(int leituraId) criarItens,
+    Jornada jornadaFinalizada,
+  ) {
+    return transaction(() async {
+      if (await buscarPorTipo(
+            leitura.jornadaId.value,
+            TipoLeituraGanhos.finalDaJornada,
+          ) !=
+          null) {
+        throw StateError('A leitura final desta Jornada já foi registrada.');
+      }
+
+      final leituraId = await into(leiturasGanhos).insert(leitura);
+      await batch((batch) {
+        batch.insertAll(leiturasGanhoPlataforma, criarItens(leituraId));
+      });
+
+      final atualizada = await update(jornadas).replace(jornadaFinalizada);
+      if (!atualizada) {
+        throw StateError('Não foi possível finalizar a Jornada.');
+      }
 
       return leituraId;
     });

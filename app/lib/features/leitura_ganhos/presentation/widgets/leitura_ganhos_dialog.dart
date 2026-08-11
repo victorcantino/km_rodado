@@ -10,11 +10,13 @@ typedef LeituraGanhosResultado = List<ItemLeituraGanhosEntrada>;
 class LeituraGanhosDialog extends StatefulWidget {
   final List<Plataforma> plataformas;
   final Map<int, LeiturasGanhoPlataformaData> sugestoes;
+  final String titulo;
 
   const LeituraGanhosDialog({
     super.key,
     required this.plataformas,
     required this.sugestoes,
+    this.titulo = 'Registrar ganhos',
   });
 
   @override
@@ -106,7 +108,7 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
     final possuiAcumulada = plataformasAcumuladas.isNotEmpty;
 
     return AlertDialog(
-      title: const Text('Registrar ganhos'),
+      title: Text(widget.titulo),
       content: SizedBox(
         width: 420,
         child: Form(
