@@ -18,6 +18,7 @@ import '../../../pausa/data/pausa_service.dart';
 import '../../../pausa/presentation/controllers/pausa_controller.dart';
 import '../../../pausa/presentation/pausa_formatters.dart';
 import '../../../pausa/presentation/widgets/odometro_pausa_dialog.dart';
+import '../../../pausa/presentation/widgets/editar_titulo_pausa_dialog.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
 import '../controllers/jornada_controller.dart';
@@ -213,6 +214,7 @@ class _JornadaPageState extends State<JornadaPage> {
         plataformas: leituraController.plataformas,
         sugestoes: leituraController.sugestoes,
         titulo: titulo,
+        leituraInicial: !usarSugestoes,
         todasPlataformas: todasPlataformas,
         onConfigurar: (ativacoes) async {
           return leituraController.configurarPlataformas(
@@ -340,29 +342,10 @@ class _JornadaPageState extends State<JornadaPage> {
   }
 
   Future<void> _editarTituloPausa(Pausa pausa) async {
-    final textoController = TextEditingController(text: pausa.titulo ?? '');
     final titulo = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Título da Pausa'),
-        content: TextField(
-          controller: textoController,
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'Título opcional'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, textoController.text),
-            child: const Text('Salvar'),
-          ),
-        ],
-      ),
+      builder: (_) => EditarTituloPausaDialog(tituloInicial: pausa.titulo),
     );
-    textoController.dispose();
 
     if (!mounted || titulo == null) {
       return;

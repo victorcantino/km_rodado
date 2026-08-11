@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/constants/enums/tipo_registro_ganhos.dart';
@@ -14,6 +15,7 @@ class LeituraGanhosDialog extends StatefulWidget {
   final String titulo;
   final List<Plataforma>? todasPlataformas;
   final Future<List<Plataforma>> Function(Map<int, bool>)? onConfigurar;
+  final bool leituraInicial;
 
   const LeituraGanhosDialog({
     super.key,
@@ -22,6 +24,7 @@ class LeituraGanhosDialog extends StatefulWidget {
     this.titulo = 'Registrar ganhos',
     this.todasPlataformas,
     this.onConfigurar,
+    this.leituraInicial = false,
   });
 
   @override
@@ -30,7 +33,6 @@ class LeituraGanhosDialog extends StatefulWidget {
 
 class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
   final formKey = GlobalKey<FormState>();
-  final moeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
   final valores = <int, TextEditingController>{};
   final quantidades = <int, TextEditingController>{};
   late List<Plataforma> plataformas = widget.plataformas;
@@ -49,7 +51,7 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
       valores[plataforma.id] = TextEditingController(
         text: sugestao == null
             ? ''
-            : moeda.format(sugestao.valorAcumuladoCentavos / 100),
+            : _formatarCentavos(sugestao.valorAcumuladoCentavos),
       );
       quantidades[plataforma.id] = TextEditingController(
         text: sugestao?.quantidadeViagensAcumulada.toString() ?? '0',
@@ -58,6 +60,7 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
   }
 
   Future<void> _configurar() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     final resultado = await showDialog<Map<int, bool>>(
       context: context,
       builder: (_) =>
@@ -85,18 +88,20 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
   }
 
   int? _centavos(String texto) {
-    var normalizado = texto.trim().replaceAll(RegExp(r'[^0-9,.-]'), '');
+    final digitos = texto.replaceAll(RegExp(r'\D'), '');
+    return digitos.isEmpty ? null : int.tryParse(digitos);
+  }
 
-    if (normalizado.isEmpty) {
-      return null;
+  void _zerar(int plataformaId) {
+    valores[plataformaId]!.text = _formatarCentavos(0);
+    quantidades[plataformaId]!.text = '0';
+    setState(() {});
+  }
+
+  void _zerarTudo() {
+    for (final plataforma in plataformasAcumuladas) {
+      _zerar(plataforma.id);
     }
-
-    if (normalizado.contains(',')) {
-      normalizado = normalizado.replaceAll('.', '').replaceAll(',', '.');
-    }
-
-    final valor = double.tryParse(normalizado);
-    return valor == null ? null : (valor * 100).round();
   }
 
   void _alterarQuantidade(int plataformaId, int diferenca) {
@@ -125,6 +130,11 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
         ),
     ];
 
+    _fechar(resultado);
+  }
+
+  void _fechar([LeituraGanhosResultado? resultado]) {
+    FocusManager.instance.primaryFocus?.unfocus();
     Navigator.pop<LeituraGanhosResultado>(context, resultado);
   }
 
@@ -154,6 +164,14 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
               children: [
                 if (plataformas.isEmpty)
                   const Text('Nenhuma plataforma ativa cadastrada.'),
+                if (widget.leituraInicial && possuiAcumulada)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _zerarTudo,
+                      child: const Text('Tudo zerado'),
+                    ),
+                  ),
                 for (final plataforma in plataformas) ...[
                   Align(
                     alignment: Alignment.centerLeft,
@@ -176,9 +194,9 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
                     TextFormField(
                       key: ValueKey('valor_${plataforma.id}'),
                       controller: valores[plataforma.id],
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: const [_CentavosInputFormatter()],
+                      selectAllOnFocus: true,
                       decoration: const InputDecoration(
                         labelText: 'Valor mostrado',
                         prefixText: r'R$ ',
@@ -195,6 +213,14 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
                       },
                     ),
                     const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        key: ValueKey('zero_${plataforma.id}'),
+                        onPressed: () => _zerar(plataforma.id),
+                        child: const Text('Zero'),
+                      ),
+                    ),
                     Row(
                       children: [
                         IconButton(
@@ -244,15 +270,38 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
         ),
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
-        ),
+        TextButton(onPressed: _fechar, child: const Text('Cancelar')),
         ElevatedButton(
           onPressed: possuiAcumulada ? _salvar : null,
           child: const Text('Salvar leitura'),
         ),
       ],
+    );
+  }
+}
+
+String _formatarCentavos(int centavos) {
+  final reais = centavos ~/ 100;
+  final centavosRestantes = (centavos % 100).toString().padLeft(2, '0');
+  return '${NumberFormat.decimalPattern('pt_BR').format(reais)},$centavosRestantes';
+}
+
+class _CentavosInputFormatter extends TextInputFormatter {
+  const _CentavosInputFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digitos = newValue.text.replaceAll(RegExp(r'\D'), '');
+    if (digitos.isEmpty) return const TextEditingValue();
+    final centavos = int.tryParse(digitos);
+    if (centavos == null) return oldValue;
+    final texto = _formatarCentavos(centavos);
+    return TextEditingValue(
+      text: texto,
+      selection: TextSelection.collapsed(offset: texto.length),
     );
   }
 }

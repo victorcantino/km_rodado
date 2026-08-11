@@ -1,21 +1,20 @@
-# Tarefa atual — Odômetro nas Pausas e plataformas operacionais
+# Tarefa atual — Experiência móvel do registro de ganhos
 
 ## Objetivo
 
-Registrar odômetros no início e fim das Pausas e configurar no diálogo de
-ganhos quais plataformas participam das próximas Jornadas.
+Tornar rápida e inequívoca a entrada de valores acumulados no uso móvel.
 
 ## Escopo
 
-- migrar schema 2 para 3 preservando odômetros históricos nulos;
-- exigir progressão não regressiva em novas Pausas;
-- permitir Jornada e Pausa sem deslocamento;
-- manter o fluxo de leituras;
-- ativar/desativar plataformas sem excluir dados;
-- fixar o conjunto acumulado pelos itens da Leitura Inicial.
+- digitação monetária por dígitos, com duas casas decimais em pt-BR;
+- manter centavos inteiros como fonte de verdade;
+- exibir `R$` uma única vez, fora do conteúdo editável;
+- oferecer Zero por plataforma acumulada;
+- oferecer Tudo zerado somente na Leitura Inicial;
+- preservar sugestões nas leituras parcial e final.
 
 ## Fora do escopo
 
-- dashboard, manutenção, abastecimento e eventos;
-- lançamentos individuais;
-- tela geral de configurações.
+- redesign geral;
+- mudanças de schema ou arquitetura;
+- migração histórica do AppSheet.

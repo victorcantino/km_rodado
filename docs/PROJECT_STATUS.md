@@ -2,7 +2,7 @@
 
 ## Funcionalidade em desenvolvimento
 
-Odômetro nas Pausas e configuração rápida de plataformas.
+Experiência móvel do registro de ganhos.
 
 ## Objetivo atual
 
@@ -76,10 +76,12 @@ final integrada atomicamente ao fechamento, sem alterar o schema 2.
 - Odômetros obrigatórios no início e fim de novas Pausas
 - Configuração rápida de plataformas no diálogo de ganhos
 - Conjunto acumulado da Jornada fixado pela Leitura Inicial
+- Entrada monetária móvel por dígitos, formatada em pt-BR e persistida em centavos
+- Atalhos Zero por plataforma e Tudo zerado na Leitura Inicial
 
 ## Em andamento
 
-- Validação de odômetros nas Pausas e ativação de plataformas
+- Validação da experiência móvel do registro de ganhos
 
 ## Próximo passo
 

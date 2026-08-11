@@ -1,4 +1,5 @@
 import 'package:drift/native.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:km_rodado/core/database/app_database.dart';
 import 'package:km_rodado/core/database/daos/jornada_dao.dart';
@@ -9,6 +10,7 @@ import 'package:km_rodado/features/jornada/data/jornada_service.dart';
 import 'package:km_rodado/features/pausa/data/pausa_repository.dart';
 import 'package:km_rodado/features/pausa/data/pausa_service.dart';
 import 'package:km_rodado/features/pausa/presentation/pausa_formatters.dart';
+import 'package:km_rodado/features/pausa/presentation/widgets/editar_titulo_pausa_dialog.dart';
 
 void main() {
   late AppDatabase database;
@@ -177,18 +179,73 @@ void main() {
   });
 
   test('formata duração sem segundos', () {
+    expect(formatarDuracaoPausa(const Duration(minutes: 5)), '5min');
     expect(
       formatarDuracaoPausa(const Duration(minutes: 46, seconds: 59)),
-      '46m',
+      '46min',
     );
     expect(formatarDuracaoPausa(const Duration(hours: 1)), '1h');
     expect(
       formatarDuracaoPausa(const Duration(hours: 1, minutes: 5)),
-      '1h 05m',
+      '1h 05min',
     );
     expect(
       formatarDuracaoPausa(const Duration(hours: 3, minutes: 27)),
-      '3h 27m',
+      '3h 27min',
     );
+  });
+
+  testWidgets('edita e cancela título com campo focado sem exceções', (
+    tester,
+  ) async {
+    final jornada = await abrirJornada();
+    await pausaService.iniciarPausa(odometroInicio: 100);
+    var pausa = (await pausaService.listarPorJornada(jornada.id)).single;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () async {
+                final titulo = await showDialog<String>(
+                  context: context,
+                  builder: (_) =>
+                      EditarTituloPausaDialog(tituloInicial: pausa.titulo),
+                );
+                if (titulo != null) {
+                  await pausaService.editarTitulo(pausa, titulo);
+                  pausa = (await pausaService.listarPorJornada(
+                    jornada.id,
+                  )).single;
+                }
+              },
+              child: const Text('Editar título'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Editar título'));
+    await tester.pumpAndSettle();
+    final campo = find.byType(TextFormField);
+    await tester.tap(campo);
+    await tester.enterText(campo, 'Almoço');
+    await tester.tap(find.text('Salvar'));
+    await tester.pumpAndSettle();
+
+    expect(pausa.titulo, 'Almoço');
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.text('Editar título'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(TextFormField));
+    await tester.enterText(find.byType(TextFormField), 'Não salvar');
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+
+    expect(pausa.titulo, 'Almoço');
+    expect(tester.takeException(), isNull);
   });
 }
