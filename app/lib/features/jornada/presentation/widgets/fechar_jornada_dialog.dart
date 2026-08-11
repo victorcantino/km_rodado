@@ -78,8 +78,8 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
                     return 'O odômetro não pode ser negativo.';
                   }
 
-                  if (odometro <= widget.odometroInicio) {
-                    return 'O odômetro final deve ser maior que o inicial.';
+                  if (odometro < widget.odometroInicio) {
+                    return 'O odômetro final não pode ser menor que o inicial.';
                   }
 
                   return null;

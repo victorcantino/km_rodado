@@ -17,6 +17,7 @@ import '../../../pausa/data/pausa_repository.dart';
 import '../../../pausa/data/pausa_service.dart';
 import '../../../pausa/presentation/controllers/pausa_controller.dart';
 import '../../../pausa/presentation/pausa_formatters.dart';
+import '../../../pausa/presentation/widgets/odometro_pausa_dialog.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
 import '../controllers/jornada_controller.dart';
@@ -145,8 +146,17 @@ class _JornadaPageState extends State<JornadaPage> {
       return;
     }
 
+    final odometro = await showDialog<int>(
+      context: context,
+      builder: (_) => OdometroPausaDialog(
+        titulo: 'Iniciar Pausa',
+        odometroMinimo: _ultimoOdometroConhecido(),
+      ),
+    );
+    if (!mounted || odometro == null) return;
+
     try {
-      await pausaController.iniciar(jornadaId);
+      await pausaController.iniciar(jornadaId, odometroInicio: odometro);
       final pausa = pausaController.pausaAberta;
 
       if (pausa != null && mounted) {
@@ -194,12 +204,23 @@ class _JornadaPageState extends State<JornadaPage> {
       return null;
     }
 
+    final todasPlataformas = await leituraController.listarTodasPlataformas();
+    if (!mounted) return null;
+
     return showDialog<LeituraGanhosResultado>(
       context: context,
       builder: (context) => LeituraGanhosDialog(
         plataformas: leituraController.plataformas,
         sugestoes: leituraController.sugestoes,
         titulo: titulo,
+        todasPlataformas: todasPlataformas,
+        onConfigurar: (ativacoes) async {
+          return leituraController.configurarPlataformas(
+            jornadaId,
+            ativacoes,
+            leituraInicial: !usarSugestoes,
+          );
+        },
       ),
     );
   }
@@ -282,8 +303,19 @@ class _JornadaPageState extends State<JornadaPage> {
       return;
     }
 
+    final pausa = pausaController.pausaAberta;
+    if (pausa == null) return;
+    final odometro = await showDialog<int>(
+      context: context,
+      builder: (_) => OdometroPausaDialog(
+        titulo: 'Retomar Jornada',
+        odometroMinimo: pausa.odometroInicio ?? _ultimoOdometroConhecido(),
+      ),
+    );
+    if (!mounted || odometro == null) return;
+
     try {
-      await pausaController.finalizar(jornadaId);
+      await pausaController.finalizar(jornadaId, odometroFim: odometro);
     } catch (error, stackTrace) {
       if (!mounted) {
         return;
@@ -296,6 +328,15 @@ class _JornadaPageState extends State<JornadaPage> {
         mensagemPadrao: 'Não foi possível finalizar a Pausa.',
       );
     }
+  }
+
+  int _ultimoOdometroConhecido() {
+    final jornada = controller!.jornadaAtual!;
+    for (final pausa in pausaController!.pausas.reversed) {
+      final valor = pausa.odometroFim ?? pausa.odometroInicio;
+      if (valor != null) return valor;
+    }
+    return jornada.odometroInicio;
   }
 
   Future<void> _editarTituloPausa(Pausa pausa) async {
@@ -354,7 +395,7 @@ class _JornadaPageState extends State<JornadaPage> {
     final resultado = await showDialog<FecharJornadaResultado>(
       context: context,
       builder: (context) => FecharJornadaDialog(
-        odometroInicio: jornada.odometroInicio,
+        odometroInicio: _ultimoOdometroConhecido(),
         cidadeDestinoInicial: jornada.cidadeOrigem,
       ),
     );

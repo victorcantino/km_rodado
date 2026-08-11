@@ -46,14 +46,17 @@ void main() {
   }
 
   test('não inicia Pausa sem Jornada aberta', () async {
-    await expectLater(pausaService.iniciarPausa(), throwsException);
+    await expectLater(
+      pausaService.iniciarPausa(odometroInicio: 100),
+      throwsException,
+    );
     expect(await database.select(database.pausas).get(), isEmpty);
   });
 
   test('inicia, persiste e restaura uma Pausa aberta', () async {
     final jornada = await abrirJornada();
 
-    final pausaId = await pausaService.iniciarPausa();
+    final pausaId = await pausaService.iniciarPausa(odometroInicio: 100);
     final pausaPersistida = await pausaRepository.buscarAbertaPorJornada(
       jornada.id,
     );
@@ -66,6 +69,7 @@ void main() {
     expect(pausaPersistida, isNotNull);
     expect(pausaPersistida!.id, pausaId);
     expect(pausaPersistida.inicio, agora);
+    expect(pausaPersistida.odometroInicio, 100);
     expect(pausaPersistida.fim, isNull);
     expect(pausaPersistida.titulo, isNull);
     expect(await novoService.buscarAbertaPorJornada(jornada.id), isNotNull);
@@ -73,36 +77,60 @@ void main() {
 
   test('impede duas Pausas abertas na mesma Jornada', () async {
     await abrirJornada();
-    await pausaService.iniciarPausa();
+    await pausaService.iniciarPausa(odometroInicio: 100);
 
-    await expectLater(pausaService.iniciarPausa(), throwsException);
+    await expectLater(
+      pausaService.iniciarPausa(odometroInicio: 100),
+      throwsException,
+    );
     expect(await database.select(database.pausas).get(), hasLength(1));
   });
 
   test('finaliza a Pausa e persiste o fim', () async {
     final jornada = await abrirJornada();
-    await pausaService.iniciarPausa();
+    await pausaService.iniciarPausa(odometroInicio: 100);
     agora = DateTime(2026, 8, 10, 12, 54, 59);
 
-    await pausaService.finalizarPausa(jornada.id);
+    await pausaService.finalizarPausa(jornada.id, odometroFim: 100);
 
     final pausas = await pausaService.listarPorJornada(jornada.id);
     expect(pausas.single.fim, agora);
+    expect(pausas.single.odometroFim, 100);
     expect(await pausaService.buscarAbertaPorJornada(jornada.id), isNull);
+  });
+
+  test('impede regressão e permite deslocamento durante a Pausa', () async {
+    final jornada = await abrirJornada();
+    await expectLater(
+      pausaService.iniciarPausa(odometroInicio: 99),
+      throwsException,
+    );
+    await pausaService.iniciarPausa(odometroInicio: 100);
+    await expectLater(
+      pausaService.finalizarPausa(jornada.id, odometroFim: 99),
+      throwsException,
+    );
+    await pausaService.finalizarPausa(jornada.id, odometroFim: 105);
+    final pausa = (await pausaService.listarPorJornada(jornada.id)).single;
+    expect(pausa.odometroInicio, 100);
+    expect(pausa.odometroFim, 105);
   });
 
   test('rejeita fim anterior ao início', () async {
     final jornada = await abrirJornada();
-    await pausaService.iniciarPausa();
+    await pausaService.iniciarPausa(odometroInicio: 100);
     agora = DateTime(2026, 8, 10, 12, 7);
 
-    await expectLater(pausaService.finalizarPausa(jornada.id), throwsException);
+    await expectLater(
+      pausaService.finalizarPausa(jornada.id, odometroFim: 100),
+      throwsException,
+    );
     expect(await pausaService.buscarAbertaPorJornada(jornada.id), isNotNull);
   });
 
   test('normaliza título e título vazio volta ao nome derivado', () async {
     final jornada = await abrirJornada();
-    await pausaService.iniciarPausa();
+    await pausaService.iniciarPausa(odometroInicio: 100);
     var pausa = (await pausaService.listarPorJornada(jornada.id)).single;
 
     await pausaService.editarTitulo(pausa, '  Almoço  ');
@@ -119,11 +147,11 @@ void main() {
   test('lista e numera Pausas pela ordem de início e id', () async {
     final jornada = await abrirJornada();
 
-    await pausaService.iniciarPausa();
+    await pausaService.iniciarPausa(odometroInicio: 100);
     agora = DateTime(2026, 8, 10, 12, 20);
-    await pausaService.finalizarPausa(jornada.id);
+    await pausaService.finalizarPausa(jornada.id, odometroFim: 100);
     agora = DateTime(2026, 8, 10, 14, 10);
-    await pausaService.iniciarPausa();
+    await pausaService.iniciarPausa(odometroInicio: 100);
 
     final pausas = await pausaService.listarPorJornada(jornada.id);
     expect(pausas, hasLength(2));
@@ -134,7 +162,7 @@ void main() {
 
   test('Jornada não fecha com Pausa aberta e fecha após retomada', () async {
     final jornada = await abrirJornada();
-    await pausaService.iniciarPausa();
+    await pausaService.iniciarPausa(odometroInicio: 100);
 
     await expectLater(
       jornadaService.fecharJornada(odometroFim: 101),
@@ -143,7 +171,7 @@ void main() {
     expect(await jornadaService.jornadaAberta(), isNotNull);
 
     agora = DateTime(2026, 8, 10, 12, 30);
-    await pausaService.finalizarPausa(jornada.id);
+    await pausaService.finalizarPausa(jornada.id, odometroFim: 100);
     await jornadaService.fecharJornada(odometroFim: 101);
     expect(await jornadaService.jornadaAberta(), isNull);
   });

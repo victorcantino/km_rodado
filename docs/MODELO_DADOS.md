@@ -107,6 +107,9 @@ jornada_id
 inicio
 fim
 
+odometro_inicio
+odometro_fim
+
 titulo
 
 observacao

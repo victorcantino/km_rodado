@@ -2557,6 +2557,28 @@ class $PausasTable extends Pausas with TableInfo<$PausasTable, Pausa> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _odometroInicioMeta = const VerificationMeta(
+    'odometroInicio',
+  );
+  @override
+  late final GeneratedColumn<int> odometroInicio = GeneratedColumn<int>(
+    'odometro_inicio',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _odometroFimMeta = const VerificationMeta(
+    'odometroFim',
+  );
+  @override
+  late final GeneratedColumn<int> odometroFim = GeneratedColumn<int>(
+    'odometro_fim',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _tituloMeta = const VerificationMeta('titulo');
   @override
   late final GeneratedColumn<String> titulo = GeneratedColumn<String>(
@@ -2595,6 +2617,8 @@ class $PausasTable extends Pausas with TableInfo<$PausasTable, Pausa> {
     jornadaId,
     inicio,
     fim,
+    odometroInicio,
+    odometroFim,
     titulo,
     observacao,
     dataCriacao,
@@ -2634,6 +2658,24 @@ class $PausasTable extends Pausas with TableInfo<$PausasTable, Pausa> {
       context.handle(
         _fimMeta,
         fim.isAcceptableOrUnknown(data['fim']!, _fimMeta),
+      );
+    }
+    if (data.containsKey('odometro_inicio')) {
+      context.handle(
+        _odometroInicioMeta,
+        odometroInicio.isAcceptableOrUnknown(
+          data['odometro_inicio']!,
+          _odometroInicioMeta,
+        ),
+      );
+    }
+    if (data.containsKey('odometro_fim')) {
+      context.handle(
+        _odometroFimMeta,
+        odometroFim.isAcceptableOrUnknown(
+          data['odometro_fim']!,
+          _odometroFimMeta,
+        ),
       );
     }
     if (data.containsKey('titulo')) {
@@ -2682,6 +2724,14 @@ class $PausasTable extends Pausas with TableInfo<$PausasTable, Pausa> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}fim'],
       ),
+      odometroInicio: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}odometro_inicio'],
+      ),
+      odometroFim: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}odometro_fim'],
+      ),
       titulo: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}titulo'],
@@ -2708,6 +2758,8 @@ class Pausa extends DataClass implements Insertable<Pausa> {
   final int jornadaId;
   final DateTime inicio;
   final DateTime? fim;
+  final int? odometroInicio;
+  final int? odometroFim;
   final String? titulo;
   final String? observacao;
   final DateTime dataCriacao;
@@ -2716,6 +2768,8 @@ class Pausa extends DataClass implements Insertable<Pausa> {
     required this.jornadaId,
     required this.inicio,
     this.fim,
+    this.odometroInicio,
+    this.odometroFim,
     this.titulo,
     this.observacao,
     required this.dataCriacao,
@@ -2728,6 +2782,12 @@ class Pausa extends DataClass implements Insertable<Pausa> {
     map['inicio'] = Variable<DateTime>(inicio);
     if (!nullToAbsent || fim != null) {
       map['fim'] = Variable<DateTime>(fim);
+    }
+    if (!nullToAbsent || odometroInicio != null) {
+      map['odometro_inicio'] = Variable<int>(odometroInicio);
+    }
+    if (!nullToAbsent || odometroFim != null) {
+      map['odometro_fim'] = Variable<int>(odometroFim);
     }
     if (!nullToAbsent || titulo != null) {
       map['titulo'] = Variable<String>(titulo);
@@ -2745,6 +2805,12 @@ class Pausa extends DataClass implements Insertable<Pausa> {
       jornadaId: Value(jornadaId),
       inicio: Value(inicio),
       fim: fim == null && nullToAbsent ? const Value.absent() : Value(fim),
+      odometroInicio: odometroInicio == null && nullToAbsent
+          ? const Value.absent()
+          : Value(odometroInicio),
+      odometroFim: odometroFim == null && nullToAbsent
+          ? const Value.absent()
+          : Value(odometroFim),
       titulo: titulo == null && nullToAbsent
           ? const Value.absent()
           : Value(titulo),
@@ -2765,6 +2831,8 @@ class Pausa extends DataClass implements Insertable<Pausa> {
       jornadaId: serializer.fromJson<int>(json['jornadaId']),
       inicio: serializer.fromJson<DateTime>(json['inicio']),
       fim: serializer.fromJson<DateTime?>(json['fim']),
+      odometroInicio: serializer.fromJson<int?>(json['odometroInicio']),
+      odometroFim: serializer.fromJson<int?>(json['odometroFim']),
       titulo: serializer.fromJson<String?>(json['titulo']),
       observacao: serializer.fromJson<String?>(json['observacao']),
       dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
@@ -2778,6 +2846,8 @@ class Pausa extends DataClass implements Insertable<Pausa> {
       'jornadaId': serializer.toJson<int>(jornadaId),
       'inicio': serializer.toJson<DateTime>(inicio),
       'fim': serializer.toJson<DateTime?>(fim),
+      'odometroInicio': serializer.toJson<int?>(odometroInicio),
+      'odometroFim': serializer.toJson<int?>(odometroFim),
       'titulo': serializer.toJson<String?>(titulo),
       'observacao': serializer.toJson<String?>(observacao),
       'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
@@ -2789,6 +2859,8 @@ class Pausa extends DataClass implements Insertable<Pausa> {
     int? jornadaId,
     DateTime? inicio,
     Value<DateTime?> fim = const Value.absent(),
+    Value<int?> odometroInicio = const Value.absent(),
+    Value<int?> odometroFim = const Value.absent(),
     Value<String?> titulo = const Value.absent(),
     Value<String?> observacao = const Value.absent(),
     DateTime? dataCriacao,
@@ -2797,6 +2869,10 @@ class Pausa extends DataClass implements Insertable<Pausa> {
     jornadaId: jornadaId ?? this.jornadaId,
     inicio: inicio ?? this.inicio,
     fim: fim.present ? fim.value : this.fim,
+    odometroInicio: odometroInicio.present
+        ? odometroInicio.value
+        : this.odometroInicio,
+    odometroFim: odometroFim.present ? odometroFim.value : this.odometroFim,
     titulo: titulo.present ? titulo.value : this.titulo,
     observacao: observacao.present ? observacao.value : this.observacao,
     dataCriacao: dataCriacao ?? this.dataCriacao,
@@ -2807,6 +2883,12 @@ class Pausa extends DataClass implements Insertable<Pausa> {
       jornadaId: data.jornadaId.present ? data.jornadaId.value : this.jornadaId,
       inicio: data.inicio.present ? data.inicio.value : this.inicio,
       fim: data.fim.present ? data.fim.value : this.fim,
+      odometroInicio: data.odometroInicio.present
+          ? data.odometroInicio.value
+          : this.odometroInicio,
+      odometroFim: data.odometroFim.present
+          ? data.odometroFim.value
+          : this.odometroFim,
       titulo: data.titulo.present ? data.titulo.value : this.titulo,
       observacao: data.observacao.present
           ? data.observacao.value
@@ -2824,6 +2906,8 @@ class Pausa extends DataClass implements Insertable<Pausa> {
           ..write('jornadaId: $jornadaId, ')
           ..write('inicio: $inicio, ')
           ..write('fim: $fim, ')
+          ..write('odometroInicio: $odometroInicio, ')
+          ..write('odometroFim: $odometroFim, ')
           ..write('titulo: $titulo, ')
           ..write('observacao: $observacao, ')
           ..write('dataCriacao: $dataCriacao')
@@ -2832,8 +2916,17 @@ class Pausa extends DataClass implements Insertable<Pausa> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, jornadaId, inicio, fim, titulo, observacao, dataCriacao);
+  int get hashCode => Object.hash(
+    id,
+    jornadaId,
+    inicio,
+    fim,
+    odometroInicio,
+    odometroFim,
+    titulo,
+    observacao,
+    dataCriacao,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2842,6 +2935,8 @@ class Pausa extends DataClass implements Insertable<Pausa> {
           other.jornadaId == this.jornadaId &&
           other.inicio == this.inicio &&
           other.fim == this.fim &&
+          other.odometroInicio == this.odometroInicio &&
+          other.odometroFim == this.odometroFim &&
           other.titulo == this.titulo &&
           other.observacao == this.observacao &&
           other.dataCriacao == this.dataCriacao);
@@ -2852,6 +2947,8 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
   final Value<int> jornadaId;
   final Value<DateTime> inicio;
   final Value<DateTime?> fim;
+  final Value<int?> odometroInicio;
+  final Value<int?> odometroFim;
   final Value<String?> titulo;
   final Value<String?> observacao;
   final Value<DateTime> dataCriacao;
@@ -2860,6 +2957,8 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
     this.jornadaId = const Value.absent(),
     this.inicio = const Value.absent(),
     this.fim = const Value.absent(),
+    this.odometroInicio = const Value.absent(),
+    this.odometroFim = const Value.absent(),
     this.titulo = const Value.absent(),
     this.observacao = const Value.absent(),
     this.dataCriacao = const Value.absent(),
@@ -2869,6 +2968,8 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
     required int jornadaId,
     required DateTime inicio,
     this.fim = const Value.absent(),
+    this.odometroInicio = const Value.absent(),
+    this.odometroFim = const Value.absent(),
     this.titulo = const Value.absent(),
     this.observacao = const Value.absent(),
     this.dataCriacao = const Value.absent(),
@@ -2879,6 +2980,8 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
     Expression<int>? jornadaId,
     Expression<DateTime>? inicio,
     Expression<DateTime>? fim,
+    Expression<int>? odometroInicio,
+    Expression<int>? odometroFim,
     Expression<String>? titulo,
     Expression<String>? observacao,
     Expression<DateTime>? dataCriacao,
@@ -2888,6 +2991,8 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
       if (jornadaId != null) 'jornada_id': jornadaId,
       if (inicio != null) 'inicio': inicio,
       if (fim != null) 'fim': fim,
+      if (odometroInicio != null) 'odometro_inicio': odometroInicio,
+      if (odometroFim != null) 'odometro_fim': odometroFim,
       if (titulo != null) 'titulo': titulo,
       if (observacao != null) 'observacao': observacao,
       if (dataCriacao != null) 'data_criacao': dataCriacao,
@@ -2899,6 +3004,8 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
     Value<int>? jornadaId,
     Value<DateTime>? inicio,
     Value<DateTime?>? fim,
+    Value<int?>? odometroInicio,
+    Value<int?>? odometroFim,
     Value<String?>? titulo,
     Value<String?>? observacao,
     Value<DateTime>? dataCriacao,
@@ -2908,6 +3015,8 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
       jornadaId: jornadaId ?? this.jornadaId,
       inicio: inicio ?? this.inicio,
       fim: fim ?? this.fim,
+      odometroInicio: odometroInicio ?? this.odometroInicio,
+      odometroFim: odometroFim ?? this.odometroFim,
       titulo: titulo ?? this.titulo,
       observacao: observacao ?? this.observacao,
       dataCriacao: dataCriacao ?? this.dataCriacao,
@@ -2929,6 +3038,12 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
     if (fim.present) {
       map['fim'] = Variable<DateTime>(fim.value);
     }
+    if (odometroInicio.present) {
+      map['odometro_inicio'] = Variable<int>(odometroInicio.value);
+    }
+    if (odometroFim.present) {
+      map['odometro_fim'] = Variable<int>(odometroFim.value);
+    }
     if (titulo.present) {
       map['titulo'] = Variable<String>(titulo.value);
     }
@@ -2948,6 +3063,8 @@ class PausasCompanion extends UpdateCompanion<Pausa> {
           ..write('jornadaId: $jornadaId, ')
           ..write('inicio: $inicio, ')
           ..write('fim: $fim, ')
+          ..write('odometroInicio: $odometroInicio, ')
+          ..write('odometroFim: $odometroFim, ')
           ..write('titulo: $titulo, ')
           ..write('observacao: $observacao, ')
           ..write('dataCriacao: $dataCriacao')
@@ -6124,6 +6241,8 @@ typedef $$PausasTableCreateCompanionBuilder =
       required int jornadaId,
       required DateTime inicio,
       Value<DateTime?> fim,
+      Value<int?> odometroInicio,
+      Value<int?> odometroFim,
       Value<String?> titulo,
       Value<String?> observacao,
       Value<DateTime> dataCriacao,
@@ -6134,6 +6253,8 @@ typedef $$PausasTableUpdateCompanionBuilder =
       Value<int> jornadaId,
       Value<DateTime> inicio,
       Value<DateTime?> fim,
+      Value<int?> odometroInicio,
+      Value<int?> odometroFim,
       Value<String?> titulo,
       Value<String?> observacao,
       Value<DateTime> dataCriacao,
@@ -6200,6 +6321,16 @@ class $$PausasTableFilterComposer
 
   ColumnFilters<DateTime> get fim => $composableBuilder(
     column: $table.fim,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get odometroInicio => $composableBuilder(
+    column: $table.odometroInicio,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get odometroFim => $composableBuilder(
+    column: $table.odometroFim,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6291,6 +6422,16 @@ class $$PausasTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get odometroInicio => $composableBuilder(
+    column: $table.odometroInicio,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get odometroFim => $composableBuilder(
+    column: $table.odometroFim,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get titulo => $composableBuilder(
     column: $table.titulo,
     builder: (column) => ColumnOrderings(column),
@@ -6347,6 +6488,16 @@ class $$PausasTableAnnotationComposer
 
   GeneratedColumn<DateTime> get fim =>
       $composableBuilder(column: $table.fim, builder: (column) => column);
+
+  GeneratedColumn<int> get odometroInicio => $composableBuilder(
+    column: $table.odometroInicio,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get odometroFim => $composableBuilder(
+    column: $table.odometroFim,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get titulo =>
       $composableBuilder(column: $table.titulo, builder: (column) => column);
@@ -6442,6 +6593,8 @@ class $$PausasTableTableManager
                 Value<int> jornadaId = const Value.absent(),
                 Value<DateTime> inicio = const Value.absent(),
                 Value<DateTime?> fim = const Value.absent(),
+                Value<int?> odometroInicio = const Value.absent(),
+                Value<int?> odometroFim = const Value.absent(),
                 Value<String?> titulo = const Value.absent(),
                 Value<String?> observacao = const Value.absent(),
                 Value<DateTime> dataCriacao = const Value.absent(),
@@ -6450,6 +6603,8 @@ class $$PausasTableTableManager
                 jornadaId: jornadaId,
                 inicio: inicio,
                 fim: fim,
+                odometroInicio: odometroInicio,
+                odometroFim: odometroFim,
                 titulo: titulo,
                 observacao: observacao,
                 dataCriacao: dataCriacao,
@@ -6460,6 +6615,8 @@ class $$PausasTableTableManager
                 required int jornadaId,
                 required DateTime inicio,
                 Value<DateTime?> fim = const Value.absent(),
+                Value<int?> odometroInicio = const Value.absent(),
+                Value<int?> odometroFim = const Value.absent(),
                 Value<String?> titulo = const Value.absent(),
                 Value<String?> observacao = const Value.absent(),
                 Value<DateTime> dataCriacao = const Value.absent(),
@@ -6468,6 +6625,8 @@ class $$PausasTableTableManager
                 jornadaId: jornadaId,
                 inicio: inicio,
                 fim: fim,
+                odometroInicio: odometroInicio,
+                odometroFim: odometroFim,
                 titulo: titulo,
                 observacao: observacao,
                 dataCriacao: dataCriacao,

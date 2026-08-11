@@ -1,35 +1,21 @@
-# Tarefa atual — Leitura inicial e final da Jornada
+# Tarefa atual — Odômetro nas Pausas e plataformas operacionais
 
 ## Objetivo
 
-Completar o ciclo de Leituras de Ganhos no schema 2 existente.
+Registrar odômetros no início e fim das Pausas e configurar no diálogo de
+ganhos quais plataformas participam das próximas Jornadas.
 
 ## Escopo
 
-- solicitar leitura inicial após persistir a Jornada;
-- manter a Jornada quando a leitura inicial for cancelada;
-- restaurar e apresentar o estado de ganhos iniciais pendentes;
-- impedir leituras parciais e final sem a base inicial;
-- preservar as leituras parciais durante Pausas;
-- sugerir na leitura final a última leitura da própria Jornada;
-- coletar todos os dados antes de persistir o encerramento;
-- salvar leitura final e fechamento da Jornada atomicamente;
-- impedir mais de uma leitura inicial ou final por Jornada;
-- manter plataformas individuais apenas informativas.
+- migrar schema 2 para 3 preservando odômetros históricos nulos;
+- exigir progressão não regressiva em novas Pausas;
+- permitir Jornada e Pausa sem deslocamento;
+- manter o fluxo de leituras;
+- ativar/desativar plataformas sem excluir dados;
+- fixar o conjunto acumulado pelos itens da Leitura Inicial.
 
 ## Fora do escopo
 
+- dashboard, manutenção, abastecimento e eventos;
 - lançamentos individuais;
-- alteração do schema 2;
-- cálculos financeiros, diferenças e dashboards;
-- configuração de plataformas por Jornada;
-- redesign geral da Jornada.
-
-## Pronto quando
-
-- a inicial estabelecer a base sem herdar dados da Jornada anterior;
-- uma inicial pendente sobreviver ao reinício sem dados inventados;
-- parciais exigirem a inicial e continuarem funcionando depois dela;
-- cancelar qualquer diálogo de encerramento não alterar a Jornada;
-- leitura final e fechamento forem confirmados ou revertidos juntos;
-- análise, testes e documentação representarem o comportamento entregue.
+- tela geral de configurações.

@@ -21,6 +21,9 @@
 
 # Futuro
 
+- Manutenção com mapa visual do veículo para selecionar regiões e lados, como
+  faróis e pneus dianteiros/traseiros, reduzindo digitação manual
+
 - Timeline como projeção de tabelas especializadas, sem tabela genérica Evento
 - Definir regras específicas de reset somente quando conhecidas
 - Clima

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/constants/enums/tipo_registro_ganhos.dart';
 import '../../../../core/database/app_database.dart';
 import '../../data/leitura_ganhos_service.dart';
+import 'configurar_plataformas_dialog.dart';
 
 typedef LeituraGanhosResultado = List<ItemLeituraGanhosEntrada>;
 
@@ -11,12 +12,16 @@ class LeituraGanhosDialog extends StatefulWidget {
   final List<Plataforma> plataformas;
   final Map<int, LeiturasGanhoPlataformaData> sugestoes;
   final String titulo;
+  final List<Plataforma>? todasPlataformas;
+  final Future<List<Plataforma>> Function(Map<int, bool>)? onConfigurar;
 
   const LeituraGanhosDialog({
     super.key,
     required this.plataformas,
     required this.sugestoes,
     this.titulo = 'Registrar ganhos',
+    this.todasPlataformas,
+    this.onConfigurar,
   });
 
   @override
@@ -28,8 +33,9 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
   final moeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
   final valores = <int, TextEditingController>{};
   final quantidades = <int, TextEditingController>{};
+  late List<Plataforma> plataformas = widget.plataformas;
 
-  Iterable<Plataforma> get plataformasAcumuladas => widget.plataformas.where(
+  Iterable<Plataforma> get plataformasAcumuladas => plataformas.where(
     (plataforma) =>
         plataforma.tipoRegistroGanhos == TipoRegistroGanhos.acumulado,
   );
@@ -47,6 +53,25 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
       );
       quantidades[plataforma.id] = TextEditingController(
         text: sugestao?.quantidadeViagensAcumulada.toString() ?? '0',
+      );
+    }
+  }
+
+  Future<void> _configurar() async {
+    final resultado = await showDialog<Map<int, bool>>(
+      context: context,
+      builder: (_) =>
+          ConfigurarPlataformasDialog(plataformas: widget.todasPlataformas!),
+    );
+    if (resultado == null) return;
+    final atualizadas = await widget.onConfigurar!(resultado);
+    if (!mounted) return;
+    setState(() => plataformas = atualizadas);
+    for (final plataforma in plataformasAcumuladas) {
+      valores.putIfAbsent(plataforma.id, TextEditingController.new);
+      quantidades.putIfAbsent(
+        plataforma.id,
+        () => TextEditingController(text: '0'),
       );
     }
   }
@@ -108,7 +133,17 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
     final possuiAcumulada = plataformasAcumuladas.isNotEmpty;
 
     return AlertDialog(
-      title: Text(widget.titulo),
+      title: Row(
+        children: [
+          Expanded(child: Text(widget.titulo)),
+          if (widget.onConfigurar != null)
+            IconButton(
+              tooltip: 'Configurar plataformas',
+              onPressed: _configurar,
+              icon: const Icon(Icons.settings),
+            ),
+        ],
+      ),
       content: SizedBox(
         width: 420,
         child: Form(
@@ -117,9 +152,9 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (widget.plataformas.isEmpty)
+                if (plataformas.isEmpty)
                   const Text('Nenhuma plataforma ativa cadastrada.'),
-                for (final plataforma in widget.plataformas) ...[
+                for (final plataforma in plataformas) ...[
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(

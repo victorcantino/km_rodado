@@ -31,12 +31,32 @@ class LeituraGanhosController extends ChangeNotifier {
 
   Future<void> preparar(int jornadaId, {required bool usarSugestoes}) async {
     await _executar(() async {
-      plataformas = await _service.listarPlataformasAtivas();
+      plataformas = await _service.listarPlataformasParaLeitura(
+        jornadaId,
+        leituraInicial: !usarSugestoes,
+      );
       sugestoes = usarSugestoes
           ? await _service.buscarSugestoes(jornadaId)
           : const {};
     });
   }
+
+  Future<List<Plataforma>> configurarPlataformas(
+    int jornadaId,
+    Map<int, bool> ativacoes, {
+    required bool leituraInicial,
+  }) async {
+    await _service.atualizarAtivacao(ativacoes);
+    plataformas = await _service.listarPlataformasParaLeitura(
+      jornadaId,
+      leituraInicial: leituraInicial,
+    );
+    notifyListeners();
+    return plataformas;
+  }
+
+  Future<List<Plataforma>> listarTodasPlataformas() =>
+      _service.listarPlataformas();
 
   Future<void> salvarInicial({
     required int jornadaId,

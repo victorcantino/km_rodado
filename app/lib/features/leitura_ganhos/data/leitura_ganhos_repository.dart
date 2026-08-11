@@ -11,6 +11,14 @@ class LeituraGanhosRepository {
     return _dao.listarPlataformasAtivas();
   }
 
+  Future<List<Plataforma>> listarPlataformas() => _dao.listarPlataformas();
+
+  Future<void> atualizarAtivacao(Map<int, bool> ativacoes) =>
+      _dao.atualizarAtivacao(ativacoes);
+
+  Future<List<Plataforma>> listarPlataformasDaLeituraInicial(int jornadaId) =>
+      _dao.listarPlataformasDaLeituraInicial(jornadaId);
+
   Future<Pausa?> buscarPausa(int pausaId) {
     return _dao.buscarPausa(pausaId);
   }

@@ -34,6 +34,49 @@ class LeituraGanhosDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
+  Future<List<Plataforma>> listarPlataformas() =>
+      (select(plataformas)..orderBy([
+            (plataforma) => OrderingTerm.asc(plataforma.ordem),
+            (plataforma) => OrderingTerm.asc(plataforma.nome),
+          ]))
+          .get();
+
+  Future<void> atualizarAtivacao(Map<int, bool> ativacoes) async {
+    await transaction(() async {
+      for (final entry in ativacoes.entries) {
+        await (update(plataformas)..where((p) => p.id.equals(entry.key))).write(
+          PlataformasCompanion(ativa: Value(entry.value)),
+        );
+      }
+    });
+  }
+
+  Future<List<Plataforma>> listarPlataformasDaLeituraInicial(
+    int jornadaId,
+  ) async {
+    final consulta =
+        select(plataformas).join([
+            innerJoin(
+              leiturasGanhoPlataforma,
+              leiturasGanhoPlataforma.plataformaId.equalsExp(plataformas.id),
+            ),
+            innerJoin(
+              leiturasGanhos,
+              leiturasGanhos.id.equalsExp(
+                leiturasGanhoPlataforma.leituraGanhosId,
+              ),
+            ),
+          ])
+          ..where(
+            leiturasGanhos.jornadaId.equals(jornadaId) &
+                leiturasGanhos.tipo.equalsValue(TipoLeituraGanhos.inicial),
+          )
+          ..orderBy([OrderingTerm.asc(plataformas.ordem)]);
+    return (await consulta.get())
+        .map((row) => row.readTable(plataformas))
+        .toList();
+  }
+
   Future<Pausa?> buscarPausa(int pausaId) {
     return (select(
       pausas,

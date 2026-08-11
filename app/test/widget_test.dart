@@ -230,19 +230,11 @@ void main() {
     await tester.pump();
     expect(find.text('O odômetro não pode ser negativo.'), findsOneWidget);
 
-    await tester.enterText(campoOdometro, '100');
-    await tester.tap(find.text('Confirmar'));
-    await tester.pump();
-    expect(
-      find.text('O odômetro final deve ser maior que o inicial.'),
-      findsOneWidget,
-    );
-
     await tester.enterText(campoOdometro, '99');
     await tester.tap(find.text('Confirmar'));
     await tester.pump();
     expect(
-      find.text('O odômetro final deve ser maior que o inicial.'),
+      find.text('O odômetro final não pode ser menor que o inicial.'),
       findsOneWidget,
     );
   });
