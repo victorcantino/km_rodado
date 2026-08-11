@@ -11,6 +11,10 @@ class Pausas extends Table {
 
   DateTimeColumn get fim => dateTime().nullable()();
 
+  IntColumn get odometroInicio => integer().nullable()();
+
+  IntColumn get odometroFim => integer().nullable()();
+
   TextColumn get titulo => text().nullable()();
 
   TextColumn get observacao => text().nullable()();

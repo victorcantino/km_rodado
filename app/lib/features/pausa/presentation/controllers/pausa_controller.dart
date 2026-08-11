@@ -35,16 +35,16 @@ class PausaController extends ChangeNotifier {
     });
   }
 
-  Future<void> iniciar(int jornadaId) async {
+  Future<void> iniciar(int jornadaId, {required int odometroInicio}) async {
     await _executar(() async {
-      await _service.iniciarPausa();
+      await _service.iniciarPausa(odometroInicio: odometroInicio);
       pausas = await _service.listarPorJornada(jornadaId);
     });
   }
 
-  Future<void> finalizar(int jornadaId) async {
+  Future<void> finalizar(int jornadaId, {required int odometroFim}) async {
     await _executar(() async {
-      await _service.finalizarPausa(jornadaId);
+      await _service.finalizarPausa(jornadaId, odometroFim: odometroFim);
       pausas = await _service.listarPorJornada(jornadaId);
     });
   }

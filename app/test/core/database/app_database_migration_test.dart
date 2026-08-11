@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:km_rodado/core/constants/enums/tipo_leitura_ganhos.dart';
@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('migra schema 1 vazio para schema 2', () async {
+  test('migra schema 1 vazio para schema 3', () async {
     _criarBancoSchema1(arquivoBanco);
 
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
@@ -34,7 +34,7 @@ void main() {
     expect(await _contar(database, 'pausas'), 0);
     expect(await _contar(database, 'leituras_ganhos'), 0);
     expect(await _contar(database, 'leituras_ganho_plataforma'), 0);
-    expect(await _userVersion(database), 2);
+    expect(await _userVersion(database), 3);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(
       await _indiceExiste(database, 'idx_leituras_ganhos_jornada_data_hora'),
@@ -59,6 +59,8 @@ void main() {
     expect(pausas.single.jornadaId, 11);
     expect(pausas.single.titulo, 'Almoço');
     expect(pausas.single.observacao, 'Pausa principal');
+    expect(pausas.single.odometroInicio, isNull);
+    expect(pausas.single.odometroFim, isNull);
 
     expect(leituras, hasLength(3));
     expect(itens, hasLength(3));
@@ -84,7 +86,7 @@ void main() {
       plataformas.map((plataforma) => plataforma.tipoRegistroGanhos).toSet(),
       {TipoRegistroGanhos.acumulado},
     );
-    expect(await _userVersion(database), 2);
+    expect(await _userVersion(database), 3);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
@@ -168,6 +170,32 @@ void main() {
       '''),
       throwsA(isA<Exception>()),
     );
+  });
+
+  test('migra schema 2 preservando Pausa sem inventar odômetros', () async {
+    final banco = sqlite.sqlite3.open(arquivoBanco.path);
+    banco.execute('''
+      CREATE TABLE pausas (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        jornada_id INTEGER NOT NULL,
+        inicio INTEGER NOT NULL,
+        fim INTEGER NULL,
+        titulo TEXT NULL,
+        observacao TEXT NULL,
+        data_criacao INTEGER NOT NULL
+      );
+      INSERT INTO pausas VALUES (1, 1, 1700000000, 1700000100, 'Antiga', NULL, 1700000000);
+      PRAGMA user_version = 2;
+    ''');
+    banco.close();
+
+    final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
+    addTearDown(database.close);
+    final pausa = (await database.select(database.pausas).get()).single;
+
+    expect(await _userVersion(database), 3);
+    expect(pausa.odometroInicio, isNull);
+    expect(pausa.odometroFim, isNull);
   });
 }
 

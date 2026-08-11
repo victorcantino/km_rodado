@@ -23,15 +23,28 @@ class PausaService {
     return _repository.buscarAbertaPorJornada(jornadaId);
   }
 
-  Future<int> iniciarPausa() async {
+  Future<int> iniciarPausa({required int odometroInicio}) async {
     final jornada = await _jornadaRepository.buscarJornadaAberta();
 
     if (jornada == null) {
       throw Exception('Não existe Jornada aberta para iniciar uma Pausa.');
     }
 
+    if (odometroInicio < 0) {
+      throw Exception('O odômetro não pode ser negativo.');
+    }
+    final pausas = await _repository.listarPorJornada(jornada.id);
+    final ultimoOdometro = _ultimoOdometroConhecido(jornada, pausas);
+    if (odometroInicio < ultimoOdometro) {
+      throw Exception('O odômetro não pode ser menor que o último registrado.');
+    }
+
     final pausaId = await _repository.inserirSeNaoHouverAberta(
-      PausasCompanion.insert(jornadaId: jornada.id, inicio: _agora()),
+      PausasCompanion.insert(
+        jornadaId: jornada.id,
+        inicio: _agora(),
+        odometroInicio: Value(odometroInicio),
+      ),
     );
 
     if (pausaId == null) {
@@ -41,7 +54,7 @@ class PausaService {
     return pausaId;
   }
 
-  Future<bool> finalizarPausa(int jornadaId) async {
+  Future<bool> finalizarPausa(int jornadaId, {required int odometroFim}) async {
     final pausa = await _repository.buscarAbertaPorJornada(jornadaId);
 
     if (pausa == null) {
@@ -54,7 +67,30 @@ class PausaService {
       throw Exception('O fim da Pausa não pode ser anterior ao início.');
     }
 
-    return _repository.atualizar(pausa.copyWith(fim: Value(fim)));
+    if (odometroFim < 0) {
+      throw Exception('O odômetro não pode ser negativo.');
+    }
+    var odometroMinimo = pausa.odometroInicio;
+    if (odometroMinimo == null) {
+      final jornada = await _jornadaRepository.buscarJornadaAberta();
+      if (jornada == null || jornada.id != jornadaId) {
+        throw Exception('Não existe Jornada aberta para finalizar a Pausa.');
+      }
+      final pausas = await _repository.listarPorJornada(jornadaId);
+      odometroMinimo = _ultimoOdometroConhecido(
+        jornada,
+        pausas.where((registro) => registro.id != pausa.id).toList(),
+      );
+    }
+    if (odometroFim < odometroMinimo) {
+      throw Exception(
+        'O odômetro final da Pausa não pode ser menor que o último registrado.',
+      );
+    }
+
+    return _repository.atualizar(
+      pausa.copyWith(fim: Value(fim), odometroFim: Value(odometroFim)),
+    );
   }
 
   Future<bool> editarTitulo(Pausa pausa, String titulo) {
@@ -65,5 +101,13 @@ class PausaService {
         titulo: Value(tituloNormalizado.isEmpty ? null : tituloNormalizado),
       ),
     );
+  }
+
+  int _ultimoOdometroConhecido(Jornada jornada, List<Pausa> pausas) {
+    for (final pausa in pausas.reversed) {
+      final odometro = pausa.odometroFim ?? pausa.odometroInicio;
+      if (odometro != null) return odometro;
+    }
+    return jornada.odometroInicio;
   }
 }

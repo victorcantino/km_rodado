@@ -125,6 +125,57 @@ void main() {
     );
   });
 
+  test(
+    'ativação define a inicial e não altera o conjunto da Jornada',
+    () async {
+      final jornada = await abrirJornada();
+      final uberId = await inserirPlataforma(
+        'Uber',
+        TipoRegistroGanhos.acumulado,
+      );
+      final noventaNoveId = await inserirPlataforma(
+        '99',
+        TipoRegistroGanhos.acumulado,
+      );
+      final inDriveId = await inserirPlataforma(
+        'inDrive',
+        TipoRegistroGanhos.acumulado,
+      );
+
+      await leituraService.atualizarAtivacao({inDriveId: false});
+      final plataformasIniciais = await leituraService
+          .listarPlataformasParaLeitura(jornada.id, leituraInicial: true);
+      expect(
+        plataformasIniciais.map((p) => p.id),
+        unorderedEquals([uberId, noventaNoveId]),
+      );
+
+      await leituraService.salvarLeituraInicial(
+        jornadaId: jornada.id,
+        itens: [item(uberId), item(noventaNoveId)],
+      );
+      await leituraService.atualizarAtivacao({uberId: false, inDriveId: true});
+
+      final plataformasDaJornada = await leituraService
+          .listarPlataformasParaLeitura(jornada.id, leituraInicial: false);
+      expect(
+        plataformasDaJornada.map((p) => p.id),
+        unorderedEquals([uberId, noventaNoveId]),
+      );
+      final pausaId = await pausaService.iniciarPausa(odometroInicio: 100);
+      await leituraService.salvarLeituraParcial(
+        jornadaId: jornada.id,
+        pausaId: pausaId,
+        itens: [item(uberId), item(noventaNoveId)],
+      );
+
+      final todas = await leituraService.listarPlataformas();
+      expect(todas, hasLength(3));
+      expect(todas.singleWhere((p) => p.id == uberId).ativa, isFalse);
+      expect(todas.singleWhere((p) => p.id == inDriveId).ativa, isTrue);
+    },
+  );
+
   test('leitura inicial não herda valores de Jornada anterior', () async {
     final uberId = await inserirPlataforma(
       'Uber',
@@ -177,7 +228,7 @@ void main() {
 
   test('impede leitura parcial enquanto a inicial estiver pendente', () async {
     final jornada = await abrirJornada();
-    final pausaId = await pausaService.iniciarPausa();
+    final pausaId = await pausaService.iniciarPausa(odometroInicio: 100);
     final uberId = await inserirPlataforma(
       'Uber',
       TipoRegistroGanhos.acumulado,
@@ -361,7 +412,7 @@ void main() {
       TipoRegistroGanhos.acumulado,
     );
     await registrarInicial(jornada, [uberId]);
-    await pausaService.iniciarPausa();
+    await pausaService.iniciarPausa(odometroInicio: 100);
 
     await expectLater(
       leituraService.finalizarJornada(
@@ -433,7 +484,7 @@ void main() {
 
   test('salva leitura parcial na Pausa e mantém a Pausa aberta', () async {
     final jornada = await abrirJornada();
-    final pausaId = await pausaService.iniciarPausa();
+    final pausaId = await pausaService.iniciarPausa(odometroInicio: 100);
     final uberId = await inserirPlataforma(
       'Uber',
       TipoRegistroGanhos.acumulado,
@@ -498,7 +549,7 @@ void main() {
     'rejeita plataforma repetida, individual, inativa e negativos',
     () async {
       final jornada = await abrirJornada();
-      final pausaId = await pausaService.iniciarPausa();
+      final pausaId = await pausaService.iniciarPausa(odometroInicio: 100);
       final uberId = await inserirPlataforma(
         'Uber',
         TipoRegistroGanhos.acumulado,
@@ -547,7 +598,9 @@ void main() {
 
   test('sugere leitura anterior e aceita snapshot sem alteração', () async {
     final jornada = await abrirJornada();
-    final primeiraPausaId = await pausaService.iniciarPausa();
+    final primeiraPausaId = await pausaService.iniciarPausa(
+      odometroInicio: 100,
+    );
     final uberId = await inserirPlataforma(
       'Uber',
       TipoRegistroGanhos.acumulado,
@@ -560,8 +613,8 @@ void main() {
       pausaId: primeiraPausaId,
       itens: [snapshot],
     );
-    await pausaService.finalizarPausa(jornada.id);
-    final segundaPausaId = await pausaService.iniciarPausa();
+    await pausaService.finalizarPausa(jornada.id, odometroFim: 100);
+    final segundaPausaId = await pausaService.iniciarPausa(odometroInicio: 100);
 
     final sugestoes = await leituraService.buscarSugestoes(jornada.id);
     expect(sugestoes[uberId]!.valorAcumuladoCentavos, 5025);
@@ -579,7 +632,7 @@ void main() {
 
   test('leitura pode ser restaurada por nova instância do service', () async {
     final jornada = await abrirJornada();
-    final pausaId = await pausaService.iniciarPausa();
+    final pausaId = await pausaService.iniciarPausa(odometroInicio: 100);
     final uberId = await inserirPlataforma(
       'Uber',
       TipoRegistroGanhos.acumulado,
@@ -647,7 +700,7 @@ void main() {
 
   testWidgets('cancelar diálogo mantém a Pausa aberta', (tester) async {
     final jornada = await abrirJornada();
-    await pausaService.iniciarPausa();
+    await pausaService.iniciarPausa(odometroInicio: 100);
     final uberId = await inserirPlataforma(
       'Uber',
       TipoRegistroGanhos.acumulado,

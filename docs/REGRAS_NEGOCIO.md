@@ -81,10 +81,11 @@ justificativa obrigatória e registro da alteração.
 
 ## 2.3 Fechamento da Jornada
 
-O odômetro final deve ser obrigatoriamente maior que o odômetro inicial.
+O odômetro final deve ser maior ou igual ao odômetro inicial e ao último
+odômetro conhecido da Jornada.
 
 ```text
-odometro_fim > odometro_inicio
+odometro_fim >= odometro_inicio
 ```
 
 Os quilômetros percorridos devem ser calculados por:
@@ -93,7 +94,7 @@ Os quilômetros percorridos devem ser calculados por:
 odometro_fim - odometro_inicio
 ```
 
-Uma Jornada não pode ser finalizada com zero ou com quilômetros negativos.
+Uma Jornada pode ser finalizada sem deslocamento, mas nunca com regressão.
 
 Enquanto o GPS não estiver implementado, a cidade de origem da Jornada aberta
 deve ser sugerida como destino no fechamento. O usuário pode editar ou remover
@@ -162,7 +163,12 @@ Ao iniciar uma pausa:
 O sistema deve registrar:
 
 * horário inicial;
+* odômetro inicial;
 * título opcional.
+
+Ao retomar, horário e odômetro final são registrados. Os odômetros são
+obrigatórios para novas Pausas, nunca podem regredir e podem permanecer iguais.
+Pausas históricas permanecem sem odômetro quando o dado não existe.
 
 Sem título, a interface pode apresentar `Pausa 1`, `Pausa 2` etc. A duração é
 derivada de início e fim e não deve ser persistida.
@@ -254,6 +260,10 @@ demais em dashboards, pausas, fechamento e relatórios.
 Uma instalação nova deve disponibilizar Uber, 99, inDrive e Particular como
 plataformas padrão ativas. O seed identifica plataformas pelo nome normalizado,
 não depende de IDs fixos e preserva integralmente registros já existentes.
+
+A configuração rápida permite ativar ou desativar plataformas sem excluí-las.
+A Leitura Inicial fixa o conjunto acumulado obrigatório da Jornada. Mudanças
+posteriores valem para a próxima Jornada e não alteram dados históricos.
 
 Nesta primeira entrega, plataformas individuais aparecem na leitura apenas com
 a indicação de que seus totais virão de lançamentos futuros. Elas não são

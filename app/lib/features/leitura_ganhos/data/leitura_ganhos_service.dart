@@ -31,6 +31,26 @@ class LeituraGanhosService {
     return _repository.listarPlataformasAtivas();
   }
 
+  Future<List<Plataforma>> listarPlataformas() =>
+      _repository.listarPlataformas();
+
+  Future<void> atualizarAtivacao(Map<int, bool> ativacoes) =>
+      _repository.atualizarAtivacao(ativacoes);
+
+  Future<List<Plataforma>> listarPlataformasParaLeitura(
+    int jornadaId, {
+    required bool leituraInicial,
+  }) async {
+    if (leituraInicial) return listarPlataformasAtivas();
+    final acumuladas = await _repository.listarPlataformasDaLeituraInicial(
+      jornadaId,
+    );
+    final individuaisAtivas = (await listarPlataformasAtivas()).where(
+      (p) => p.tipoRegistroGanhos == TipoRegistroGanhos.individual,
+    );
+    return [...acumuladas, ...individuaisAtivas];
+  }
+
   Future<Map<int, LeiturasGanhoPlataformaData>> buscarSugestoes(int jornadaId) {
     return _repository.buscarUltimosItensPorPlataforma(jornadaId);
   }
@@ -55,7 +75,7 @@ class LeituraGanhosService {
     required List<ItemLeituraGanhosEntrada> itens,
   }) async {
     await _validarJornadaAberta(jornadaId);
-    await _validarItens(itens);
+    await _validarItens(jornadaId, itens, usarLeituraInicial: false);
 
     if (await buscarLeituraInicial(jornadaId) != null) {
       throw Exception('Os ganhos iniciais desta Jornada já foram registrados.');
@@ -91,7 +111,7 @@ class LeituraGanhosService {
       throw Exception('A Pausa não pertence à Jornada da leitura.');
     }
 
-    await _validarItens(itens);
+    await _validarItens(jornadaId, itens, usarLeituraInicial: true);
     final agora = _agora();
     return _repository.salvarLeitura(
       _criarLeitura(
@@ -129,11 +149,19 @@ class LeituraGanhosService {
       );
     }
 
-    if (odometroFim <= jornada.odometroInicio) {
-      throw Exception('O odômetro final deve ser maior que o inicial.');
+    final pausas = await _pausaRepository.listarPorJornada(jornadaId);
+    var ultimoOdometro = jornada.odometroInicio;
+    for (final pausa in pausas) {
+      ultimoOdometro =
+          pausa.odometroFim ?? pausa.odometroInicio ?? ultimoOdometro;
+    }
+    if (odometroFim < ultimoOdometro) {
+      throw Exception(
+        'O odômetro final não pode ser menor que o último registrado.',
+      );
     }
 
-    await _validarItens(itens);
+    await _validarItens(jornadaId, itens, usarLeituraInicial: true);
     final agora = _agora();
     final jornadaFinalizada = jornada.copyWith(
       dataHoraFim: Value(agora),
@@ -160,7 +188,11 @@ class LeituraGanhosService {
     return jornada;
   }
 
-  Future<void> _validarItens(List<ItemLeituraGanhosEntrada> itens) async {
+  Future<void> _validarItens(
+    int jornadaId,
+    List<ItemLeituraGanhosEntrada> itens, {
+    required bool usarLeituraInicial,
+  }) async {
     if (itens.isEmpty) {
       throw Exception('Informe ao menos uma plataforma acumulada.');
     }
@@ -176,7 +208,9 @@ class LeituraGanhosService {
       throw Exception('A quantidade acumulada não pode ser negativa.');
     }
 
-    final plataformas = await _repository.listarPlataformasAtivas();
+    final plataformas = usarLeituraInicial
+        ? await _repository.listarPlataformasDaLeituraInicial(jornadaId)
+        : await _repository.listarPlataformasAtivas();
     final idsAcumulados = plataformas
         .where(
           (plataforma) =>

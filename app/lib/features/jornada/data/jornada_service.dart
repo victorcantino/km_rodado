@@ -73,8 +73,16 @@ class JornadaService {
       );
     }
 
-    if (odometroFim <= jornada.odometroInicio) {
-      throw Exception('O odômetro final deve ser maior que o inicial.');
+    final pausas = await _pausaRepository.listarPorJornada(jornada.id);
+    var ultimoOdometro = jornada.odometroInicio;
+    for (final pausa in pausas) {
+      ultimoOdometro =
+          pausa.odometroFim ?? pausa.odometroInicio ?? ultimoOdometro;
+    }
+    if (odometroFim < ultimoOdometro) {
+      throw Exception(
+        'O odômetro final não pode ser menor que o último registrado.',
+      );
     }
 
     final jornadaAtualizada = jornada.copyWith(

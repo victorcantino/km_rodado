@@ -2,7 +2,7 @@
 
 ## Funcionalidade em desenvolvimento
 
-Leituras inicial e final de ganhos da Jornada.
+Odômetro nas Pausas e configuração rápida de plataformas.
 
 ## Objetivo atual
 
@@ -72,10 +72,14 @@ final integrada atomicamente ao fechamento, sem alterar o schema 2.
 - Leitura final sugerida pela última leitura da própria Jornada
 - Persistência atômica da leitura final e do fechamento da Jornada
 - Unicidade de leituras inicial e final protegida na camada de negócio
+- Schema 3 com odômetros nullable em Pausas para compatibilidade histórica
+- Odômetros obrigatórios no início e fim de novas Pausas
+- Configuração rápida de plataformas no diálogo de ganhos
+- Conjunto acumulado da Jornada fixado pela Leitura Inicial
 
 ## Em andamento
 
-- Validação da leitura inicial e final em instalação real
+- Validação de odômetros nas Pausas e ativação de plataformas
 
 ## Próximo passo
 
