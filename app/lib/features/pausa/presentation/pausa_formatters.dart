@@ -4,14 +4,14 @@ String formatarDuracaoPausa(Duration duracao) {
   final minutos = minutosTotais.remainder(Duration.minutesPerHour);
 
   if (horas == 0) {
-    return '${minutos}m';
+    return '${minutos}min';
   }
 
   if (minutos == 0) {
     return '${horas}h';
   }
 
-  return '${horas}h ${minutos.toString().padLeft(2, '0')}m';
+  return '${horas}h ${minutos.toString().padLeft(2, '0')}min';
 }
 
 String tituloExibicaoPausa(String? titulo, int numero) {

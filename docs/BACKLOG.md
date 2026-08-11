@@ -21,6 +21,24 @@
 
 # Futuro
 
+- Planejar migração histórica de mais de um ano de dados do AppSheet quando o
+  modelo de destino estiver estável, preservando Jornadas, ganhos, odômetros,
+  manutenções, custos e os dados originais para análises históricas
+- Evoluir a interface funcional atual para uma experiência móvel e operacional
+  mais rica, sem antecipar o redesign durante a estabilização dos fluxos
+
+- Modelar custos futuros distinguindo custos diretamente associados a uma
+  Jornada, custos ocorridos no dia sem necessariamente pertencer à Jornada e
+  custos independentes de Jornada. Estacionamento e pedágio durante o trabalho
+  podem pertencer à Jornada; manutenção pode ter `jornadaId` quando ocorrer
+  durante o trabalho ou deixá-lo ausente fora dele; IPVA, seguro, licenciamento
+  e financiamento permanecem custos ou obrigações independentes da Jornada
+
+- Permitir que o futuro resumo apresente separadamente, quando houver dados,
+  receita bruta, custos diretamente atribuíveis à Jornada, resultado
+  operacional da Jornada e custos gerais do dia, sem atribuir artificialmente
+  estes últimos à Jornada
+
 - Manutenção com mapa visual do veículo para selecionar regiões e lados, como
   faróis e pneus dianteiros/traseiros, reduzindo digitação manual
 

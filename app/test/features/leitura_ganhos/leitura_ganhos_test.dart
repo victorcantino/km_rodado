@@ -698,6 +698,225 @@ void main() {
     expect(quantidade.controller!.text, '1');
   });
 
+  testWidgets('digitação monetária persiste centavos inteiros', (tester) async {
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+    final plataforma = (await leituraService.listarPlataformasAtivas()).single;
+    LeituraGanhosResultado? resultado;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () async {
+                resultado = await showDialog<LeituraGanhosResultado>(
+                  context: context,
+                  builder: (_) => LeituraGanhosDialog(
+                    plataformas: [plataforma],
+                    sugestoes: const {},
+                  ),
+                );
+              },
+              child: const Text('Abrir valores'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    for (final caso in [
+      ('0', '0,00', 0),
+      ('1', '0,01', 1),
+      ('1350', '13,50', 1350),
+      ('10000', '100,00', 10000),
+    ]) {
+      await tester.tap(find.text('Abrir valores'));
+      await tester.pumpAndSettle();
+      final campo = find.byKey(ValueKey('valor_$uberId'));
+      await tester.enterText(campo, caso.$1);
+      expect(tester.widget<TextFormField>(campo).controller!.text, caso.$2);
+      await tester.tap(find.text('Salvar leitura'));
+      await tester.pumpAndSettle();
+      expect(resultado!.single.valorAcumuladoCentavos, caso.$3);
+    }
+  });
+
+  testWidgets('Zero limpa valor e viagens da plataforma', (tester) async {
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+    final plataforma = (await leituraService.listarPlataformasAtivas()).single;
+    final sugestao = LeiturasGanhoPlataformaData(
+      id: 1,
+      leituraGanhosId: 1,
+      plataformaId: uberId,
+      valorAcumuladoCentavos: 10000,
+      quantidadeViagensAcumulada: 9,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LeituraGanhosDialog(
+          plataformas: [plataforma],
+          sugestoes: {uberId: sugestao},
+        ),
+      ),
+    );
+
+    await tester.tap(find.byKey(ValueKey('zero_$uberId')));
+    expect(
+      tester
+          .widget<TextFormField>(find.byKey(ValueKey('valor_$uberId')))
+          .controller!
+          .text,
+      '0,00',
+    );
+    expect(
+      tester
+          .widget<TextFormField>(find.byKey(ValueKey('quantidade_$uberId')))
+          .controller!
+          .text,
+      '0',
+    );
+  });
+
+  testWidgets('Tudo zerado limpa todas as acumuladas da inicial', (
+    tester,
+  ) async {
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+    final outroId = await inserirPlataforma('99', TipoRegistroGanhos.acumulado);
+    final plataformas = await leituraService.listarPlataformasAtivas();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LeituraGanhosDialog(
+          plataformas: plataformas,
+          sugestoes: {
+            uberId: LeiturasGanhoPlataformaData(
+              id: 1,
+              leituraGanhosId: 1,
+              plataformaId: uberId,
+              valorAcumuladoCentavos: 5000,
+              quantidadeViagensAcumulada: 5,
+            ),
+            outroId: LeiturasGanhoPlataformaData(
+              id: 2,
+              leituraGanhosId: 1,
+              plataformaId: outroId,
+              valorAcumuladoCentavos: 3000,
+              quantidadeViagensAcumulada: 3,
+            ),
+          },
+          leituraInicial: true,
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Tudo zerado'));
+    for (final id in [uberId, outroId]) {
+      expect(
+        tester
+            .widget<TextFormField>(find.byKey(ValueKey('valor_$id')))
+            .controller!
+            .text,
+        '0,00',
+      );
+      expect(
+        tester
+            .widget<TextFormField>(find.byKey(ValueKey('quantidade_$id')))
+            .controller!
+            .text,
+        '0',
+      );
+    }
+  });
+
+  testWidgets(
+    'fecha diálogo com campos focados sem usar controller descartado',
+    (tester) async {
+      final uberId = await inserirPlataforma(
+        'Uber',
+        TipoRegistroGanhos.acumulado,
+      );
+      final outroId = await inserirPlataforma(
+        '99',
+        TipoRegistroGanhos.acumulado,
+      );
+      final plataformas = await leituraService.listarPlataformasAtivas();
+      LeituraGanhosResultado? resultado;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () async {
+                  resultado = await showDialog<LeituraGanhosResultado>(
+                    context: context,
+                    builder: (_) => LeituraGanhosDialog(
+                      plataformas: plataformas,
+                      sugestoes: {
+                        uberId: LeiturasGanhoPlataformaData(
+                          id: 1,
+                          leituraGanhosId: 1,
+                          plataformaId: uberId,
+                          valorAcumuladoCentavos: 5000,
+                          quantidadeViagensAcumulada: 5,
+                        ),
+                        outroId: LeiturasGanhoPlataformaData(
+                          id: 2,
+                          leituraGanhosId: 1,
+                          plataformaId: outroId,
+                          valorAcumuladoCentavos: 3000,
+                          quantidadeViagensAcumulada: 3,
+                        ),
+                      },
+                      leituraInicial: true,
+                    ),
+                  );
+                },
+                child: const Text('Abrir regressão'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Abrir regressão'));
+      await tester.pumpAndSettle();
+      final valorUber = find.byKey(ValueKey('valor_$uberId'));
+      await tester.tap(valorUber);
+      await tester.enterText(valorUber, '1350');
+      final zeroUber = find.byKey(ValueKey('zero_$uberId'));
+      await tester.ensureVisible(zeroUber);
+      await tester.tap(zeroUber);
+      final quantidadeOutro = find.byKey(ValueKey('quantidade_$outroId'));
+      await tester.ensureVisible(quantidadeOutro);
+      await tester.tap(quantidadeOutro);
+      await tester.enterText(quantidadeOutro, '7');
+      await tester.ensureVisible(find.text('Tudo zerado'));
+      await tester.tap(find.text('Tudo zerado'));
+      await tester.ensureVisible(find.text('Salvar leitura'));
+      await tester.tap(find.text('Salvar leitura'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(resultado, hasLength(2));
+      expect(
+        resultado!.every((item) => item.valorAcumuladoCentavos == 0),
+        isTrue,
+      );
+      expect(
+        resultado!.every((item) => item.quantidadeViagensAcumulada == 0),
+        isTrue,
+      );
+    },
+  );
+
   testWidgets('cancelar diálogo mantém a Pausa aberta', (tester) async {
     final jornada = await abrirJornada();
     await pausaService.iniciarPausa(odometroInicio: 100);
