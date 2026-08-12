@@ -10,6 +10,12 @@ import '../tables/plataforma.dart';
 
 part 'leitura_ganhos_dao.g.dart';
 
+typedef SnapshotPlataforma = ({
+  LeiturasGanho leitura,
+  LeiturasGanhoPlataformaData item,
+  Plataforma plataforma,
+});
+
 @DriftAccessor(
   tables: [
     Jornadas,
@@ -209,5 +215,40 @@ class LeituraGanhosDao extends DatabaseAccessor<AppDatabase>
           ..where((item) => item.leituraGanhosId.equals(leituraId))
           ..orderBy([(item) => OrderingTerm.asc(item.plataformaId)]))
         .get();
+  }
+
+  Future<List<SnapshotPlataforma>> listarSnapshotsDaJornada(
+    int jornadaId,
+  ) async {
+    final consulta =
+        select(leiturasGanhos).join([
+            innerJoin(
+              leiturasGanhoPlataforma,
+              leiturasGanhoPlataforma.leituraGanhosId.equalsExp(
+                leiturasGanhos.id,
+              ),
+            ),
+            innerJoin(
+              plataformas,
+              plataformas.id.equalsExp(leiturasGanhoPlataforma.plataformaId),
+            ),
+          ])
+          ..where(leiturasGanhos.jornadaId.equals(jornadaId))
+          ..orderBy([
+            OrderingTerm.asc(leiturasGanhos.dataHora),
+            OrderingTerm.asc(leiturasGanhos.id),
+            OrderingTerm.asc(plataformas.ordem),
+            OrderingTerm.asc(plataformas.id),
+          ]);
+
+    return (await consulta.get())
+        .map(
+          (linha) => (
+            leitura: linha.readTable(leiturasGanhos),
+            item: linha.readTable(leiturasGanhoPlataforma),
+            plataforma: linha.readTable(plataformas),
+          ),
+        )
+        .toList();
   }
 }

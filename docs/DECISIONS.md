@@ -57,3 +57,15 @@ Jornada em uma única transação Drift específica desse fluxo.
 Motivo: a leitura final faz parte do encerramento. Uma transação impede tanto
 uma Jornada finalizada sem a leitura obrigatória quanto uma leitura final órfã
 em uma Jornada ainda aberta, sem introduzir uma camada arquitetural genérica.
+
+## ADR-009 — Resumo derivado e regressões não inferidas
+
+Decisão: calcular o resumo da Jornada a partir de Jornada, Pausas e Leituras de
+Ganhos persistidas, sem armazenar os indicadores derivados. Uma regressão de
+valor acumulado ou quantidade de viagens em qualquer snapshot entre a Leitura
+Inicial e a Final torna o resultado da plataforma não calculável.
+
+Motivo: diferentes plataformas podem alterar seus acumulados visíveis de formas
+ainda desconhecidas. Interpretar automaticamente uma regressão como reset
+inventaria receita. A futura conferência/reconciliação tratará esses casos com
+informação explícita do usuário.

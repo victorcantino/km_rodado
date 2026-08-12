@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/database/app_database.dart';
 import '../../data/jornada_service.dart';
+import '../../data/resumo_jornada.dart';
 
 class JornadaController extends ChangeNotifier {
   final JornadaService _service;
@@ -10,6 +11,7 @@ class JornadaController extends ChangeNotifier {
 
   Jornada? jornadaAtual;
   Jornada? ultimaJornadaFinalizada;
+  ResumoJornada? resumoUltimaJornada;
 
   bool carregando = false;
 
@@ -22,6 +24,7 @@ class JornadaController extends ChangeNotifier {
     try {
       jornadaAtual = await _service.jornadaAberta();
       ultimaJornadaFinalizada = await _service.ultimaJornadaFinalizada();
+      resumoUltimaJornada = await _service.resumoUltimaJornada();
     } finally {
       carregando = false;
       notifyListeners();
@@ -69,6 +72,7 @@ class JornadaController extends ChangeNotifier {
 
       jornadaAtual = await _service.jornadaAberta();
       ultimaJornadaFinalizada = await _service.ultimaJornadaFinalizada();
+      resumoUltimaJornada = await _service.resumoUltimaJornada();
     } finally {
       carregando = false;
       notifyListeners();
