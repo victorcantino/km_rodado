@@ -71,4 +71,8 @@ class LeituraGanhosRepository {
   Future<List<LeiturasGanhoPlataformaData>> listarItens(int leituraId) {
     return _dao.listarItens(leituraId);
   }
+
+  Future<List<SnapshotPlataforma>> listarSnapshotsDaJornada(int jornadaId) {
+    return _dao.listarSnapshotsDaJornada(jornadaId);
+  }
 }

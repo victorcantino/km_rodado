@@ -21,6 +21,7 @@ import '../../../pausa/presentation/widgets/odometro_pausa_dialog.dart';
 import '../../../pausa/presentation/widgets/editar_titulo_pausa_dialog.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
+import '../../data/resumo_jornada.dart';
 import '../controllers/jornada_controller.dart';
 import '../widgets/abrir_jornada_dialog.dart';
 import '../widgets/fechar_jornada_dialog.dart';
@@ -67,7 +68,11 @@ class _JornadaPageState extends State<JornadaPage> {
     final leituraGanhosRepository = LeituraGanhosRepository(
       LeituraGanhosDao(database),
     );
-    final service = JornadaService(repository, pausaRepository);
+    final service = JornadaService(
+      repository,
+      pausaRepository,
+      leituraGanhosRepository,
+    );
     final pausaService = PausaService(pausaRepository, repository);
     final leituraGanhosService = LeituraGanhosService(
       leituraGanhosRepository,
@@ -639,6 +644,7 @@ class _JornadaPageState extends State<JornadaPage> {
           }
 
           final ultimaJornada = controller.ultimaJornadaFinalizada;
+          final resumo = controller.resumoUltimaJornada;
 
           if (ultimaJornada == null) {
             return Center(
@@ -653,17 +659,6 @@ class _JornadaPageState extends State<JornadaPage> {
             context,
           ).platformDispatcher.locale.toLanguageTag();
           final numeros = NumberFormat.decimalPattern(locale);
-          final dataHoraFim = ultimaJornada.dataHoraFim!;
-          final duracao = dataHoraFim.difference(ultimaJornada.dataHoraInicio);
-          final quilometros = ultimaJornada.quilometrosPercorridos!;
-          final duracaoEmHoras =
-              duracao.inMilliseconds / Duration.millisecondsPerHour;
-          final mediaFormatada = duracaoEmHoras > 0
-              ? (NumberFormat.decimalPattern(locale)
-                      ..minimumFractionDigits = 1
-                      ..maximumFractionDigits = 1)
-                    .format(quilometros / duracaoEmHoras)
-              : null;
 
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -679,12 +674,14 @@ class _JornadaPageState extends State<JornadaPage> {
                   ultimaJornada.cidadeDestino,
                 ),
               ),
-              Text('${numeros.format(quilometros)} km percorridos'),
-              Text('Duração: ${_formatarDuracao(duracao, numeros)}'),
-              Text(
-                'Média da jornada: '
-                '${mediaFormatada == null ? 'indisponível' : '$mediaFormatada km/h'}',
-              ),
+              if (resumo != null) ...[
+                const SizedBox(height: 16),
+                _ResumoJornadaConcluida(
+                  resumo: resumo,
+                  numeros: numeros,
+                  formatarDuracao: _formatarDuracao,
+                ),
+              ],
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _abrirJornada,
@@ -705,6 +702,133 @@ class _JornadaPageState extends State<JornadaPage> {
     controller?.dispose();
     database.close();
     super.dispose();
+  }
+}
+
+class _ResumoJornadaConcluida extends StatelessWidget {
+  final ResumoJornada resumo;
+  final NumberFormat numeros;
+  final String Function(Duration, NumberFormat) formatarDuracao;
+
+  const _ResumoJornadaConcluida({
+    required this.resumo,
+    required this.numeros,
+    required this.formatarDuracao,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final moeda = NumberFormat.currency(
+      locale: 'pt_BR',
+      symbol: r'R$',
+      decimalDigits: 2,
+    );
+    final decimal = NumberFormat.decimalPattern('pt_BR')
+      ..minimumFractionDigits = 2
+      ..maximumFractionDigits = 2;
+    final receitaTotal = resumo.receitaTotalCentavos;
+    final viagensTotal = resumo.quantidadeTotalViagens;
+    final kmPausa = resumo.quilometrosEmPausa;
+    final kmAtivo = resumo.quilometrosAtivos;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Resultado da Jornada',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        if (receitaTotal != null && viagensTotal != null) ...[
+          Text(
+            moeda.format(receitaTotal / 100),
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          Text('$viagensTotal ${viagensTotal == 1 ? 'viagem' : 'viagens'}'),
+          Text(
+            'Ticket médio geral: '
+            '${resumo.ticketMedioGeral == null ? '—' : moeda.format(resumo.ticketMedioGeral)}',
+          ),
+        ] else
+          const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Resultado financeiro incompleto'),
+              Text('Ticket médio geral: —'),
+            ],
+          ),
+        const SizedBox(height: 12),
+        for (final resultado in resumo.resultadosPlataformas)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: resultado.calculavel
+                ? Text(
+                    '${resultado.nome}: '
+                    '${moeda.format(resultado.receitaCentavos! / 100)} · '
+                    '${resultado.quantidadeViagens} '
+                    '${resultado.quantidadeViagens == 1 ? 'viagem' : 'viagens'} · '
+                    'Ticket médio: '
+                    '${resultado.ticketMedio == null ? '—' : moeda.format(resultado.ticketMedio)}',
+                  )
+                : Text(
+                    '${resultado.nome}: Revisão necessária · '
+                    'Ticket médio: —',
+                  ),
+          ),
+        const SizedBox(height: 12),
+        _SecaoResumo(
+          titulo: 'Tempo',
+          linhas: [
+            '${formatarDuracao(resumo.duracaoTotal, numeros)} total',
+            '${formatarDuracao(resumo.tempoPausa, numeros)} em pausa',
+            '${formatarDuracao(resumo.tempoAtivo, numeros)} ativo',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _SecaoResumo(
+          titulo: 'Distância',
+          linhas: [
+            '${numeros.format(resumo.quilometrosTotal)} km total',
+            kmPausa == null
+                ? 'km em pausa: indisponível'
+                : '${numeros.format(kmPausa)} km em pausa',
+            kmAtivo == null
+                ? 'km ativo: indisponível'
+                : '${numeros.format(kmAtivo)} km ativo',
+          ],
+        ),
+        const SizedBox(height: 12),
+        _SecaoResumo(
+          titulo: 'Desempenho',
+          linhas: [
+            resumo.receitaPorHoraAtiva == null
+                ? r'R$/h ativo: —'
+                : 'R\$ ${decimal.format(resumo.receitaPorHoraAtiva)}/h ativo',
+            resumo.receitaPorKmAtivo == null
+                ? r'R$/km ativo: —'
+                : 'R\$ ${decimal.format(resumo.receitaPorKmAtivo)}/km ativo',
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _SecaoResumo extends StatelessWidget {
+  final String titulo;
+  final List<String> linhas;
+
+  const _SecaoResumo({required this.titulo, required this.linhas});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(titulo, style: Theme.of(context).textTheme.titleSmall),
+        for (final linha in linhas) Text(linha),
+      ],
+    );
   }
 }
 

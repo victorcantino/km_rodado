@@ -317,7 +317,71 @@ Gerar alerta:
 Jornada finalizada sem registro de ganhos.
 ```
 
-# 5.5 Lançamentos individuais futuros
+## 5.5 Resumo analítico da Jornada
+
+O resumo da Jornada é integralmente derivado e não persiste duração, tempos,
+distâncias ativas, receita, viagens ou indicadores.
+
+O tempo ativo corresponde à duração total menos a soma das Pausas concluídas.
+Os quilômetros ativos correspondem aos quilômetros totais menos o deslocamento
+registrado durante as Pausas. Resultados negativos decorrentes de histórico
+inconsistente são protegidos e apresentados como zero.
+
+Pausas históricas sem odômetro inicial ou final não são interpretadas como
+deslocamento zero: os quilômetros totais continuam disponíveis, mas quilômetros
+em Pausa, quilômetros ativos e receita por quilômetro ativo ficam incompletos.
+
+A receita e as viagens de cada plataforma acumulada partem da Leitura Inicial e
+terminam na Leitura Final. Leituras anteriores à Inicial são ignoradas. Se valor
+ou viagens regredirem em qualquer snapshot dessa sequência, a plataforma exige
+revisão e nenhuma diferença é apresentada como resultado confiável. Não se
+infere automaticamente que a regressão seja um reset.
+
+Receita total, viagens totais, receita por hora ativa e receita por quilômetro
+ativo só são completas quando todas as plataformas acumuladas participantes são
+calculáveis. Divisões por tempo ativo ou quilômetros ativos iguais a zero ficam
+indisponíveis. Receita e quantidade de viagens iguais a zero permanecem válidas.
+
+O resumo calcula o ticket médio de cada plataforma acumulada dividindo seu
+faturamento calculável pela quantidade de viagens. O ticket médio geral divide
+o faturamento total pelas viagens totais. Com zero viagens, regressão de
+snapshot ou resultado financeiro total incompleto, o respectivo ticket médio
+fica indisponível. Particular permanece fora até a implementação dos ganhos
+individuais.
+
+Ganhos individuais, incluindo Particular, e custos ainda não compõem este
+resumo.
+
+## 5.6 Conferência futura de snapshots e eventos financeiros
+
+Uma regressão ou um salto entre snapshots acumulados não significa
+necessariamente erro ou reset. A variação poderá ser explicada por compra de
+passe, bônus, promoção ou outra movimentação financeira conhecida. A futura
+conferência deverá relacionar esses fatos sem assumir uma regra universal para
+o efeito observado em cada plataforma.
+
+A compra de passe de plataforma deverá registrar plataforma, data e hora,
+modalidade e valor. É um custo operacional, mas seu efeito sobre saldo ou
+contador visível varia por plataforma e não deve ser tratado automaticamente
+como simples subtração do acumulado.
+
+O bônus ou promoção deverá registrar plataforma, data e hora e valor. É um
+crédito financeiro que pode ocorrer no mesmo dia ou ser creditado depois, sem
+presunção de horário ou regra por plataforma. Quando relacionado ao período de
+uma Jornada, deverá participar da futura reconciliação para não ser confundido
+com faturamento de corridas.
+
+O ticket médio considera somente faturamento atribuível às viagens. Bônus não
+aumenta ticket médio, e passe não reduz artificialmente o faturamento bruto das
+corridas. O resultado operacional poderá considerar separadamente:
+
+```text
+faturamento de corridas + bônus - passes e custos da plataforma
+```
+
+Esses eventos e sua reconciliação não fazem parte do resumo atual.
+
+## 5.7 Lançamentos individuais futuros
 
 Um lançamento individual terá quantidade de viagens maior ou igual a 1 e valor
 total em centavos maior ou igual a zero. Poderá representar uma ou várias
@@ -460,6 +524,10 @@ O evento deve conter:
 * categoria;
 * plataforma quando aplicável;
 * descrição.
+
+Compras de passe e bônus ou promoções são eventos financeiros vinculados à
+plataforma. Seus efeitos nos acumulados observados não possuem regra universal
+e somente serão interpretados pela futura conferência/reconciliação.
 
 ---
 

@@ -2,12 +2,12 @@
 
 ## Funcionalidade em desenvolvimento
 
-Experiência móvel do registro de ganhos.
+Resumo analítico da Jornada.
 
 ## Objetivo atual
 
-Completar o ciclo de Leituras de Ganhos com base inicial obrigatória e leitura
-final integrada atomicamente ao fechamento, sem alterar o schema 2.
+Transformar Jornada, Pausas e Leituras de Ganhos persistidas em indicadores
+operacionais derivados, sem alterar o schema 3.
 
 ## Já implementado
 
@@ -78,14 +78,25 @@ final integrada atomicamente ao fechamento, sem alterar o schema 2.
 - Conjunto acumulado da Jornada fixado pela Leitura Inicial
 - Entrada monetária móvel por dígitos, formatada em pt-BR e persistida em centavos
 - Atalhos Zero por plataforma e Tudo zerado na Leitura Inicial
+- Resumo derivado da última Jornada com receita e viagens por plataforma
+  acumulada, totais, tempos, distâncias e indicadores de eficiência ativa
+- Ticket médio por plataforma acumulada e geral, indisponível quando não houver
+  viagens ou quando o resultado correspondente estiver incompleto
+- Tempo ativo calculado sem Pausas e quilômetros ativos calculados sem o
+  deslocamento ocorrido durante Pausas
+- Pausas históricas sem odômetros sinalizadas como distância ativa incompleta
+- Regressões de valor ou viagens entre snapshots sinalizadas para revisão, sem
+  inferência automática de reset
+- Resumo recalculado dos dados persistidos após fechamento e reinício
 
 ## Em andamento
 
-- Validação da experiência móvel do registro de ganhos
+- Validação do resumo analítico da Jornada
 
 ## Próximo passo
 
-Implementar lançamentos individuais em entrega futura.
+Validar o resumo em uso operacional e implementar lançamentos individuais em
+entrega futura.
 
 ## Decisões temporárias
 

@@ -1,15 +1,24 @@
 import 'package:drift/drift.dart';
 import '../../../core/constants/enums/status_jornada.dart';
+import '../../../core/constants/enums/tipo_leitura_ganhos.dart';
 import '../../../core/database/app_database.dart';
+import '../../../core/database/daos/leitura_ganhos_dao.dart';
+import '../../leitura_ganhos/data/leitura_ganhos_repository.dart';
 import '../../pausa/data/pausa_repository.dart';
 
 import 'jornada_repository.dart';
+import 'resumo_jornada.dart';
 
 class JornadaService {
   final JornadaRepository _repository;
   final PausaRepository _pausaRepository;
+  final LeituraGanhosRepository? _leituraGanhosRepository;
 
-  JornadaService(this._repository, this._pausaRepository);
+  JornadaService(
+    this._repository,
+    this._pausaRepository, [
+    this._leituraGanhosRepository,
+  ]);
 
   Future<Jornada?> jornadaAberta() {
     return _repository.buscarJornadaAberta();
@@ -18,6 +27,140 @@ class JornadaService {
   Future<Jornada?> ultimaJornadaFinalizada() {
     return _repository.buscarUltimaJornadaFinalizada();
   }
+
+  Future<ResumoJornada?> resumoUltimaJornada() async {
+    final jornada = await _repository.buscarUltimaJornadaFinalizada();
+    final leituraRepository = _leituraGanhosRepository;
+    if (jornada == null ||
+        jornada.dataHoraFim == null ||
+        jornada.odometroFim == null ||
+        leituraRepository == null) {
+      return null;
+    }
+
+    final pausas = await _pausaRepository.listarPorJornada(jornada.id);
+    final snapshots = await leituraRepository.listarSnapshotsDaJornada(
+      jornada.id,
+    );
+    final duracaoTotal = _duracaoNaoNegativa(
+      jornada.dataHoraFim!.difference(jornada.dataHoraInicio),
+    );
+    final tempoPausa = pausas.fold(Duration.zero, (total, pausa) {
+      final fim = pausa.fim;
+      if (fim == null) return total;
+      return total + _duracaoNaoNegativa(fim.difference(pausa.inicio));
+    });
+    final tempoAtivo = _duracaoNaoNegativa(duracaoTotal - tempoPausa);
+    final quilometrosTotal = (jornada.odometroFim! - jornada.odometroInicio)
+        .clamp(0, 1 << 62);
+    final odometrosCompletos = pausas.every(
+      (pausa) => pausa.odometroInicio != null && pausa.odometroFim != null,
+    );
+    final quilometrosEmPausa = odometrosCompletos
+        ? pausas.fold<int>(
+            0,
+            (total, pausa) =>
+                total +
+                (pausa.odometroFim! - pausa.odometroInicio!).clamp(0, 1 << 62),
+          )
+        : null;
+    final quilometrosAtivos = quilometrosEmPausa == null
+        ? null
+        : (quilometrosTotal - quilometrosEmPausa).clamp(0, 1 << 62);
+
+    return ResumoJornada(
+      jornada: jornada,
+      duracaoTotal: duracaoTotal,
+      tempoPausa: tempoPausa,
+      tempoAtivo: tempoAtivo,
+      quilometrosTotal: quilometrosTotal,
+      quilometrosEmPausa: quilometrosEmPausa,
+      quilometrosAtivos: quilometrosAtivos,
+      resultadosPlataformas: _calcularResultadosPlataformas(snapshots),
+    );
+  }
+
+  List<ResultadoPlataformaJornada> _calcularResultadosPlataformas(
+    List<SnapshotPlataforma> snapshots,
+  ) {
+    final leituras = <int, LeiturasGanho>{};
+    for (final snapshot in snapshots) {
+      leituras[snapshot.leitura.id] = snapshot.leitura;
+    }
+    final ordenadas = leituras.values.toList()
+      ..sort((a, b) {
+        final porData = a.dataHora.compareTo(b.dataHora);
+        return porData != 0 ? porData : a.id.compareTo(b.id);
+      });
+    final indiceInicial = ordenadas.indexWhere(
+      (leitura) => leitura.tipo == TipoLeituraGanhos.inicial,
+    );
+    final indiceFinal = ordenadas.lastIndexWhere(
+      (leitura) => leitura.tipo == TipoLeituraGanhos.finalDaJornada,
+    );
+    if (indiceInicial < 0 || indiceFinal < indiceInicial) return const [];
+
+    final sequencia = ordenadas.sublist(indiceInicial, indiceFinal + 1);
+    final idsSequencia = sequencia.map((leitura) => leitura.id).toSet();
+    final itensPorLeitura = <int, Map<int, SnapshotPlataforma>>{};
+    for (final snapshot in snapshots) {
+      if (!idsSequencia.contains(snapshot.leitura.id)) continue;
+      itensPorLeitura.putIfAbsent(
+        snapshot.leitura.id,
+        () => {},
+      )[snapshot.plataforma.id] = snapshot;
+    }
+    final itensIniciais = itensPorLeitura[sequencia.first.id] ?? const {};
+
+    return [
+      for (final inicial in itensIniciais.values)
+        _calcularResultadoPlataforma(inicial, sequencia, itensPorLeitura),
+    ]..sort((a, b) => a.nome.compareTo(b.nome));
+  }
+
+  ResultadoPlataformaJornada _calcularResultadoPlataforma(
+    SnapshotPlataforma inicial,
+    List<LeiturasGanho> sequencia,
+    Map<int, Map<int, SnapshotPlataforma>> itensPorLeitura,
+  ) {
+    var valorAnterior = inicial.item.valorAcumuladoCentavos;
+    var viagensAnteriores = inicial.item.quantidadeViagensAcumulada;
+    var calculavel = true;
+    SnapshotPlataforma? finalSnapshot;
+
+    for (final leitura in sequencia) {
+      final atual = itensPorLeitura[leitura.id]?[inicial.plataforma.id];
+      if (atual == null) {
+        calculavel = false;
+        continue;
+      }
+      if (atual.item.valorAcumuladoCentavos < valorAnterior ||
+          atual.item.quantidadeViagensAcumulada < viagensAnteriores) {
+        calculavel = false;
+      }
+      valorAnterior = atual.item.valorAcumuladoCentavos;
+      viagensAnteriores = atual.item.quantidadeViagensAcumulada;
+      if (leitura.tipo == TipoLeituraGanhos.finalDaJornada) {
+        finalSnapshot = atual;
+      }
+    }
+
+    return ResultadoPlataformaJornada(
+      plataformaId: inicial.plataforma.id,
+      nome: inicial.plataforma.nome,
+      receitaCentavos: calculavel && finalSnapshot != null
+          ? finalSnapshot.item.valorAcumuladoCentavos -
+                inicial.item.valorAcumuladoCentavos
+          : null,
+      quantidadeViagens: calculavel && finalSnapshot != null
+          ? finalSnapshot.item.quantidadeViagensAcumulada -
+                inicial.item.quantidadeViagensAcumulada
+          : null,
+    );
+  }
+
+  Duration _duracaoNaoNegativa(Duration duracao) =>
+      duracao.isNegative ? Duration.zero : duracao;
 
   Future<int> abrirJornada({
     required int usuarioId,
