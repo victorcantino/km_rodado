@@ -56,7 +56,9 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
           children: [
             TextFormField(
               controller: odometroController,
+              autofocus: true,
               keyboardType: TextInputType.number,
+              selectAllOnFocus: true,
               decoration: const InputDecoration(labelText: 'Odômetro'),
               validator: (valor) {
                 final texto = valor?.trim() ?? '';

@@ -4,6 +4,7 @@ import '../../../core/constants/enums/tipo_leitura_ganhos.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/database/daos/leitura_ganhos_dao.dart';
 import '../../leitura_ganhos/data/leitura_ganhos_repository.dart';
+import '../../ganho_individual/data/ganho_individual_repository.dart';
 import '../../pausa/data/pausa_repository.dart';
 
 import 'jornada_repository.dart';
@@ -13,11 +14,13 @@ class JornadaService {
   final JornadaRepository _repository;
   final PausaRepository _pausaRepository;
   final LeituraGanhosRepository? _leituraGanhosRepository;
+  final GanhoIndividualRepository? _ganhoIndividualRepository;
 
   JornadaService(
     this._repository,
     this._pausaRepository, [
     this._leituraGanhosRepository,
+    this._ganhoIndividualRepository,
   ]);
 
   Future<Jornada?> jornadaAberta() {
@@ -42,6 +45,9 @@ class JornadaService {
     final snapshots = await leituraRepository.listarSnapshotsDaJornada(
       jornada.id,
     );
+    final totaisIndividuais =
+        await _ganhoIndividualRepository?.totalizarPorJornada(jornada.id) ??
+        const [];
     final duracaoTotal = _duracaoNaoNegativa(
       jornada.dataHoraFim!.difference(jornada.dataHoraInicio),
     );
@@ -76,7 +82,16 @@ class JornadaService {
       quilometrosTotal: quilometrosTotal,
       quilometrosEmPausa: quilometrosEmPausa,
       quilometrosAtivos: quilometrosAtivos,
-      resultadosPlataformas: _calcularResultadosPlataformas(snapshots),
+      resultadosPlataformas: [
+        ..._calcularResultadosPlataformas(snapshots),
+        for (final total in totaisIndividuais)
+          ResultadoPlataformaJornada(
+            plataformaId: total.plataforma.id,
+            nome: total.plataforma.nome,
+            receitaCentavos: total.valorTotalCentavos,
+            quantidadeViagens: total.quantidadeViagens,
+          ),
+      ]..sort((a, b) => a.nome.compareTo(b.nome)),
     );
   }
 

@@ -4413,6 +4413,499 @@ class LeiturasGanhoPlataformaCompanion
   }
 }
 
+class $LancamentosGanhoIndividualTable extends LancamentosGanhoIndividual
+    with
+        TableInfo<
+          $LancamentosGanhoIndividualTable,
+          LancamentosGanhoIndividualData
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LancamentosGanhoIndividualTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _plataformaIdMeta = const VerificationMeta(
+    'plataformaId',
+  );
+  @override
+  late final GeneratedColumn<int> plataformaId = GeneratedColumn<int>(
+    'plataforma_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES plataformas (id)',
+    ),
+  );
+  static const VerificationMeta _jornadaIdMeta = const VerificationMeta(
+    'jornadaId',
+  );
+  @override
+  late final GeneratedColumn<int> jornadaId = GeneratedColumn<int>(
+    'jornada_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES jornadas (id)',
+    ),
+  );
+  static const VerificationMeta _quantidadeViagensMeta = const VerificationMeta(
+    'quantidadeViagens',
+  );
+  @override
+  late final GeneratedColumn<int> quantidadeViagens = GeneratedColumn<int>(
+    'quantidade_viagens',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valorTotalCentavosMeta =
+      const VerificationMeta('valorTotalCentavos');
+  @override
+  late final GeneratedColumn<int> valorTotalCentavos = GeneratedColumn<int>(
+    'valor_total_centavos',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _observacaoMeta = const VerificationMeta(
+    'observacao',
+  );
+  @override
+  late final GeneratedColumn<String> observacao = GeneratedColumn<String>(
+    'observacao',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dataCriacaoMeta = const VerificationMeta(
+    'dataCriacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataCriacao = GeneratedColumn<DateTime>(
+    'data_criacao',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    plataformaId,
+    jornadaId,
+    quantidadeViagens,
+    valorTotalCentavos,
+    observacao,
+    dataCriacao,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'lancamentos_ganho_individual';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LancamentosGanhoIndividualData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('plataforma_id')) {
+      context.handle(
+        _plataformaIdMeta,
+        plataformaId.isAcceptableOrUnknown(
+          data['plataforma_id']!,
+          _plataformaIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_plataformaIdMeta);
+    }
+    if (data.containsKey('jornada_id')) {
+      context.handle(
+        _jornadaIdMeta,
+        jornadaId.isAcceptableOrUnknown(data['jornada_id']!, _jornadaIdMeta),
+      );
+    }
+    if (data.containsKey('quantidade_viagens')) {
+      context.handle(
+        _quantidadeViagensMeta,
+        quantidadeViagens.isAcceptableOrUnknown(
+          data['quantidade_viagens']!,
+          _quantidadeViagensMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_quantidadeViagensMeta);
+    }
+    if (data.containsKey('valor_total_centavos')) {
+      context.handle(
+        _valorTotalCentavosMeta,
+        valorTotalCentavos.isAcceptableOrUnknown(
+          data['valor_total_centavos']!,
+          _valorTotalCentavosMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_valorTotalCentavosMeta);
+    }
+    if (data.containsKey('observacao')) {
+      context.handle(
+        _observacaoMeta,
+        observacao.isAcceptableOrUnknown(data['observacao']!, _observacaoMeta),
+      );
+    }
+    if (data.containsKey('data_criacao')) {
+      context.handle(
+        _dataCriacaoMeta,
+        dataCriacao.isAcceptableOrUnknown(
+          data['data_criacao']!,
+          _dataCriacaoMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LancamentosGanhoIndividualData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LancamentosGanhoIndividualData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      plataformaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}plataforma_id'],
+      )!,
+      jornadaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}jornada_id'],
+      ),
+      quantidadeViagens: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quantidade_viagens'],
+      )!,
+      valorTotalCentavos: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_total_centavos'],
+      )!,
+      observacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}observacao'],
+      ),
+      dataCriacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_criacao'],
+      )!,
+    );
+  }
+
+  @override
+  $LancamentosGanhoIndividualTable createAlias(String alias) {
+    return $LancamentosGanhoIndividualTable(attachedDatabase, alias);
+  }
+}
+
+class LancamentosGanhoIndividualData extends DataClass
+    implements Insertable<LancamentosGanhoIndividualData> {
+  final int id;
+  final int plataformaId;
+  final int? jornadaId;
+  final int quantidadeViagens;
+  final int valorTotalCentavos;
+  final String? observacao;
+  final DateTime dataCriacao;
+  const LancamentosGanhoIndividualData({
+    required this.id,
+    required this.plataformaId,
+    this.jornadaId,
+    required this.quantidadeViagens,
+    required this.valorTotalCentavos,
+    this.observacao,
+    required this.dataCriacao,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['plataforma_id'] = Variable<int>(plataformaId);
+    if (!nullToAbsent || jornadaId != null) {
+      map['jornada_id'] = Variable<int>(jornadaId);
+    }
+    map['quantidade_viagens'] = Variable<int>(quantidadeViagens);
+    map['valor_total_centavos'] = Variable<int>(valorTotalCentavos);
+    if (!nullToAbsent || observacao != null) {
+      map['observacao'] = Variable<String>(observacao);
+    }
+    map['data_criacao'] = Variable<DateTime>(dataCriacao);
+    return map;
+  }
+
+  LancamentosGanhoIndividualCompanion toCompanion(bool nullToAbsent) {
+    return LancamentosGanhoIndividualCompanion(
+      id: Value(id),
+      plataformaId: Value(plataformaId),
+      jornadaId: jornadaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(jornadaId),
+      quantidadeViagens: Value(quantidadeViagens),
+      valorTotalCentavos: Value(valorTotalCentavos),
+      observacao: observacao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(observacao),
+      dataCriacao: Value(dataCriacao),
+    );
+  }
+
+  factory LancamentosGanhoIndividualData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LancamentosGanhoIndividualData(
+      id: serializer.fromJson<int>(json['id']),
+      plataformaId: serializer.fromJson<int>(json['plataformaId']),
+      jornadaId: serializer.fromJson<int?>(json['jornadaId']),
+      quantidadeViagens: serializer.fromJson<int>(json['quantidadeViagens']),
+      valorTotalCentavos: serializer.fromJson<int>(json['valorTotalCentavos']),
+      observacao: serializer.fromJson<String?>(json['observacao']),
+      dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'plataformaId': serializer.toJson<int>(plataformaId),
+      'jornadaId': serializer.toJson<int?>(jornadaId),
+      'quantidadeViagens': serializer.toJson<int>(quantidadeViagens),
+      'valorTotalCentavos': serializer.toJson<int>(valorTotalCentavos),
+      'observacao': serializer.toJson<String?>(observacao),
+      'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
+    };
+  }
+
+  LancamentosGanhoIndividualData copyWith({
+    int? id,
+    int? plataformaId,
+    Value<int?> jornadaId = const Value.absent(),
+    int? quantidadeViagens,
+    int? valorTotalCentavos,
+    Value<String?> observacao = const Value.absent(),
+    DateTime? dataCriacao,
+  }) => LancamentosGanhoIndividualData(
+    id: id ?? this.id,
+    plataformaId: plataformaId ?? this.plataformaId,
+    jornadaId: jornadaId.present ? jornadaId.value : this.jornadaId,
+    quantidadeViagens: quantidadeViagens ?? this.quantidadeViagens,
+    valorTotalCentavos: valorTotalCentavos ?? this.valorTotalCentavos,
+    observacao: observacao.present ? observacao.value : this.observacao,
+    dataCriacao: dataCriacao ?? this.dataCriacao,
+  );
+  LancamentosGanhoIndividualData copyWithCompanion(
+    LancamentosGanhoIndividualCompanion data,
+  ) {
+    return LancamentosGanhoIndividualData(
+      id: data.id.present ? data.id.value : this.id,
+      plataformaId: data.plataformaId.present
+          ? data.plataformaId.value
+          : this.plataformaId,
+      jornadaId: data.jornadaId.present ? data.jornadaId.value : this.jornadaId,
+      quantidadeViagens: data.quantidadeViagens.present
+          ? data.quantidadeViagens.value
+          : this.quantidadeViagens,
+      valorTotalCentavos: data.valorTotalCentavos.present
+          ? data.valorTotalCentavos.value
+          : this.valorTotalCentavos,
+      observacao: data.observacao.present
+          ? data.observacao.value
+          : this.observacao,
+      dataCriacao: data.dataCriacao.present
+          ? data.dataCriacao.value
+          : this.dataCriacao,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LancamentosGanhoIndividualData(')
+          ..write('id: $id, ')
+          ..write('plataformaId: $plataformaId, ')
+          ..write('jornadaId: $jornadaId, ')
+          ..write('quantidadeViagens: $quantidadeViagens, ')
+          ..write('valorTotalCentavos: $valorTotalCentavos, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    plataformaId,
+    jornadaId,
+    quantidadeViagens,
+    valorTotalCentavos,
+    observacao,
+    dataCriacao,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LancamentosGanhoIndividualData &&
+          other.id == this.id &&
+          other.plataformaId == this.plataformaId &&
+          other.jornadaId == this.jornadaId &&
+          other.quantidadeViagens == this.quantidadeViagens &&
+          other.valorTotalCentavos == this.valorTotalCentavos &&
+          other.observacao == this.observacao &&
+          other.dataCriacao == this.dataCriacao);
+}
+
+class LancamentosGanhoIndividualCompanion
+    extends UpdateCompanion<LancamentosGanhoIndividualData> {
+  final Value<int> id;
+  final Value<int> plataformaId;
+  final Value<int?> jornadaId;
+  final Value<int> quantidadeViagens;
+  final Value<int> valorTotalCentavos;
+  final Value<String?> observacao;
+  final Value<DateTime> dataCriacao;
+  const LancamentosGanhoIndividualCompanion({
+    this.id = const Value.absent(),
+    this.plataformaId = const Value.absent(),
+    this.jornadaId = const Value.absent(),
+    this.quantidadeViagens = const Value.absent(),
+    this.valorTotalCentavos = const Value.absent(),
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+  });
+  LancamentosGanhoIndividualCompanion.insert({
+    this.id = const Value.absent(),
+    required int plataformaId,
+    this.jornadaId = const Value.absent(),
+    required int quantidadeViagens,
+    required int valorTotalCentavos,
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+  }) : plataformaId = Value(plataformaId),
+       quantidadeViagens = Value(quantidadeViagens),
+       valorTotalCentavos = Value(valorTotalCentavos);
+  static Insertable<LancamentosGanhoIndividualData> custom({
+    Expression<int>? id,
+    Expression<int>? plataformaId,
+    Expression<int>? jornadaId,
+    Expression<int>? quantidadeViagens,
+    Expression<int>? valorTotalCentavos,
+    Expression<String>? observacao,
+    Expression<DateTime>? dataCriacao,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (plataformaId != null) 'plataforma_id': plataformaId,
+      if (jornadaId != null) 'jornada_id': jornadaId,
+      if (quantidadeViagens != null) 'quantidade_viagens': quantidadeViagens,
+      if (valorTotalCentavos != null)
+        'valor_total_centavos': valorTotalCentavos,
+      if (observacao != null) 'observacao': observacao,
+      if (dataCriacao != null) 'data_criacao': dataCriacao,
+    });
+  }
+
+  LancamentosGanhoIndividualCompanion copyWith({
+    Value<int>? id,
+    Value<int>? plataformaId,
+    Value<int?>? jornadaId,
+    Value<int>? quantidadeViagens,
+    Value<int>? valorTotalCentavos,
+    Value<String?>? observacao,
+    Value<DateTime>? dataCriacao,
+  }) {
+    return LancamentosGanhoIndividualCompanion(
+      id: id ?? this.id,
+      plataformaId: plataformaId ?? this.plataformaId,
+      jornadaId: jornadaId ?? this.jornadaId,
+      quantidadeViagens: quantidadeViagens ?? this.quantidadeViagens,
+      valorTotalCentavos: valorTotalCentavos ?? this.valorTotalCentavos,
+      observacao: observacao ?? this.observacao,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (plataformaId.present) {
+      map['plataforma_id'] = Variable<int>(plataformaId.value);
+    }
+    if (jornadaId.present) {
+      map['jornada_id'] = Variable<int>(jornadaId.value);
+    }
+    if (quantidadeViagens.present) {
+      map['quantidade_viagens'] = Variable<int>(quantidadeViagens.value);
+    }
+    if (valorTotalCentavos.present) {
+      map['valor_total_centavos'] = Variable<int>(valorTotalCentavos.value);
+    }
+    if (observacao.present) {
+      map['observacao'] = Variable<String>(observacao.value);
+    }
+    if (dataCriacao.present) {
+      map['data_criacao'] = Variable<DateTime>(dataCriacao.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LancamentosGanhoIndividualCompanion(')
+          ..write('id: $id, ')
+          ..write('plataformaId: $plataformaId, ')
+          ..write('jornadaId: $jornadaId, ')
+          ..write('quantidadeViagens: $quantidadeViagens, ')
+          ..write('valorTotalCentavos: $valorTotalCentavos, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4425,9 +4918,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $LeiturasGanhosTable leiturasGanhos = $LeiturasGanhosTable(this);
   late final $LeiturasGanhoPlataformaTable leiturasGanhoPlataforma =
       $LeiturasGanhoPlataformaTable(this);
+  late final $LancamentosGanhoIndividualTable lancamentosGanhoIndividual =
+      $LancamentosGanhoIndividualTable(this);
   late final JornadaDao jornadaDao = JornadaDao(this as AppDatabase);
   late final PausaDao pausaDao = PausaDao(this as AppDatabase);
   late final LeituraGanhosDao leituraGanhosDao = LeituraGanhosDao(
+    this as AppDatabase,
+  );
+  late final GanhoIndividualDao ganhoIndividualDao = GanhoIndividualDao(
     this as AppDatabase,
   );
   @override
@@ -4443,6 +4941,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     plataformas,
     leiturasGanhos,
     leiturasGanhoPlataforma,
+    lancamentosGanhoIndividual,
   ];
 }
 
@@ -5537,6 +6036,31 @@ final class $$JornadasTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $LancamentosGanhoIndividualTable,
+    List<LancamentosGanhoIndividualData>
+  >
+  _lancamentosGanhoIndividualRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.lancamentosGanhoIndividual,
+        aliasName: 'jornadas__id__lancamentos_ganho_individual__jornada_id',
+      );
+
+  $$LancamentosGanhoIndividualTableProcessedTableManager
+  get lancamentosGanhoIndividualRefs {
+    final manager = $$LancamentosGanhoIndividualTableTableManager(
+      $_db,
+      $_db.lancamentosGanhoIndividual,
+    ).filter((f) => f.jornadaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _lancamentosGanhoIndividualRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$JornadasTableFilterComposer
@@ -5707,6 +6231,33 @@ class $$JornadasTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> lancamentosGanhoIndividualRefs(
+    Expression<bool> Function($$LancamentosGanhoIndividualTableFilterComposer f)
+    f,
+  ) {
+    final $$LancamentosGanhoIndividualTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.lancamentosGanhoIndividual,
+          getReferencedColumn: (t) => t.jornadaId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LancamentosGanhoIndividualTableFilterComposer(
+                $db: $db,
+                $table: $db.lancamentosGanhoIndividual,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -5997,6 +6548,35 @@ class $$JornadasTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> lancamentosGanhoIndividualRefs<T extends Object>(
+    Expression<T> Function(
+      $$LancamentosGanhoIndividualTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$LancamentosGanhoIndividualTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.lancamentosGanhoIndividual,
+          getReferencedColumn: (t) => t.jornadaId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LancamentosGanhoIndividualTableAnnotationComposer(
+                $db: $db,
+                $table: $db.lancamentosGanhoIndividual,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$JornadasTableTableManager
@@ -6017,6 +6597,7 @@ class $$JornadasTableTableManager
             bool veiculoId,
             bool pausasRefs,
             bool leiturasGanhosRefs,
+            bool lancamentosGanhoIndividualRefs,
           })
         > {
   $$JornadasTableTableManager(_$AppDatabase db, $JornadasTable table)
@@ -6112,12 +6693,15 @@ class $$JornadasTableTableManager
                 veiculoId = false,
                 pausasRefs = false,
                 leiturasGanhosRefs = false,
+                lancamentosGanhoIndividualRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (pausasRefs) db.pausas,
                     if (leiturasGanhosRefs) db.leiturasGanhos,
+                    if (lancamentosGanhoIndividualRefs)
+                      db.lancamentosGanhoIndividual,
                   ],
                   addJoins:
                       <
@@ -6208,6 +6792,27 @@ class $$JornadasTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (lancamentosGanhoIndividualRefs)
+                        await $_getPrefetchedData<
+                          Jornada,
+                          $JornadasTable,
+                          LancamentosGanhoIndividualData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$JornadasTableReferences
+                              ._lancamentosGanhoIndividualRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$JornadasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).lancamentosGanhoIndividualRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.jornadaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -6233,6 +6838,7 @@ typedef $$JornadasTableProcessedTableManager =
         bool veiculoId,
         bool pausasRefs,
         bool leiturasGanhosRefs,
+        bool lancamentosGanhoIndividualRefs,
       })
     >;
 typedef $$PausasTableCreateCompanionBuilder =
@@ -6772,6 +7378,32 @@ final class $$PlataformasTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $LancamentosGanhoIndividualTable,
+    List<LancamentosGanhoIndividualData>
+  >
+  _lancamentosGanhoIndividualRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.lancamentosGanhoIndividual,
+        aliasName:
+            'plataformas__id__lancamentos_ganho_individual__plataforma_id',
+      );
+
+  $$LancamentosGanhoIndividualTableProcessedTableManager
+  get lancamentosGanhoIndividualRefs {
+    final manager = $$LancamentosGanhoIndividualTableTableManager(
+      $_db,
+      $_db.lancamentosGanhoIndividual,
+    ).filter((f) => f.plataformaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _lancamentosGanhoIndividualRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$PlataformasTableFilterComposer
@@ -6841,6 +7473,33 @@ class $$PlataformasTableFilterComposer
               }) => $$LeiturasGanhoPlataformaTableFilterComposer(
                 $db: $db,
                 $table: $db.leiturasGanhoPlataforma,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> lancamentosGanhoIndividualRefs(
+    Expression<bool> Function($$LancamentosGanhoIndividualTableFilterComposer f)
+    f,
+  ) {
+    final $$LancamentosGanhoIndividualTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.lancamentosGanhoIndividual,
+          getReferencedColumn: (t) => t.plataformaId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LancamentosGanhoIndividualTableFilterComposer(
+                $db: $db,
+                $table: $db.lancamentosGanhoIndividual,
                 $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
                 joinBuilder: joinBuilder,
                 $removeJoinBuilderFromRootComposer:
@@ -6965,6 +7624,35 @@ class $$PlataformasTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> lancamentosGanhoIndividualRefs<T extends Object>(
+    Expression<T> Function(
+      $$LancamentosGanhoIndividualTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$LancamentosGanhoIndividualTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.lancamentosGanhoIndividual,
+          getReferencedColumn: (t) => t.plataformaId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LancamentosGanhoIndividualTableAnnotationComposer(
+                $db: $db,
+                $table: $db.lancamentosGanhoIndividual,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$PlataformasTableTableManager
@@ -6980,7 +7668,10 @@ class $$PlataformasTableTableManager
           $$PlataformasTableUpdateCompanionBuilder,
           (Plataforma, $$PlataformasTableReferences),
           Plataforma,
-          PrefetchHooks Function({bool leiturasGanhoPlataformaRefs})
+          PrefetchHooks Function({
+            bool leiturasGanhoPlataformaRefs,
+            bool lancamentosGanhoIndividualRefs,
+          })
         > {
   $$PlataformasTableTableManager(_$AppDatabase db, $PlataformasTable table)
     : super(
@@ -7042,40 +7733,67 @@ class $$PlataformasTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({leiturasGanhoPlataformaRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (leiturasGanhoPlataformaRefs) db.leiturasGanhoPlataforma,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (leiturasGanhoPlataformaRefs)
-                    await $_getPrefetchedData<
-                      Plataforma,
-                      $PlataformasTable,
-                      LeiturasGanhoPlataformaData
-                    >(
-                      currentTable: table,
-                      referencedTable: $$PlataformasTableReferences
-                          ._leiturasGanhoPlataformaRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$PlataformasTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).leiturasGanhoPlataformaRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.plataformaId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({
+                leiturasGanhoPlataformaRefs = false,
+                lancamentosGanhoIndividualRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (leiturasGanhoPlataformaRefs) db.leiturasGanhoPlataforma,
+                    if (lancamentosGanhoIndividualRefs)
+                      db.lancamentosGanhoIndividual,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (leiturasGanhoPlataformaRefs)
+                        await $_getPrefetchedData<
+                          Plataforma,
+                          $PlataformasTable,
+                          LeiturasGanhoPlataformaData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlataformasTableReferences
+                              ._leiturasGanhoPlataformaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlataformasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).leiturasGanhoPlataformaRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.plataformaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (lancamentosGanhoIndividualRefs)
+                        await $_getPrefetchedData<
+                          Plataforma,
+                          $PlataformasTable,
+                          LancamentosGanhoIndividualData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlataformasTableReferences
+                              ._lancamentosGanhoIndividualRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlataformasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).lancamentosGanhoIndividualRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.plataformaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -7092,7 +7810,10 @@ typedef $$PlataformasTableProcessedTableManager =
       $$PlataformasTableUpdateCompanionBuilder,
       (Plataforma, $$PlataformasTableReferences),
       Plataforma,
-      PrefetchHooks Function({bool leiturasGanhoPlataformaRefs})
+      PrefetchHooks Function({
+        bool leiturasGanhoPlataformaRefs,
+        bool lancamentosGanhoIndividualRefs,
+      })
     >;
 typedef $$LeiturasGanhosTableCreateCompanionBuilder =
     LeiturasGanhosCompanion Function({
@@ -8071,6 +8792,481 @@ typedef $$LeiturasGanhoPlataformaTableProcessedTableManager =
       LeiturasGanhoPlataformaData,
       PrefetchHooks Function({bool leituraGanhosId, bool plataformaId})
     >;
+typedef $$LancamentosGanhoIndividualTableCreateCompanionBuilder =
+    LancamentosGanhoIndividualCompanion Function({
+      Value<int> id,
+      required int plataformaId,
+      Value<int?> jornadaId,
+      required int quantidadeViagens,
+      required int valorTotalCentavos,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+    });
+typedef $$LancamentosGanhoIndividualTableUpdateCompanionBuilder =
+    LancamentosGanhoIndividualCompanion Function({
+      Value<int> id,
+      Value<int> plataformaId,
+      Value<int?> jornadaId,
+      Value<int> quantidadeViagens,
+      Value<int> valorTotalCentavos,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+    });
+
+final class $$LancamentosGanhoIndividualTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $LancamentosGanhoIndividualTable,
+          LancamentosGanhoIndividualData
+        > {
+  $$LancamentosGanhoIndividualTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PlataformasTable _plataformaIdTable(_$AppDatabase db) =>
+      db.plataformas.createAlias(
+        'lancamentos_ganho_individual__plataforma_id__plataformas__id',
+      );
+
+  $$PlataformasTableProcessedTableManager get plataformaId {
+    final $_column = $_itemColumn<int>('plataforma_id')!;
+
+    final manager = $$PlataformasTableTableManager(
+      $_db,
+      $_db.plataformas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_plataformaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $JornadasTable _jornadaIdTable(_$AppDatabase db) => db.jornadas
+      .createAlias('lancamentos_ganho_individual__jornada_id__jornadas__id');
+
+  $$JornadasTableProcessedTableManager? get jornadaId {
+    final $_column = $_itemColumn<int>('jornada_id');
+    if ($_column == null) return null;
+    final manager = $$JornadasTableTableManager(
+      $_db,
+      $_db.jornadas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_jornadaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$LancamentosGanhoIndividualTableFilterComposer
+    extends Composer<_$AppDatabase, $LancamentosGanhoIndividualTable> {
+  $$LancamentosGanhoIndividualTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quantidadeViagens => $composableBuilder(
+    column: $table.quantidadeViagens,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get valorTotalCentavos => $composableBuilder(
+    column: $table.valorTotalCentavos,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PlataformasTableFilterComposer get plataformaId {
+    final $$PlataformasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableFilterComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableFilterComposer get jornadaId {
+    final $$JornadasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableFilterComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LancamentosGanhoIndividualTableOrderingComposer
+    extends Composer<_$AppDatabase, $LancamentosGanhoIndividualTable> {
+  $$LancamentosGanhoIndividualTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quantidadeViagens => $composableBuilder(
+    column: $table.quantidadeViagens,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get valorTotalCentavos => $composableBuilder(
+    column: $table.valorTotalCentavos,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PlataformasTableOrderingComposer get plataformaId {
+    final $$PlataformasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableOrderingComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableOrderingComposer get jornadaId {
+    final $$JornadasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableOrderingComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LancamentosGanhoIndividualTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LancamentosGanhoIndividualTable> {
+  $$LancamentosGanhoIndividualTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get quantidadeViagens => $composableBuilder(
+    column: $table.quantidadeViagens,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get valorTotalCentavos => $composableBuilder(
+    column: $table.valorTotalCentavos,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => column,
+  );
+
+  $$PlataformasTableAnnotationComposer get plataformaId {
+    final $$PlataformasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableAnnotationComposer get jornadaId {
+    final $$JornadasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LancamentosGanhoIndividualTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LancamentosGanhoIndividualTable,
+          LancamentosGanhoIndividualData,
+          $$LancamentosGanhoIndividualTableFilterComposer,
+          $$LancamentosGanhoIndividualTableOrderingComposer,
+          $$LancamentosGanhoIndividualTableAnnotationComposer,
+          $$LancamentosGanhoIndividualTableCreateCompanionBuilder,
+          $$LancamentosGanhoIndividualTableUpdateCompanionBuilder,
+          (
+            LancamentosGanhoIndividualData,
+            $$LancamentosGanhoIndividualTableReferences,
+          ),
+          LancamentosGanhoIndividualData,
+          PrefetchHooks Function({bool plataformaId, bool jornadaId})
+        > {
+  $$LancamentosGanhoIndividualTableTableManager(
+    _$AppDatabase db,
+    $LancamentosGanhoIndividualTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LancamentosGanhoIndividualTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$LancamentosGanhoIndividualTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$LancamentosGanhoIndividualTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> plataformaId = const Value.absent(),
+                Value<int?> jornadaId = const Value.absent(),
+                Value<int> quantidadeViagens = const Value.absent(),
+                Value<int> valorTotalCentavos = const Value.absent(),
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+              }) => LancamentosGanhoIndividualCompanion(
+                id: id,
+                plataformaId: plataformaId,
+                jornadaId: jornadaId,
+                quantidadeViagens: quantidadeViagens,
+                valorTotalCentavos: valorTotalCentavos,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int plataformaId,
+                Value<int?> jornadaId = const Value.absent(),
+                required int quantidadeViagens,
+                required int valorTotalCentavos,
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+              }) => LancamentosGanhoIndividualCompanion.insert(
+                id: id,
+                plataformaId: plataformaId,
+                jornadaId: jornadaId,
+                quantidadeViagens: quantidadeViagens,
+                valorTotalCentavos: valorTotalCentavos,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$LancamentosGanhoIndividualTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({plataformaId = false, jornadaId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (plataformaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.plataformaId,
+                                referencedTable:
+                                    $$LancamentosGanhoIndividualTableReferences
+                                        ._plataformaIdTable(db),
+                                referencedColumn:
+                                    $$LancamentosGanhoIndividualTableReferences
+                                        ._plataformaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (jornadaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.jornadaId,
+                                referencedTable:
+                                    $$LancamentosGanhoIndividualTableReferences
+                                        ._jornadaIdTable(db),
+                                referencedColumn:
+                                    $$LancamentosGanhoIndividualTableReferences
+                                        ._jornadaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$LancamentosGanhoIndividualTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LancamentosGanhoIndividualTable,
+      LancamentosGanhoIndividualData,
+      $$LancamentosGanhoIndividualTableFilterComposer,
+      $$LancamentosGanhoIndividualTableOrderingComposer,
+      $$LancamentosGanhoIndividualTableAnnotationComposer,
+      $$LancamentosGanhoIndividualTableCreateCompanionBuilder,
+      $$LancamentosGanhoIndividualTableUpdateCompanionBuilder,
+      (
+        LancamentosGanhoIndividualData,
+        $$LancamentosGanhoIndividualTableReferences,
+      ),
+      LancamentosGanhoIndividualData,
+      PrefetchHooks Function({bool plataformaId, bool jornadaId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8093,5 +9289,11 @@ class $AppDatabaseManager {
       $$LeiturasGanhoPlataformaTableTableManager(
         _db,
         _db.leiturasGanhoPlataforma,
+      );
+  $$LancamentosGanhoIndividualTableTableManager
+  get lancamentosGanhoIndividual =>
+      $$LancamentosGanhoIndividualTableTableManager(
+        _db,
+        _db.lancamentosGanhoIndividual,
       );
 }

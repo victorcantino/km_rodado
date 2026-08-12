@@ -653,7 +653,7 @@ void main() {
     expect(await novoService.listarItens(leituraId), hasLength(1));
   });
 
-  testWidgets('sugere valores, controla viagens e não edita individual', (
+  testWidgets('sugere valores e mostra total e ação individual', (
     tester,
   ) async {
     final uberId = await inserirPlataforma(
@@ -687,7 +687,8 @@ void main() {
     );
     expect(valor.controller!.text, contains('50,00'));
     expect(quantidade.controller!.text, '5');
-    expect(find.textContaining('lançamentos individuais'), findsOneWidget);
+    expect(find.textContaining(r'R$'), findsWidgets);
+    expect(find.text('+ Registrar'), findsOneWidget);
     expect(find.byType(TextFormField), findsNWidgets(2));
 
     for (var i = 0; i < 6; i++) {

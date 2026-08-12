@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/constants/enums/tipo_registro_ganhos.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/database/daos/ganho_individual_dao.dart';
 import '../../data/leitura_ganhos_service.dart';
 import 'configurar_plataformas_dialog.dart';
 
@@ -16,6 +17,9 @@ class LeituraGanhosDialog extends StatefulWidget {
   final List<Plataforma>? todasPlataformas;
   final Future<List<Plataforma>> Function(Map<int, bool>)? onConfigurar;
   final bool leituraInicial;
+  final List<TotalGanhoIndividual> totaisIndividuais;
+  final Future<List<TotalGanhoIndividual>> Function(Plataforma)?
+  onRegistrarIndividual;
 
   const LeituraGanhosDialog({
     super.key,
@@ -25,6 +29,8 @@ class LeituraGanhosDialog extends StatefulWidget {
     this.todasPlataformas,
     this.onConfigurar,
     this.leituraInicial = false,
+    this.totaisIndividuais = const [],
+    this.onRegistrarIndividual,
   });
 
   @override
@@ -36,6 +42,7 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
   final valores = <int, TextEditingController>{};
   final quantidades = <int, TextEditingController>{};
   late List<Plataforma> plataformas = widget.plataformas;
+  late List<TotalGanhoIndividual> totaisIndividuais = widget.totaisIndividuais;
 
   Iterable<Plataforma> get plataformasAcumuladas => plataformas.where(
     (plataforma) =>
@@ -183,12 +190,42 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
                   const SizedBox(height: 8),
                   if (plataforma.tipoRegistroGanhos ==
                       TipoRegistroGanhos.individual)
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'O total virá dos lançamentos individuais em uma '
-                        'próxima entrega.',
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final total = totaisIndividuais
+                            .where(
+                              (item) => item.plataforma.id == plataforma.id,
+                            )
+                            .firstOrNull;
+                        final moeda = NumberFormat.currency(
+                          locale: 'pt_BR',
+                          symbol: r'R$',
+                        );
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '${moeda.format((total?.valorTotalCentavos ?? 0) / 100)} · '
+                                '${total?.quantidadeViagens ?? 0} viagens',
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: widget.onRegistrarIndividual == null
+                                  ? null
+                                  : () async {
+                                      final totais = await widget
+                                          .onRegistrarIndividual!(plataforma);
+                                      if (mounted) {
+                                        setState(
+                                          () => totaisIndividuais = totais,
+                                        );
+                                      }
+                                    },
+                              child: const Text('+ Registrar'),
+                            ),
+                          ],
+                        );
+                      },
                     )
                   else ...[
                     TextFormField(

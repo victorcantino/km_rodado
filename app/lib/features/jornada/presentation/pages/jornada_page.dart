@@ -5,11 +5,16 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/daos/jornada_dao.dart';
+import '../../../../core/database/daos/ganho_individual_dao.dart';
 import '../../../../core/database/daos/leitura_ganhos_dao.dart';
 import '../../../../core/database/daos/pausa_dao.dart';
 import '../../../../core/database/seeds/seed.dart';
 import '../../../../core/database/seeds/plataformas_seed.dart';
 import '../../../leitura_ganhos/data/leitura_ganhos_repository.dart';
+import '../../../ganho_individual/data/ganho_individual_repository.dart';
+import '../../../ganho_individual/data/ganho_individual_service.dart';
+import '../../../ganho_individual/presentation/controllers/ganho_individual_controller.dart';
+import '../../../ganho_individual/presentation/widgets/registrar_ganho_individual_dialog.dart';
 import '../../../leitura_ganhos/data/leitura_ganhos_service.dart';
 import '../../../leitura_ganhos/presentation/controllers/leitura_ganhos_controller.dart';
 import '../../../leitura_ganhos/presentation/widgets/leitura_ganhos_dialog.dart';
@@ -37,6 +42,7 @@ class _JornadaPageState extends State<JornadaPage> {
   JornadaController? controller;
   LeituraGanhosController? leituraGanhosController;
   PausaController? pausaController;
+  GanhoIndividualController? ganhoIndividualController;
   late final AppDatabase database;
   Timer? atualizadorDuracao;
 
@@ -68,10 +74,14 @@ class _JornadaPageState extends State<JornadaPage> {
     final leituraGanhosRepository = LeituraGanhosRepository(
       LeituraGanhosDao(database),
     );
+    final ganhoIndividualRepository = GanhoIndividualRepository(
+      GanhoIndividualDao(database),
+    );
     final service = JornadaService(
       repository,
       pausaRepository,
       leituraGanhosRepository,
+      ganhoIndividualRepository,
     );
     final pausaService = PausaService(pausaRepository, repository);
     final leituraGanhosService = LeituraGanhosService(
@@ -84,11 +94,15 @@ class _JornadaPageState extends State<JornadaPage> {
       leituraGanhosService,
     );
     final novoPausaController = PausaController(pausaService);
+    final novoGanhoIndividualController = GanhoIndividualController(
+      GanhoIndividualService(ganhoIndividualRepository, repository),
+    );
 
     setState(() {
       controller = novoController;
       leituraGanhosController = novoLeituraGanhosController;
       pausaController = novoPausaController;
+      ganhoIndividualController = novoGanhoIndividualController;
     });
 
     await novoController.carregarJornadaAberta();
@@ -96,6 +110,41 @@ class _JornadaPageState extends State<JornadaPage> {
     await novoLeituraGanhosController.carregarEstado(
       novoController.jornadaAtual?.id,
     );
+    await novoGanhoIndividualController.carregar(
+      novoController.jornadaAtual?.id,
+    );
+  }
+
+  Future<void> _registrarGanhoIndividual([Plataforma? plataforma]) async {
+    final jornadaId = controller?.jornadaAtual?.id;
+    final ganhoController = ganhoIndividualController;
+    if (jornadaId == null || ganhoController == null) return;
+    final disponiveis = plataforma == null
+        ? ganhoController.plataformas
+        : [plataforma];
+    if (disponiveis.isEmpty) return;
+    final resultado = await showDialog<RegistrarGanhoIndividualResultado>(
+      context: context,
+      builder: (_) => RegistrarGanhoIndividualDialog(plataformas: disponiveis),
+    );
+    if (!mounted || resultado == null) return;
+    try {
+      await ganhoController.registrar(
+        jornadaId: jornadaId,
+        plataformaId: resultado.plataformaId,
+        quantidadeViagens: resultado.quantidadeViagens,
+        valorTotalCentavos: resultado.valorTotalCentavos,
+        observacao: resultado.observacao,
+      );
+    } catch (error, stackTrace) {
+      if (!mounted) return;
+      _apresentarErro(
+        operacao: 'registrar o ganho individual',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível registrar o ganho.',
+      );
+    }
   }
 
   Future<void> _abrirJornada() async {
@@ -222,11 +271,18 @@ class _JornadaPageState extends State<JornadaPage> {
         leituraInicial: !usarSugestoes,
         todasPlataformas: todasPlataformas,
         onConfigurar: (ativacoes) async {
-          return leituraController.configurarPlataformas(
+          final atualizadas = await leituraController.configurarPlataformas(
             jornadaId,
             ativacoes,
             leituraInicial: !usarSugestoes,
           );
+          await ganhoIndividualController?.carregar(jornadaId);
+          return atualizadas;
+        },
+        totaisIndividuais: ganhoIndividualController?.totais ?? const [],
+        onRegistrarIndividual: (plataforma) async {
+          await _registrarGanhoIndividual(plataforma);
+          return ganhoIndividualController?.totais ?? const [];
         },
       ),
     );
@@ -305,7 +361,6 @@ class _JornadaPageState extends State<JornadaPage> {
   Future<void> _finalizarPausa() async {
     final jornadaId = controller?.jornadaAtual?.id;
     final pausaController = this.pausaController;
-
     if (jornadaId == null || pausaController == null) {
       return;
     }
@@ -499,10 +554,12 @@ class _JornadaPageState extends State<JornadaPage> {
     final controller = this.controller;
     final leituraGanhosController = this.leituraGanhosController;
     final pausaController = this.pausaController;
+    final ganhoIndividualController = this.ganhoIndividualController;
 
     if (controller == null ||
         leituraGanhosController == null ||
-        pausaController == null) {
+        pausaController == null ||
+        ganhoIndividualController == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
@@ -513,11 +570,13 @@ class _JornadaPageState extends State<JornadaPage> {
           controller,
           pausaController,
           leituraGanhosController,
+          ganhoIndividualController,
         ]),
         builder: (context, _) {
           if (controller.carregando ||
               pausaController.carregando ||
-              leituraGanhosController.carregando) {
+              leituraGanhosController.carregando ||
+              ganhoIndividualController.carregando) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -555,6 +614,19 @@ class _JornadaPageState extends State<JornadaPage> {
                 Text('Cidade de origem: ${jornada.cidadeOrigem}'),
 
                 const SizedBox(height: 24),
+
+                if (ganhoIndividualController.plataformas.isNotEmpty) ...[
+                  OutlinedButton.icon(
+                    onPressed: _registrarGanhoIndividual,
+                    icon: const Icon(Icons.add),
+                    label: Text(
+                      ganhoIndividualController.plataformas.length == 1
+                          ? ganhoIndividualController.plataformas.single.nome
+                          : 'Ganho individual',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
 
                 if (!inicialConcluida) ...[
                   Text(
@@ -699,6 +771,7 @@ class _JornadaPageState extends State<JornadaPage> {
     atualizadorDuracao?.cancel();
     leituraGanhosController?.dispose();
     pausaController?.dispose();
+    ganhoIndividualController?.dispose();
     controller?.dispose();
     database.close();
     super.dispose();

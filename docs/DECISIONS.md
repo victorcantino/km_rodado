@@ -69,3 +69,12 @@ Motivo: diferentes plataformas podem alterar seus acumulados visíveis de formas
 ainda desconhecidas. Interpretar automaticamente uma regressão como reset
 inventaria receita. A futura conferência/reconciliação tratará esses casos com
 informação explícita do usuário.
+
+## ADR-010 — Ganhos individuais como fatos
+
+Decisão: persistir cada lançamento individual separadamente, com plataforma,
+Jornada opcional, quantidade, valor total em centavos, observação e instante de
+criação. Não criar snapshots acumulados artificiais nem odômetro por viagem.
+
+Motivo: um lançamento pode representar várias viagens sem revelar valores
+unitários. Seus totais são somas factuais e não sofrem regras de reset.

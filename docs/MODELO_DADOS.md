@@ -181,7 +181,7 @@ da plataforma.
 Plataformas individuais continuarão aparecendo com as demais em dashboards,
 pausas, fechamento e relatórios. A diferença é somente a fonte dos totais.
 
-## 5.2 Lançamento individual futuro
+## 5.2 Lançamento individual
 
 ```
 LANCAMENTO_GANHO_INDIVIDUAL
@@ -201,8 +201,10 @@ viagens, sem inferir ou persistir valores individuais. Durante uma Jornada, os
 totais serão derivados por `SUM(valor_total_centavos)` e
 `SUM(quantidade_viagens)` para a plataforma e a Jornada correspondentes.
 
-Essa tabela ainda não integra o schema 2. Nenhum reset de plataforma é inferido
-automaticamente.
+A tabela integra o schema 4. `jornada_id` permanece opcional no modelo para
+lançamentos legítimos fora do trabalho, embora a primeira interface exija uma
+Jornada aberta. Não existe odômetro por viagem: odômetros pertencem às
+transições de Jornada e Pausa. Nenhum reset é aplicado a esses fatos.
 
 ---
 
