@@ -6,10 +6,12 @@ import 'package:km_rodado/core/constants/enums/tipo_leitura_ganhos.dart';
 import 'package:km_rodado/core/constants/enums/tipo_registro_ganhos.dart';
 import 'package:km_rodado/core/database/app_database.dart';
 import 'package:km_rodado/core/database/daos/jornada_dao.dart';
+import 'package:km_rodado/core/database/daos/ganho_individual_dao.dart';
 import 'package:km_rodado/core/database/daos/leitura_ganhos_dao.dart';
 import 'package:km_rodado/core/database/daos/pausa_dao.dart';
 import 'package:km_rodado/core/database/seeds/seed.dart';
 import 'package:km_rodado/features/jornada/data/jornada_repository.dart';
+import 'package:km_rodado/features/ganho_individual/data/ganho_individual_repository.dart';
 import 'package:km_rodado/features/jornada/data/jornada_service.dart';
 import 'package:km_rodado/features/leitura_ganhos/data/leitura_ganhos_repository.dart';
 import 'package:km_rodado/features/pausa/data/pausa_repository.dart';
@@ -19,6 +21,7 @@ void main() {
   late JornadaRepository jornadaRepository;
   late PausaRepository pausaRepository;
   late LeituraGanhosRepository leituraRepository;
+  late GanhoIndividualRepository ganhoIndividualRepository;
   late JornadaService service;
 
   setUp(() async {
@@ -27,10 +30,14 @@ void main() {
     jornadaRepository = JornadaRepository(JornadaDao(database));
     pausaRepository = PausaRepository(PausaDao(database));
     leituraRepository = LeituraGanhosRepository(LeituraGanhosDao(database));
+    ganhoIndividualRepository = GanhoIndividualRepository(
+      GanhoIndividualDao(database),
+    );
     service = JornadaService(
       jornadaRepository,
       pausaRepository,
       leituraRepository,
+      ganhoIndividualRepository,
     );
   });
 
@@ -337,10 +344,65 @@ void main() {
       JornadaRepository(JornadaDao(database)),
       PausaRepository(PausaDao(database)),
       LeituraGanhosRepository(LeituraGanhosDao(database)),
+      GanhoIndividualRepository(GanhoIndividualDao(database)),
     );
     final resumo = (await novoService.resumoUltimaJornada())!;
 
     expect(resumo.receitaTotalCentavos, 2500);
     expect(resumo.quantidadeTotalViagens, 3);
+  });
+
+  test('inclui lançamentos individuais nos totais e indicadores', () async {
+    final jornadaId = await inserirJornada(
+      inicio: DateTime(2026, 8, 10, 8),
+      fim: DateTime(2026, 8, 10, 10),
+      odometroInicio: 100,
+      odometroFim: 200,
+    );
+    final uberId = await inserirPlataforma('Uber');
+    final particularId = await database
+        .into(database.plataformas)
+        .insert(
+          PlataformasCompanion.insert(
+            nome: 'Particular',
+            tipoRegistroGanhos: TipoRegistroGanhos.individual,
+          ),
+        );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.inicial,
+      DateTime(2026, 8, 10, 8),
+      {uberId: (1000, 1)},
+    );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.finalDaJornada,
+      DateTime(2026, 8, 10, 10),
+      {uberId: (5000, 3)},
+    );
+    await database
+        .into(database.lancamentosGanhoIndividual)
+        .insert(
+          LancamentosGanhoIndividualCompanion.insert(
+            plataformaId: particularId,
+            jornadaId: Value(jornadaId),
+            quantidadeViagens: 3,
+            valorTotalCentavos: 12500,
+          ),
+        );
+
+    final resumo = (await service.resumoUltimaJornada())!;
+    final particular = resumo.resultadosPlataformas.singleWhere(
+      (resultado) => resultado.nome == 'Particular',
+    );
+
+    expect(particular.receitaCentavos, 12500);
+    expect(particular.quantidadeViagens, 3);
+    expect(particular.ticketMedio, closeTo(41.666, 0.001));
+    expect(resumo.receitaTotalCentavos, 16500);
+    expect(resumo.quantidadeTotalViagens, 5);
+    expect(resumo.ticketMedioGeral, 33);
+    expect(resumo.receitaPorHoraAtiva, 82.5);
+    expect(resumo.receitaPorKmAtivo, 1.65);
   });
 }

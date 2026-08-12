@@ -38,7 +38,9 @@ class _OdometroPausaDialogState extends State<OdometroPausaDialog> {
         key: formKey,
         child: TextFormField(
           controller: controller,
+          autofocus: true,
           keyboardType: TextInputType.number,
+          selectAllOnFocus: true,
           decoration: const InputDecoration(labelText: 'Odômetro atual'),
           validator: (texto) {
             final valor = int.tryParse(texto?.trim() ?? '');

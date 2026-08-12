@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('migra schema 1 vazio para schema 3', () async {
+  test('migra schema 1 vazio para schema 4', () async {
     _criarBancoSchema1(arquivoBanco);
 
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
@@ -34,7 +34,11 @@ void main() {
     expect(await _contar(database, 'pausas'), 0);
     expect(await _contar(database, 'leituras_ganhos'), 0);
     expect(await _contar(database, 'leituras_ganho_plataforma'), 0);
-    expect(await _userVersion(database), 3);
+    expect(await _userVersion(database), 4);
+    expect(
+      await _tabelaExiste(database, 'lancamentos_ganho_individual'),
+      isTrue,
+    );
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(
       await _indiceExiste(database, 'idx_leituras_ganhos_jornada_data_hora'),
@@ -86,7 +90,8 @@ void main() {
       plataformas.map((plataforma) => plataforma.tipoRegistroGanhos).toSet(),
       {TipoRegistroGanhos.acumulado},
     );
-    expect(await _userVersion(database), 3);
+    expect(await _userVersion(database), 4);
+    expect(await _contar(database, 'lancamentos_ganho_individual'), 0);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
@@ -193,7 +198,7 @@ void main() {
     addTearDown(database.close);
     final pausa = (await database.select(database.pausas).get()).single;
 
-    expect(await _userVersion(database), 3);
+    expect(await _userVersion(database), 4);
     expect(pausa.odometroInicio, isNull);
     expect(pausa.odometroFim, isNull);
   });

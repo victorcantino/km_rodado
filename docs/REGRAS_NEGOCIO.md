@@ -265,9 +265,9 @@ A configuração rápida permite ativar ou desativar plataformas sem excluí-las
 A Leitura Inicial fixa o conjunto acumulado obrigatório da Jornada. Mudanças
 posteriores valem para a próxima Jornada e não alteram dados históricos.
 
-Nesta primeira entrega, plataformas individuais aparecem na leitura apenas com
-a indicação de que seus totais virão de lançamentos futuros. Elas não são
-editáveis e não geram `LeituraGanhoPlataforma` artificial.
+Plataformas individuais exibem na leitura os totais dos lançamentos da Jornada
+e uma ação rápida para registrar. Elas não geram `LeituraGanhoPlataforma`
+artificial.
 
 ---
 
@@ -346,10 +346,8 @@ O resumo calcula o ticket médio de cada plataforma acumulada dividindo seu
 faturamento calculável pela quantidade de viagens. O ticket médio geral divide
 o faturamento total pelas viagens totais. Com zero viagens, regressão de
 snapshot ou resultado financeiro total incompleto, o respectivo ticket médio
-fica indisponível. Particular permanece fora até a implementação dos ganhos
-individuais.
-
-Ganhos individuais, incluindo Particular, e custos ainda não compõem este
+fica indisponível. Plataformas individuais, incluindo Particular, participam
+por meio da soma de seus lançamentos factuais. Custos ainda não compõem este
 resumo.
 
 ## 5.6 Conferência futura de snapshots e eventos financeiros
@@ -381,7 +379,7 @@ faturamento de corridas + bônus - passes e custos da plataforma
 
 Esses eventos e sua reconciliação não fazem parte do resumo atual.
 
-## 5.7 Lançamentos individuais futuros
+## 5.7 Lançamentos individuais
 
 Um lançamento individual terá quantidade de viagens maior ou igual a 1 e valor
 total em centavos maior ou igual a zero. Poderá representar uma ou várias
@@ -400,6 +398,15 @@ e Jornada, com:
 SUM(valorTotalCentavos)
 SUM(quantidadeViagens)
 ```
+
+Cada lançamento é um fato e pode representar uma ou várias viagens. Um lote não
+permite inferir o valor de cada viagem. A interface operacional associa o
+lançamento automaticamente à Jornada aberta, respeita plataformas individuais
+ativas e não registra odômetro. Inativar depois preserva o histórico.
+
+O resumo combina resultados acumulados calculáveis e totais individuais. Se
+uma acumulada exigir revisão, os individuais continuam visíveis, mas os totais
+gerais permanecem incompletos.
 
 ---
 

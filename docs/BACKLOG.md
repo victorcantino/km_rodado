@@ -5,13 +5,8 @@
 - Leitura inicial de ganhos ao abrir a Jornada
 - Leitura final de ganhos antes de fechar a Jornada
 - Plataformas
-- Lançamentos individuais por plataforma: quantidade de viagens, valor total
-  em centavos, observação opcional, Jornada opcional e `dataCriacao` como
-  momento operacional
-- Totais individuais por Jornada derivados com `SUM` de valor e quantidade,
-  sem inferir valores unitários
-- Visão conjunta em pausas e fechamento com ação rápida para novo lançamento
-  individual, sem criar leitura acumulada artificial
+- Criar fluxo seguro de edição/exclusão e correção histórica de lançamentos
+  individuais, sem improvisar perda de rastreabilidade
 - Abastecimentos
 - Manutenções e abastecimentos com Jornada opcional
 - Eficiência diária
@@ -20,6 +15,9 @@
 - Criar fluxo de correção de odômetro com motivo obrigatório
 
 # Futuro
+
+- Revisar autofocus e redução de toques nos demais inputs operacionais após
+  acumular experiência de uso em campo
 
 - Planejar migração histórica de mais de um ano de dados do AppSheet quando o
   modelo de destino estiver estável, preservando Jornadas, ganhos, odômetros,
@@ -57,6 +55,20 @@
 
 - Manutenção com mapa visual do veículo para selecionar regiões e lados, como
   faróis e pneus dianteiros/traseiros, reduzindo digitação manual
+
+- Modelar recarga e consumo efetivo de crédito de pedágio separadamente, sem
+  dupla contabilização de custo; aplicar a mesma distinção a estacionamento
+  pré-pago
+
+- Modelar multas com valor original, desconto eventual, valor pago, vencimento
+  e status, sem percentual universal de desconto
+
+- Modelar IPVA por exercício, vencimentos, pagamento à vista ou parcelado,
+  parcelas e datas-limite configuráveis por ano/jurisdição, sem fixar três
+  parcelas como regra universal
+
+- Preservar licenciamento, seguro e parcelas, financiamento, alertas de
+  vencimento e manutenção por data e/ou quilometragem
 
 - Timeline como projeção de tabelas especializadas, sem tabela genérica Evento
 - Definir regras específicas de reset e movimentações de plataforma somente

@@ -59,7 +59,9 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
             children: [
               TextFormField(
                 controller: odometroController,
+                autofocus: true,
                 keyboardType: TextInputType.number,
+                selectAllOnFocus: true,
                 decoration: const InputDecoration(labelText: 'Odômetro final'),
                 validator: (valor) {
                   final texto = valor?.trim() ?? '';

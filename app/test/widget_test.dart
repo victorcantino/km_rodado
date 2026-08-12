@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:km_rodado/features/jornada/presentation/widgets/abrir_jornada_dialog.dart';
 import 'package:km_rodado/features/jornada/presentation/widgets/fechar_jornada_dialog.dart';
+import 'package:km_rodado/features/pausa/presentation/widgets/odometro_pausa_dialog.dart';
 
 void main() {
   testWidgets('exibe os campos e ações para abrir jornada', (tester) async {
@@ -15,6 +16,56 @@ void main() {
     expect(find.text('Cidade'), findsOneWidget);
     expect(find.text('Cancelar'), findsOneWidget);
     expect(find.text('Salvar'), findsOneWidget);
+    expect(
+      tester
+          .widget<EditableText>(find.byType(EditableText).first)
+          .focusNode
+          .hasFocus,
+      isTrue,
+    );
+  });
+
+  testWidgets('odômetro da Pausa recebe foco e fecha sem exceções', (
+    tester,
+  ) async {
+    int? resultado;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () async {
+                resultado = await showDialog<int>(
+                  context: context,
+                  builder: (_) => const OdometroPausaDialog(
+                    titulo: 'Iniciar Pausa',
+                    odometroMinimo: 152184,
+                  ),
+                );
+              },
+              child: const Text('Abrir odômetro'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Abrir odômetro'));
+    await tester.pumpAndSettle();
+    final campo = tester.widget<EditableText>(find.byType(EditableText));
+    expect(campo.focusNode.hasFocus, isTrue);
+    expect(campo.selectAllOnFocus, isTrue);
+    await tester.enterText(find.byType(TextFormField), '152185');
+    await tester.tap(find.text('Confirmar'));
+    await tester.pumpAndSettle();
+    expect(resultado, 152185);
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.text('Abrir odômetro'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('preenche odômetro e cidade de origem sugeridos', (tester) async {

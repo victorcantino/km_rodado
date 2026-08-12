@@ -2,12 +2,12 @@
 
 ## Funcionalidade em desenvolvimento
 
-Resumo analítico da Jornada.
+Ganhos individuais.
 
 ## Objetivo atual
 
-Transformar Jornada, Pausas e Leituras de Ganhos persistidas em indicadores
-operacionais derivados, sem alterar o schema 3.
+Permitir lançamentos factuais de plataformas individuais e integrá-los à
+operação e ao resumo.
 
 ## Já implementado
 
@@ -88,15 +88,17 @@ operacionais derivados, sem alterar o schema 3.
 - Regressões de valor ou viagens entre snapshots sinalizadas para revisão, sem
   inferência automática de reset
 - Resumo recalculado dos dados persistidos após fechamento e reinício
+- Schema 4 com lançamentos de ganhos individuais e Jornada opcional
+- Registro rápido individual durante Jornada, inclusive durante Pausa
+- Totais individuais por plataforma derivados por soma e integrados ao resumo
 
 ## Em andamento
 
-- Validação do resumo analítico da Jornada
+- Validação operacional dos ganhos individuais no Android
 
 ## Próximo passo
 
-Validar o resumo em uso operacional e implementar lançamentos individuais em
-entrega futura.
+Validar lançamentos individuais em uso operacional.
 
 ## Decisões temporárias
 
@@ -111,5 +113,4 @@ entrega futura.
 - O tratamento visual de erros ainda é genérico e restrito à abertura
 - A consistência entre Jornada e Pausa da leitura é protegida pelo service
 - Regras de reset das plataformas ainda não são conhecidas e não são inferidas
-- Lançamentos individuais permanecem futuros; Particular continua sendo
-  plataforma e seus totais serão derivados desses lançamentos
+- Edição e exclusão de lançamentos individuais permanecem futuras

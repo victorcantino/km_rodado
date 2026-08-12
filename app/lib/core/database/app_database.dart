@@ -16,10 +16,12 @@ import 'tables/pausa.dart';
 import 'tables/plataforma.dart';
 import 'tables/leitura_ganhos.dart';
 import 'tables/leitura_ganho_plataforma.dart';
+import 'tables/lancamento_ganho_individual.dart';
 
 import 'daos/jornada_dao.dart';
 import 'daos/leitura_ganhos_dao.dart';
 import 'daos/pausa_dao.dart';
+import 'daos/ganho_individual_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -33,8 +35,9 @@ part 'app_database.g.dart';
     Plataformas,
     LeiturasGanhos,
     LeiturasGanhoPlataforma,
+    LancamentosGanhoIndividual,
   ],
-  daos: [JornadaDao, PausaDao, LeituraGanhosDao],
+  daos: [JornadaDao, PausaDao, LeituraGanhosDao, GanhoIndividualDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -42,7 +45,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -54,6 +57,9 @@ class AppDatabase extends _$AppDatabase {
       if (from >= 2 && from < 3) {
         await migrator.addColumn(pausas, pausas.odometroInicio);
         await migrator.addColumn(pausas, pausas.odometroFim);
+      }
+      if (from < 4) {
+        await migrator.createTable(lancamentosGanhoIndividual);
       }
     },
     beforeOpen: (details) async {
