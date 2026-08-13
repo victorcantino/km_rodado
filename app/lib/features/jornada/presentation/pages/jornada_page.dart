@@ -5,12 +5,17 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/database/app_database.dart';
 import '../../../../core/database/daos/jornada_dao.dart';
+import '../../../../core/database/daos/abastecimento_dao.dart';
 import '../../../../core/database/daos/ganho_individual_dao.dart';
 import '../../../../core/database/daos/leitura_ganhos_dao.dart';
 import '../../../../core/database/daos/pausa_dao.dart';
 import '../../../../core/database/seeds/seed.dart';
 import '../../../../core/database/seeds/plataformas_seed.dart';
 import '../../../leitura_ganhos/data/leitura_ganhos_repository.dart';
+import '../../../abastecimento/data/abastecimento_repository.dart';
+import '../../../abastecimento/data/abastecimento_service.dart';
+import '../../../abastecimento/presentation/controllers/abastecimento_controller.dart';
+import '../../../abastecimento/presentation/widgets/registrar_abastecimento_dialog.dart';
 import '../../../ganho_individual/data/ganho_individual_repository.dart';
 import '../../../ganho_individual/data/ganho_individual_service.dart';
 import '../../../ganho_individual/presentation/controllers/ganho_individual_controller.dart';
@@ -43,6 +48,7 @@ class _JornadaPageState extends State<JornadaPage> {
   LeituraGanhosController? leituraGanhosController;
   PausaController? pausaController;
   GanhoIndividualController? ganhoIndividualController;
+  AbastecimentoController? abastecimentoController;
   late final AppDatabase database;
   Timer? atualizadorDuracao;
 
@@ -97,12 +103,19 @@ class _JornadaPageState extends State<JornadaPage> {
     final novoGanhoIndividualController = GanhoIndividualController(
       GanhoIndividualService(ganhoIndividualRepository, repository),
     );
+    final abastecimentoRepository = AbastecimentoRepository(
+      AbastecimentoDao(database),
+    );
+    final novoAbastecimentoController = AbastecimentoController(
+      AbastecimentoService(abastecimentoRepository, repository),
+    );
 
     setState(() {
       controller = novoController;
       leituraGanhosController = novoLeituraGanhosController;
       pausaController = novoPausaController;
       ganhoIndividualController = novoGanhoIndividualController;
+      abastecimentoController = novoAbastecimentoController;
     });
 
     await novoController.carregarJornadaAberta();
@@ -113,6 +126,60 @@ class _JornadaPageState extends State<JornadaPage> {
     await novoGanhoIndividualController.carregar(
       novoController.jornadaAtual?.id,
     );
+    await novoAbastecimentoController.carregar(
+      novoController.jornadaAtual?.veiculoId ?? 1,
+    );
+  }
+
+  Future<void> _registrarAbastecimento() async {
+    final abastecimentoController = this.abastecimentoController;
+    if (abastecimentoController == null) return;
+    final veiculoId = controller?.jornadaAtual?.veiculoId ?? 1;
+    final odometroInicial = await abastecimentoController.ultimoOdometro(
+      veiculoId,
+    );
+    final ultimoAbastecimento = abastecimentoController.ultimo;
+    if (!mounted) return;
+    final resultado = await showDialog<RegistrarAbastecimentoResultado>(
+      context: context,
+      builder: (_) => RegistrarAbastecimentoDialog(
+        odometroInicial: odometroInicial,
+        cidadeInicial:
+            controller?.jornadaAtual?.cidadeOrigem ??
+            controller?.ultimaJornadaFinalizada?.cidadeDestino,
+        tipoCombustivelInicial: ultimoAbastecimento?.tipoCombustivel,
+      ),
+    );
+    if (!mounted || resultado == null) return;
+    try {
+      await abastecimentoController.registrar(
+        veiculoId: veiculoId,
+        odometro: resultado.odometro,
+        tipoCombustivel: resultado.tipoCombustivel,
+        volumeMililitros: resultado.volumeMililitros,
+        valorTotalPagoCentavos: resultado.valorTotalPagoCentavos,
+        tanqueCheio: resultado.tanqueCheio,
+        dataHora: resultado.dataHora,
+        precoBombaMilesimosRealPorLitro:
+            resultado.precoBombaMilesimosRealPorLitro,
+        cidade: resultado.cidade,
+        nomePosto: resultado.nomePosto,
+        bandeiraPosto: resultado.bandeiraPosto,
+        observacao: resultado.observacao,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Abastecimento registrado.')),
+      );
+    } catch (error, stackTrace) {
+      if (!mounted) return;
+      _apresentarErro(
+        operacao: 'registrar o abastecimento',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível registrar o abastecimento.',
+      );
+    }
   }
 
   Future<void> _registrarGanhoIndividual([Plataforma? plataforma]) async {
@@ -258,7 +325,6 @@ class _JornadaPageState extends State<JornadaPage> {
     if (!mounted) {
       return null;
     }
-
     final todasPlataformas = await leituraController.listarTodasPlataformas();
     if (!mounted) return null;
 
@@ -555,28 +621,39 @@ class _JornadaPageState extends State<JornadaPage> {
     final leituraGanhosController = this.leituraGanhosController;
     final pausaController = this.pausaController;
     final ganhoIndividualController = this.ganhoIndividualController;
+    final abastecimentoController = this.abastecimentoController;
 
     if (controller == null ||
         leituraGanhosController == null ||
         pausaController == null ||
-        ganhoIndividualController == null) {
+        ganhoIndividualController == null ||
+        abastecimentoController == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Jornada')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: abastecimentoController.carregando
+            ? null
+            : _registrarAbastecimento,
+        icon: const Icon(Icons.local_gas_station),
+        label: const Text('Abastecimento'),
+      ),
       body: AnimatedBuilder(
         animation: Listenable.merge([
           controller,
           pausaController,
           leituraGanhosController,
           ganhoIndividualController,
+          abastecimentoController,
         ]),
         builder: (context, _) {
           if (controller.carregando ||
               pausaController.carregando ||
               leituraGanhosController.carregando ||
-              ganhoIndividualController.carregando) {
+              ganhoIndividualController.carregando ||
+              abastecimentoController.carregando) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -772,6 +849,7 @@ class _JornadaPageState extends State<JornadaPage> {
     leituraGanhosController?.dispose();
     pausaController?.dispose();
     ganhoIndividualController?.dispose();
+    abastecimentoController?.dispose();
     controller?.dispose();
     database.close();
     super.dispose();

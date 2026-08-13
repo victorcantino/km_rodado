@@ -4906,6 +4906,927 @@ class LancamentosGanhoIndividualCompanion
   }
 }
 
+class $AbastecimentosTable extends Abastecimentos
+    with TableInfo<$AbastecimentosTable, Abastecimento> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AbastecimentosTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _veiculoIdMeta = const VerificationMeta(
+    'veiculoId',
+  );
+  @override
+  late final GeneratedColumn<int> veiculoId = GeneratedColumn<int>(
+    'veiculo_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES veiculos (id)',
+    ),
+  );
+  static const VerificationMeta _jornadaIdMeta = const VerificationMeta(
+    'jornadaId',
+  );
+  @override
+  late final GeneratedColumn<int> jornadaId = GeneratedColumn<int>(
+    'jornada_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES jornadas (id)',
+    ),
+  );
+  static const VerificationMeta _dataHoraMeta = const VerificationMeta(
+    'dataHora',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataHora = GeneratedColumn<DateTime>(
+    'data_hora',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _odometroMeta = const VerificationMeta(
+    'odometro',
+  );
+  @override
+  late final GeneratedColumn<int> odometro = GeneratedColumn<int>(
+    'odometro',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<TipoCombustivel, String>
+  tipoCombustivel =
+      GeneratedColumn<String>(
+        'tipo_combustivel',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<TipoCombustivel>(
+        $AbastecimentosTable.$convertertipoCombustivel,
+      );
+  static const VerificationMeta _volumeMililitrosMeta = const VerificationMeta(
+    'volumeMililitros',
+  );
+  @override
+  late final GeneratedColumn<int> volumeMililitros = GeneratedColumn<int>(
+    'volume_mililitros',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valorTotalPagoCentavosMeta =
+      const VerificationMeta('valorTotalPagoCentavos');
+  @override
+  late final GeneratedColumn<int> valorTotalPagoCentavos = GeneratedColumn<int>(
+    'valor_total_pago_centavos',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _precoBombaMilesimosRealPorLitroMeta =
+      const VerificationMeta('precoBombaMilesimosRealPorLitro');
+  @override
+  late final GeneratedColumn<int> precoBombaMilesimosRealPorLitro =
+      GeneratedColumn<int>(
+        'preco_bomba_milesimos_real_por_litro',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _tanqueCheioMeta = const VerificationMeta(
+    'tanqueCheio',
+  );
+  @override
+  late final GeneratedColumn<bool> tanqueCheio = GeneratedColumn<bool>(
+    'tanque_cheio',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("tanque_cheio" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _cidadeMeta = const VerificationMeta('cidade');
+  @override
+  late final GeneratedColumn<String> cidade = GeneratedColumn<String>(
+    'cidade',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nomePostoMeta = const VerificationMeta(
+    'nomePosto',
+  );
+  @override
+  late final GeneratedColumn<String> nomePosto = GeneratedColumn<String>(
+    'nome_posto',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bandeiraPostoMeta = const VerificationMeta(
+    'bandeiraPosto',
+  );
+  @override
+  late final GeneratedColumn<String> bandeiraPosto = GeneratedColumn<String>(
+    'bandeira_posto',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _observacaoMeta = const VerificationMeta(
+    'observacao',
+  );
+  @override
+  late final GeneratedColumn<String> observacao = GeneratedColumn<String>(
+    'observacao',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dataCriacaoMeta = const VerificationMeta(
+    'dataCriacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataCriacao = GeneratedColumn<DateTime>(
+    'data_criacao',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    veiculoId,
+    jornadaId,
+    dataHora,
+    odometro,
+    tipoCombustivel,
+    volumeMililitros,
+    valorTotalPagoCentavos,
+    precoBombaMilesimosRealPorLitro,
+    tanqueCheio,
+    cidade,
+    nomePosto,
+    bandeiraPosto,
+    observacao,
+    dataCriacao,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'abastecimentos';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Abastecimento> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('veiculo_id')) {
+      context.handle(
+        _veiculoIdMeta,
+        veiculoId.isAcceptableOrUnknown(data['veiculo_id']!, _veiculoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_veiculoIdMeta);
+    }
+    if (data.containsKey('jornada_id')) {
+      context.handle(
+        _jornadaIdMeta,
+        jornadaId.isAcceptableOrUnknown(data['jornada_id']!, _jornadaIdMeta),
+      );
+    }
+    if (data.containsKey('data_hora')) {
+      context.handle(
+        _dataHoraMeta,
+        dataHora.isAcceptableOrUnknown(data['data_hora']!, _dataHoraMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dataHoraMeta);
+    }
+    if (data.containsKey('odometro')) {
+      context.handle(
+        _odometroMeta,
+        odometro.isAcceptableOrUnknown(data['odometro']!, _odometroMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_odometroMeta);
+    }
+    if (data.containsKey('volume_mililitros')) {
+      context.handle(
+        _volumeMililitrosMeta,
+        volumeMililitros.isAcceptableOrUnknown(
+          data['volume_mililitros']!,
+          _volumeMililitrosMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_volumeMililitrosMeta);
+    }
+    if (data.containsKey('valor_total_pago_centavos')) {
+      context.handle(
+        _valorTotalPagoCentavosMeta,
+        valorTotalPagoCentavos.isAcceptableOrUnknown(
+          data['valor_total_pago_centavos']!,
+          _valorTotalPagoCentavosMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_valorTotalPagoCentavosMeta);
+    }
+    if (data.containsKey('preco_bomba_milesimos_real_por_litro')) {
+      context.handle(
+        _precoBombaMilesimosRealPorLitroMeta,
+        precoBombaMilesimosRealPorLitro.isAcceptableOrUnknown(
+          data['preco_bomba_milesimos_real_por_litro']!,
+          _precoBombaMilesimosRealPorLitroMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tanque_cheio')) {
+      context.handle(
+        _tanqueCheioMeta,
+        tanqueCheio.isAcceptableOrUnknown(
+          data['tanque_cheio']!,
+          _tanqueCheioMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cidade')) {
+      context.handle(
+        _cidadeMeta,
+        cidade.isAcceptableOrUnknown(data['cidade']!, _cidadeMeta),
+      );
+    }
+    if (data.containsKey('nome_posto')) {
+      context.handle(
+        _nomePostoMeta,
+        nomePosto.isAcceptableOrUnknown(data['nome_posto']!, _nomePostoMeta),
+      );
+    }
+    if (data.containsKey('bandeira_posto')) {
+      context.handle(
+        _bandeiraPostoMeta,
+        bandeiraPosto.isAcceptableOrUnknown(
+          data['bandeira_posto']!,
+          _bandeiraPostoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('observacao')) {
+      context.handle(
+        _observacaoMeta,
+        observacao.isAcceptableOrUnknown(data['observacao']!, _observacaoMeta),
+      );
+    }
+    if (data.containsKey('data_criacao')) {
+      context.handle(
+        _dataCriacaoMeta,
+        dataCriacao.isAcceptableOrUnknown(
+          data['data_criacao']!,
+          _dataCriacaoMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Abastecimento map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Abastecimento(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      veiculoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}veiculo_id'],
+      )!,
+      jornadaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}jornada_id'],
+      ),
+      dataHora: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_hora'],
+      )!,
+      odometro: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}odometro'],
+      )!,
+      tipoCombustivel: $AbastecimentosTable.$convertertipoCombustivel.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}tipo_combustivel'],
+        )!,
+      ),
+      volumeMililitros: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}volume_mililitros'],
+      )!,
+      valorTotalPagoCentavos: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_total_pago_centavos'],
+      )!,
+      precoBombaMilesimosRealPorLitro: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}preco_bomba_milesimos_real_por_litro'],
+      ),
+      tanqueCheio: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}tanque_cheio'],
+      )!,
+      cidade: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cidade'],
+      ),
+      nomePosto: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nome_posto'],
+      ),
+      bandeiraPosto: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bandeira_posto'],
+      ),
+      observacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}observacao'],
+      ),
+      dataCriacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_criacao'],
+      )!,
+    );
+  }
+
+  @override
+  $AbastecimentosTable createAlias(String alias) {
+    return $AbastecimentosTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<TipoCombustivel, String, String>
+  $convertertipoCombustivel = const EnumNameConverter<TipoCombustivel>(
+    TipoCombustivel.values,
+  );
+}
+
+class Abastecimento extends DataClass implements Insertable<Abastecimento> {
+  final int id;
+  final int veiculoId;
+  final int? jornadaId;
+  final DateTime dataHora;
+  final int odometro;
+  final TipoCombustivel tipoCombustivel;
+  final int volumeMililitros;
+  final int valorTotalPagoCentavos;
+  final int? precoBombaMilesimosRealPorLitro;
+  final bool tanqueCheio;
+  final String? cidade;
+  final String? nomePosto;
+  final String? bandeiraPosto;
+  final String? observacao;
+  final DateTime dataCriacao;
+  const Abastecimento({
+    required this.id,
+    required this.veiculoId,
+    this.jornadaId,
+    required this.dataHora,
+    required this.odometro,
+    required this.tipoCombustivel,
+    required this.volumeMililitros,
+    required this.valorTotalPagoCentavos,
+    this.precoBombaMilesimosRealPorLitro,
+    required this.tanqueCheio,
+    this.cidade,
+    this.nomePosto,
+    this.bandeiraPosto,
+    this.observacao,
+    required this.dataCriacao,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['veiculo_id'] = Variable<int>(veiculoId);
+    if (!nullToAbsent || jornadaId != null) {
+      map['jornada_id'] = Variable<int>(jornadaId);
+    }
+    map['data_hora'] = Variable<DateTime>(dataHora);
+    map['odometro'] = Variable<int>(odometro);
+    {
+      map['tipo_combustivel'] = Variable<String>(
+        $AbastecimentosTable.$convertertipoCombustivel.toSql(tipoCombustivel),
+      );
+    }
+    map['volume_mililitros'] = Variable<int>(volumeMililitros);
+    map['valor_total_pago_centavos'] = Variable<int>(valorTotalPagoCentavos);
+    if (!nullToAbsent || precoBombaMilesimosRealPorLitro != null) {
+      map['preco_bomba_milesimos_real_por_litro'] = Variable<int>(
+        precoBombaMilesimosRealPorLitro,
+      );
+    }
+    map['tanque_cheio'] = Variable<bool>(tanqueCheio);
+    if (!nullToAbsent || cidade != null) {
+      map['cidade'] = Variable<String>(cidade);
+    }
+    if (!nullToAbsent || nomePosto != null) {
+      map['nome_posto'] = Variable<String>(nomePosto);
+    }
+    if (!nullToAbsent || bandeiraPosto != null) {
+      map['bandeira_posto'] = Variable<String>(bandeiraPosto);
+    }
+    if (!nullToAbsent || observacao != null) {
+      map['observacao'] = Variable<String>(observacao);
+    }
+    map['data_criacao'] = Variable<DateTime>(dataCriacao);
+    return map;
+  }
+
+  AbastecimentosCompanion toCompanion(bool nullToAbsent) {
+    return AbastecimentosCompanion(
+      id: Value(id),
+      veiculoId: Value(veiculoId),
+      jornadaId: jornadaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(jornadaId),
+      dataHora: Value(dataHora),
+      odometro: Value(odometro),
+      tipoCombustivel: Value(tipoCombustivel),
+      volumeMililitros: Value(volumeMililitros),
+      valorTotalPagoCentavos: Value(valorTotalPagoCentavos),
+      precoBombaMilesimosRealPorLitro:
+          precoBombaMilesimosRealPorLitro == null && nullToAbsent
+          ? const Value.absent()
+          : Value(precoBombaMilesimosRealPorLitro),
+      tanqueCheio: Value(tanqueCheio),
+      cidade: cidade == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cidade),
+      nomePosto: nomePosto == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nomePosto),
+      bandeiraPosto: bandeiraPosto == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bandeiraPosto),
+      observacao: observacao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(observacao),
+      dataCriacao: Value(dataCriacao),
+    );
+  }
+
+  factory Abastecimento.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Abastecimento(
+      id: serializer.fromJson<int>(json['id']),
+      veiculoId: serializer.fromJson<int>(json['veiculoId']),
+      jornadaId: serializer.fromJson<int?>(json['jornadaId']),
+      dataHora: serializer.fromJson<DateTime>(json['dataHora']),
+      odometro: serializer.fromJson<int>(json['odometro']),
+      tipoCombustivel: $AbastecimentosTable.$convertertipoCombustivel.fromJson(
+        serializer.fromJson<String>(json['tipoCombustivel']),
+      ),
+      volumeMililitros: serializer.fromJson<int>(json['volumeMililitros']),
+      valorTotalPagoCentavos: serializer.fromJson<int>(
+        json['valorTotalPagoCentavos'],
+      ),
+      precoBombaMilesimosRealPorLitro: serializer.fromJson<int?>(
+        json['precoBombaMilesimosRealPorLitro'],
+      ),
+      tanqueCheio: serializer.fromJson<bool>(json['tanqueCheio']),
+      cidade: serializer.fromJson<String?>(json['cidade']),
+      nomePosto: serializer.fromJson<String?>(json['nomePosto']),
+      bandeiraPosto: serializer.fromJson<String?>(json['bandeiraPosto']),
+      observacao: serializer.fromJson<String?>(json['observacao']),
+      dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'veiculoId': serializer.toJson<int>(veiculoId),
+      'jornadaId': serializer.toJson<int?>(jornadaId),
+      'dataHora': serializer.toJson<DateTime>(dataHora),
+      'odometro': serializer.toJson<int>(odometro),
+      'tipoCombustivel': serializer.toJson<String>(
+        $AbastecimentosTable.$convertertipoCombustivel.toJson(tipoCombustivel),
+      ),
+      'volumeMililitros': serializer.toJson<int>(volumeMililitros),
+      'valorTotalPagoCentavos': serializer.toJson<int>(valorTotalPagoCentavos),
+      'precoBombaMilesimosRealPorLitro': serializer.toJson<int?>(
+        precoBombaMilesimosRealPorLitro,
+      ),
+      'tanqueCheio': serializer.toJson<bool>(tanqueCheio),
+      'cidade': serializer.toJson<String?>(cidade),
+      'nomePosto': serializer.toJson<String?>(nomePosto),
+      'bandeiraPosto': serializer.toJson<String?>(bandeiraPosto),
+      'observacao': serializer.toJson<String?>(observacao),
+      'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
+    };
+  }
+
+  Abastecimento copyWith({
+    int? id,
+    int? veiculoId,
+    Value<int?> jornadaId = const Value.absent(),
+    DateTime? dataHora,
+    int? odometro,
+    TipoCombustivel? tipoCombustivel,
+    int? volumeMililitros,
+    int? valorTotalPagoCentavos,
+    Value<int?> precoBombaMilesimosRealPorLitro = const Value.absent(),
+    bool? tanqueCheio,
+    Value<String?> cidade = const Value.absent(),
+    Value<String?> nomePosto = const Value.absent(),
+    Value<String?> bandeiraPosto = const Value.absent(),
+    Value<String?> observacao = const Value.absent(),
+    DateTime? dataCriacao,
+  }) => Abastecimento(
+    id: id ?? this.id,
+    veiculoId: veiculoId ?? this.veiculoId,
+    jornadaId: jornadaId.present ? jornadaId.value : this.jornadaId,
+    dataHora: dataHora ?? this.dataHora,
+    odometro: odometro ?? this.odometro,
+    tipoCombustivel: tipoCombustivel ?? this.tipoCombustivel,
+    volumeMililitros: volumeMililitros ?? this.volumeMililitros,
+    valorTotalPagoCentavos:
+        valorTotalPagoCentavos ?? this.valorTotalPagoCentavos,
+    precoBombaMilesimosRealPorLitro: precoBombaMilesimosRealPorLitro.present
+        ? precoBombaMilesimosRealPorLitro.value
+        : this.precoBombaMilesimosRealPorLitro,
+    tanqueCheio: tanqueCheio ?? this.tanqueCheio,
+    cidade: cidade.present ? cidade.value : this.cidade,
+    nomePosto: nomePosto.present ? nomePosto.value : this.nomePosto,
+    bandeiraPosto: bandeiraPosto.present
+        ? bandeiraPosto.value
+        : this.bandeiraPosto,
+    observacao: observacao.present ? observacao.value : this.observacao,
+    dataCriacao: dataCriacao ?? this.dataCriacao,
+  );
+  Abastecimento copyWithCompanion(AbastecimentosCompanion data) {
+    return Abastecimento(
+      id: data.id.present ? data.id.value : this.id,
+      veiculoId: data.veiculoId.present ? data.veiculoId.value : this.veiculoId,
+      jornadaId: data.jornadaId.present ? data.jornadaId.value : this.jornadaId,
+      dataHora: data.dataHora.present ? data.dataHora.value : this.dataHora,
+      odometro: data.odometro.present ? data.odometro.value : this.odometro,
+      tipoCombustivel: data.tipoCombustivel.present
+          ? data.tipoCombustivel.value
+          : this.tipoCombustivel,
+      volumeMililitros: data.volumeMililitros.present
+          ? data.volumeMililitros.value
+          : this.volumeMililitros,
+      valorTotalPagoCentavos: data.valorTotalPagoCentavos.present
+          ? data.valorTotalPagoCentavos.value
+          : this.valorTotalPagoCentavos,
+      precoBombaMilesimosRealPorLitro:
+          data.precoBombaMilesimosRealPorLitro.present
+          ? data.precoBombaMilesimosRealPorLitro.value
+          : this.precoBombaMilesimosRealPorLitro,
+      tanqueCheio: data.tanqueCheio.present
+          ? data.tanqueCheio.value
+          : this.tanqueCheio,
+      cidade: data.cidade.present ? data.cidade.value : this.cidade,
+      nomePosto: data.nomePosto.present ? data.nomePosto.value : this.nomePosto,
+      bandeiraPosto: data.bandeiraPosto.present
+          ? data.bandeiraPosto.value
+          : this.bandeiraPosto,
+      observacao: data.observacao.present
+          ? data.observacao.value
+          : this.observacao,
+      dataCriacao: data.dataCriacao.present
+          ? data.dataCriacao.value
+          : this.dataCriacao,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Abastecimento(')
+          ..write('id: $id, ')
+          ..write('veiculoId: $veiculoId, ')
+          ..write('jornadaId: $jornadaId, ')
+          ..write('dataHora: $dataHora, ')
+          ..write('odometro: $odometro, ')
+          ..write('tipoCombustivel: $tipoCombustivel, ')
+          ..write('volumeMililitros: $volumeMililitros, ')
+          ..write('valorTotalPagoCentavos: $valorTotalPagoCentavos, ')
+          ..write(
+            'precoBombaMilesimosRealPorLitro: $precoBombaMilesimosRealPorLitro, ',
+          )
+          ..write('tanqueCheio: $tanqueCheio, ')
+          ..write('cidade: $cidade, ')
+          ..write('nomePosto: $nomePosto, ')
+          ..write('bandeiraPosto: $bandeiraPosto, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    veiculoId,
+    jornadaId,
+    dataHora,
+    odometro,
+    tipoCombustivel,
+    volumeMililitros,
+    valorTotalPagoCentavos,
+    precoBombaMilesimosRealPorLitro,
+    tanqueCheio,
+    cidade,
+    nomePosto,
+    bandeiraPosto,
+    observacao,
+    dataCriacao,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Abastecimento &&
+          other.id == this.id &&
+          other.veiculoId == this.veiculoId &&
+          other.jornadaId == this.jornadaId &&
+          other.dataHora == this.dataHora &&
+          other.odometro == this.odometro &&
+          other.tipoCombustivel == this.tipoCombustivel &&
+          other.volumeMililitros == this.volumeMililitros &&
+          other.valorTotalPagoCentavos == this.valorTotalPagoCentavos &&
+          other.precoBombaMilesimosRealPorLitro ==
+              this.precoBombaMilesimosRealPorLitro &&
+          other.tanqueCheio == this.tanqueCheio &&
+          other.cidade == this.cidade &&
+          other.nomePosto == this.nomePosto &&
+          other.bandeiraPosto == this.bandeiraPosto &&
+          other.observacao == this.observacao &&
+          other.dataCriacao == this.dataCriacao);
+}
+
+class AbastecimentosCompanion extends UpdateCompanion<Abastecimento> {
+  final Value<int> id;
+  final Value<int> veiculoId;
+  final Value<int?> jornadaId;
+  final Value<DateTime> dataHora;
+  final Value<int> odometro;
+  final Value<TipoCombustivel> tipoCombustivel;
+  final Value<int> volumeMililitros;
+  final Value<int> valorTotalPagoCentavos;
+  final Value<int?> precoBombaMilesimosRealPorLitro;
+  final Value<bool> tanqueCheio;
+  final Value<String?> cidade;
+  final Value<String?> nomePosto;
+  final Value<String?> bandeiraPosto;
+  final Value<String?> observacao;
+  final Value<DateTime> dataCriacao;
+  const AbastecimentosCompanion({
+    this.id = const Value.absent(),
+    this.veiculoId = const Value.absent(),
+    this.jornadaId = const Value.absent(),
+    this.dataHora = const Value.absent(),
+    this.odometro = const Value.absent(),
+    this.tipoCombustivel = const Value.absent(),
+    this.volumeMililitros = const Value.absent(),
+    this.valorTotalPagoCentavos = const Value.absent(),
+    this.precoBombaMilesimosRealPorLitro = const Value.absent(),
+    this.tanqueCheio = const Value.absent(),
+    this.cidade = const Value.absent(),
+    this.nomePosto = const Value.absent(),
+    this.bandeiraPosto = const Value.absent(),
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+  });
+  AbastecimentosCompanion.insert({
+    this.id = const Value.absent(),
+    required int veiculoId,
+    this.jornadaId = const Value.absent(),
+    required DateTime dataHora,
+    required int odometro,
+    required TipoCombustivel tipoCombustivel,
+    required int volumeMililitros,
+    required int valorTotalPagoCentavos,
+    this.precoBombaMilesimosRealPorLitro = const Value.absent(),
+    this.tanqueCheio = const Value.absent(),
+    this.cidade = const Value.absent(),
+    this.nomePosto = const Value.absent(),
+    this.bandeiraPosto = const Value.absent(),
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+  }) : veiculoId = Value(veiculoId),
+       dataHora = Value(dataHora),
+       odometro = Value(odometro),
+       tipoCombustivel = Value(tipoCombustivel),
+       volumeMililitros = Value(volumeMililitros),
+       valorTotalPagoCentavos = Value(valorTotalPagoCentavos);
+  static Insertable<Abastecimento> custom({
+    Expression<int>? id,
+    Expression<int>? veiculoId,
+    Expression<int>? jornadaId,
+    Expression<DateTime>? dataHora,
+    Expression<int>? odometro,
+    Expression<String>? tipoCombustivel,
+    Expression<int>? volumeMililitros,
+    Expression<int>? valorTotalPagoCentavos,
+    Expression<int>? precoBombaMilesimosRealPorLitro,
+    Expression<bool>? tanqueCheio,
+    Expression<String>? cidade,
+    Expression<String>? nomePosto,
+    Expression<String>? bandeiraPosto,
+    Expression<String>? observacao,
+    Expression<DateTime>? dataCriacao,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (veiculoId != null) 'veiculo_id': veiculoId,
+      if (jornadaId != null) 'jornada_id': jornadaId,
+      if (dataHora != null) 'data_hora': dataHora,
+      if (odometro != null) 'odometro': odometro,
+      if (tipoCombustivel != null) 'tipo_combustivel': tipoCombustivel,
+      if (volumeMililitros != null) 'volume_mililitros': volumeMililitros,
+      if (valorTotalPagoCentavos != null)
+        'valor_total_pago_centavos': valorTotalPagoCentavos,
+      if (precoBombaMilesimosRealPorLitro != null)
+        'preco_bomba_milesimos_real_por_litro': precoBombaMilesimosRealPorLitro,
+      if (tanqueCheio != null) 'tanque_cheio': tanqueCheio,
+      if (cidade != null) 'cidade': cidade,
+      if (nomePosto != null) 'nome_posto': nomePosto,
+      if (bandeiraPosto != null) 'bandeira_posto': bandeiraPosto,
+      if (observacao != null) 'observacao': observacao,
+      if (dataCriacao != null) 'data_criacao': dataCriacao,
+    });
+  }
+
+  AbastecimentosCompanion copyWith({
+    Value<int>? id,
+    Value<int>? veiculoId,
+    Value<int?>? jornadaId,
+    Value<DateTime>? dataHora,
+    Value<int>? odometro,
+    Value<TipoCombustivel>? tipoCombustivel,
+    Value<int>? volumeMililitros,
+    Value<int>? valorTotalPagoCentavos,
+    Value<int?>? precoBombaMilesimosRealPorLitro,
+    Value<bool>? tanqueCheio,
+    Value<String?>? cidade,
+    Value<String?>? nomePosto,
+    Value<String?>? bandeiraPosto,
+    Value<String?>? observacao,
+    Value<DateTime>? dataCriacao,
+  }) {
+    return AbastecimentosCompanion(
+      id: id ?? this.id,
+      veiculoId: veiculoId ?? this.veiculoId,
+      jornadaId: jornadaId ?? this.jornadaId,
+      dataHora: dataHora ?? this.dataHora,
+      odometro: odometro ?? this.odometro,
+      tipoCombustivel: tipoCombustivel ?? this.tipoCombustivel,
+      volumeMililitros: volumeMililitros ?? this.volumeMililitros,
+      valorTotalPagoCentavos:
+          valorTotalPagoCentavos ?? this.valorTotalPagoCentavos,
+      precoBombaMilesimosRealPorLitro:
+          precoBombaMilesimosRealPorLitro ??
+          this.precoBombaMilesimosRealPorLitro,
+      tanqueCheio: tanqueCheio ?? this.tanqueCheio,
+      cidade: cidade ?? this.cidade,
+      nomePosto: nomePosto ?? this.nomePosto,
+      bandeiraPosto: bandeiraPosto ?? this.bandeiraPosto,
+      observacao: observacao ?? this.observacao,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (veiculoId.present) {
+      map['veiculo_id'] = Variable<int>(veiculoId.value);
+    }
+    if (jornadaId.present) {
+      map['jornada_id'] = Variable<int>(jornadaId.value);
+    }
+    if (dataHora.present) {
+      map['data_hora'] = Variable<DateTime>(dataHora.value);
+    }
+    if (odometro.present) {
+      map['odometro'] = Variable<int>(odometro.value);
+    }
+    if (tipoCombustivel.present) {
+      map['tipo_combustivel'] = Variable<String>(
+        $AbastecimentosTable.$convertertipoCombustivel.toSql(
+          tipoCombustivel.value,
+        ),
+      );
+    }
+    if (volumeMililitros.present) {
+      map['volume_mililitros'] = Variable<int>(volumeMililitros.value);
+    }
+    if (valorTotalPagoCentavos.present) {
+      map['valor_total_pago_centavos'] = Variable<int>(
+        valorTotalPagoCentavos.value,
+      );
+    }
+    if (precoBombaMilesimosRealPorLitro.present) {
+      map['preco_bomba_milesimos_real_por_litro'] = Variable<int>(
+        precoBombaMilesimosRealPorLitro.value,
+      );
+    }
+    if (tanqueCheio.present) {
+      map['tanque_cheio'] = Variable<bool>(tanqueCheio.value);
+    }
+    if (cidade.present) {
+      map['cidade'] = Variable<String>(cidade.value);
+    }
+    if (nomePosto.present) {
+      map['nome_posto'] = Variable<String>(nomePosto.value);
+    }
+    if (bandeiraPosto.present) {
+      map['bandeira_posto'] = Variable<String>(bandeiraPosto.value);
+    }
+    if (observacao.present) {
+      map['observacao'] = Variable<String>(observacao.value);
+    }
+    if (dataCriacao.present) {
+      map['data_criacao'] = Variable<DateTime>(dataCriacao.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AbastecimentosCompanion(')
+          ..write('id: $id, ')
+          ..write('veiculoId: $veiculoId, ')
+          ..write('jornadaId: $jornadaId, ')
+          ..write('dataHora: $dataHora, ')
+          ..write('odometro: $odometro, ')
+          ..write('tipoCombustivel: $tipoCombustivel, ')
+          ..write('volumeMililitros: $volumeMililitros, ')
+          ..write('valorTotalPagoCentavos: $valorTotalPagoCentavos, ')
+          ..write(
+            'precoBombaMilesimosRealPorLitro: $precoBombaMilesimosRealPorLitro, ',
+          )
+          ..write('tanqueCheio: $tanqueCheio, ')
+          ..write('cidade: $cidade, ')
+          ..write('nomePosto: $nomePosto, ')
+          ..write('bandeiraPosto: $bandeiraPosto, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4920,12 +5841,16 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $LeiturasGanhoPlataformaTable(this);
   late final $LancamentosGanhoIndividualTable lancamentosGanhoIndividual =
       $LancamentosGanhoIndividualTable(this);
+  late final $AbastecimentosTable abastecimentos = $AbastecimentosTable(this);
   late final JornadaDao jornadaDao = JornadaDao(this as AppDatabase);
   late final PausaDao pausaDao = PausaDao(this as AppDatabase);
   late final LeituraGanhosDao leituraGanhosDao = LeituraGanhosDao(
     this as AppDatabase,
   );
   late final GanhoIndividualDao ganhoIndividualDao = GanhoIndividualDao(
+    this as AppDatabase,
+  );
+  late final AbastecimentoDao abastecimentoDao = AbastecimentoDao(
     this as AppDatabase,
   );
   @override
@@ -4942,6 +5867,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     leiturasGanhos,
     leiturasGanhoPlataforma,
     lancamentosGanhoIndividual,
+    abastecimentos,
   ];
 }
 
@@ -5309,6 +6235,24 @@ final class $$VeiculosTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$AbastecimentosTable, List<Abastecimento>>
+  _abastecimentosRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.abastecimentos,
+    aliasName: 'veiculos__id__abastecimentos__veiculo_id',
+  );
+
+  $$AbastecimentosTableProcessedTableManager get abastecimentosRefs {
+    final manager = $$AbastecimentosTableTableManager(
+      $_db,
+      $_db.abastecimentos,
+    ).filter((f) => f.veiculoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_abastecimentosRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$VeiculosTableFilterComposer
@@ -5401,6 +6345,31 @@ class $$VeiculosTableFilterComposer
           }) => $$JornadasTableFilterComposer(
             $db: $db,
             $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> abastecimentosRefs(
+    Expression<bool> Function($$AbastecimentosTableFilterComposer f) f,
+  ) {
+    final $$AbastecimentosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.abastecimentos,
+      getReferencedColumn: (t) => t.veiculoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AbastecimentosTableFilterComposer(
+            $db: $db,
+            $table: $db.abastecimentos,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5570,6 +6539,31 @@ class $$VeiculosTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> abastecimentosRefs<T extends Object>(
+    Expression<T> Function($$AbastecimentosTableAnnotationComposer a) f,
+  ) {
+    final $$AbastecimentosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.abastecimentos,
+      getReferencedColumn: (t) => t.veiculoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AbastecimentosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.abastecimentos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$VeiculosTableTableManager
@@ -5585,7 +6579,7 @@ class $$VeiculosTableTableManager
           $$VeiculosTableUpdateCompanionBuilder,
           (Veiculo, $$VeiculosTableReferences),
           Veiculo,
-          PrefetchHooks Function({bool jornadasRefs})
+          PrefetchHooks Function({bool jornadasRefs, bool abastecimentosRefs})
         > {
   $$VeiculosTableTableManager(_$AppDatabase db, $VeiculosTable table)
     : super(
@@ -5666,28 +6660,63 @@ class $$VeiculosTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({jornadasRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (jornadasRefs) db.jornadas],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (jornadasRefs)
-                    await $_getPrefetchedData<Veiculo, $VeiculosTable, Jornada>(
-                      currentTable: table,
-                      referencedTable: $$VeiculosTableReferences
-                          ._jornadasRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$VeiculosTableReferences(db, table, p0).jornadasRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.veiculoId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({jornadasRefs = false, abastecimentosRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (jornadasRefs) db.jornadas,
+                    if (abastecimentosRefs) db.abastecimentos,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (jornadasRefs)
+                        await $_getPrefetchedData<
+                          Veiculo,
+                          $VeiculosTable,
+                          Jornada
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VeiculosTableReferences
+                              ._jornadasRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VeiculosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).jornadasRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.veiculoId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (abastecimentosRefs)
+                        await $_getPrefetchedData<
+                          Veiculo,
+                          $VeiculosTable,
+                          Abastecimento
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VeiculosTableReferences
+                              ._abastecimentosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VeiculosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).abastecimentosRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.veiculoId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -5704,7 +6733,7 @@ typedef $$VeiculosTableProcessedTableManager =
       $$VeiculosTableUpdateCompanionBuilder,
       (Veiculo, $$VeiculosTableReferences),
       Veiculo,
-      PrefetchHooks Function({bool jornadasRefs})
+      PrefetchHooks Function({bool jornadasRefs, bool abastecimentosRefs})
     >;
 typedef $$ConfiguracoesTableCreateCompanionBuilder =
     ConfiguracoesCompanion Function({
@@ -6061,6 +7090,24 @@ final class $$JornadasTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$AbastecimentosTable, List<Abastecimento>>
+  _abastecimentosRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.abastecimentos,
+    aliasName: 'jornadas__id__abastecimentos__jornada_id',
+  );
+
+  $$AbastecimentosTableProcessedTableManager get abastecimentosRefs {
+    final manager = $$AbastecimentosTableTableManager(
+      $_db,
+      $_db.abastecimentos,
+    ).filter((f) => f.jornadaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_abastecimentosRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$JornadasTableFilterComposer
@@ -6258,6 +7305,31 @@ class $$JornadasTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> abastecimentosRefs(
+    Expression<bool> Function($$AbastecimentosTableFilterComposer f) f,
+  ) {
+    final $$AbastecimentosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.abastecimentos,
+      getReferencedColumn: (t) => t.jornadaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AbastecimentosTableFilterComposer(
+            $db: $db,
+            $table: $db.abastecimentos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -6577,6 +7649,31 @@ class $$JornadasTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> abastecimentosRefs<T extends Object>(
+    Expression<T> Function($$AbastecimentosTableAnnotationComposer a) f,
+  ) {
+    final $$AbastecimentosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.abastecimentos,
+      getReferencedColumn: (t) => t.jornadaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AbastecimentosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.abastecimentos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$JornadasTableTableManager
@@ -6598,6 +7695,7 @@ class $$JornadasTableTableManager
             bool pausasRefs,
             bool leiturasGanhosRefs,
             bool lancamentosGanhoIndividualRefs,
+            bool abastecimentosRefs,
           })
         > {
   $$JornadasTableTableManager(_$AppDatabase db, $JornadasTable table)
@@ -6694,6 +7792,7 @@ class $$JornadasTableTableManager
                 pausasRefs = false,
                 leiturasGanhosRefs = false,
                 lancamentosGanhoIndividualRefs = false,
+                abastecimentosRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -6702,6 +7801,7 @@ class $$JornadasTableTableManager
                     if (leiturasGanhosRefs) db.leiturasGanhos,
                     if (lancamentosGanhoIndividualRefs)
                       db.lancamentosGanhoIndividual,
+                    if (abastecimentosRefs) db.abastecimentos,
                   ],
                   addJoins:
                       <
@@ -6813,6 +7913,27 @@ class $$JornadasTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (abastecimentosRefs)
+                        await $_getPrefetchedData<
+                          Jornada,
+                          $JornadasTable,
+                          Abastecimento
+                        >(
+                          currentTable: table,
+                          referencedTable: $$JornadasTableReferences
+                              ._abastecimentosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$JornadasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).abastecimentosRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.jornadaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -6839,6 +7960,7 @@ typedef $$JornadasTableProcessedTableManager =
         bool pausasRefs,
         bool leiturasGanhosRefs,
         bool lancamentosGanhoIndividualRefs,
+        bool abastecimentosRefs,
       })
     >;
 typedef $$PausasTableCreateCompanionBuilder =
@@ -9267,6 +10389,625 @@ typedef $$LancamentosGanhoIndividualTableProcessedTableManager =
       LancamentosGanhoIndividualData,
       PrefetchHooks Function({bool plataformaId, bool jornadaId})
     >;
+typedef $$AbastecimentosTableCreateCompanionBuilder =
+    AbastecimentosCompanion Function({
+      Value<int> id,
+      required int veiculoId,
+      Value<int?> jornadaId,
+      required DateTime dataHora,
+      required int odometro,
+      required TipoCombustivel tipoCombustivel,
+      required int volumeMililitros,
+      required int valorTotalPagoCentavos,
+      Value<int?> precoBombaMilesimosRealPorLitro,
+      Value<bool> tanqueCheio,
+      Value<String?> cidade,
+      Value<String?> nomePosto,
+      Value<String?> bandeiraPosto,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+    });
+typedef $$AbastecimentosTableUpdateCompanionBuilder =
+    AbastecimentosCompanion Function({
+      Value<int> id,
+      Value<int> veiculoId,
+      Value<int?> jornadaId,
+      Value<DateTime> dataHora,
+      Value<int> odometro,
+      Value<TipoCombustivel> tipoCombustivel,
+      Value<int> volumeMililitros,
+      Value<int> valorTotalPagoCentavos,
+      Value<int?> precoBombaMilesimosRealPorLitro,
+      Value<bool> tanqueCheio,
+      Value<String?> cidade,
+      Value<String?> nomePosto,
+      Value<String?> bandeiraPosto,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+    });
+
+final class $$AbastecimentosTableReferences
+    extends BaseReferences<_$AppDatabase, $AbastecimentosTable, Abastecimento> {
+  $$AbastecimentosTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $VeiculosTable _veiculoIdTable(_$AppDatabase db) =>
+      db.veiculos.createAlias('abastecimentos__veiculo_id__veiculos__id');
+
+  $$VeiculosTableProcessedTableManager get veiculoId {
+    final $_column = $_itemColumn<int>('veiculo_id')!;
+
+    final manager = $$VeiculosTableTableManager(
+      $_db,
+      $_db.veiculos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_veiculoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $JornadasTable _jornadaIdTable(_$AppDatabase db) =>
+      db.jornadas.createAlias('abastecimentos__jornada_id__jornadas__id');
+
+  $$JornadasTableProcessedTableManager? get jornadaId {
+    final $_column = $_itemColumn<int>('jornada_id');
+    if ($_column == null) return null;
+    final manager = $$JornadasTableTableManager(
+      $_db,
+      $_db.jornadas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_jornadaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AbastecimentosTableFilterComposer
+    extends Composer<_$AppDatabase, $AbastecimentosTable> {
+  $$AbastecimentosTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get odometro => $composableBuilder(
+    column: $table.odometro,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<TipoCombustivel, TipoCombustivel, String>
+  get tipoCombustivel => $composableBuilder(
+    column: $table.tipoCombustivel,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get volumeMililitros => $composableBuilder(
+    column: $table.volumeMililitros,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get valorTotalPagoCentavos => $composableBuilder(
+    column: $table.valorTotalPagoCentavos,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get precoBombaMilesimosRealPorLitro => $composableBuilder(
+    column: $table.precoBombaMilesimosRealPorLitro,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get tanqueCheio => $composableBuilder(
+    column: $table.tanqueCheio,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cidade => $composableBuilder(
+    column: $table.cidade,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nomePosto => $composableBuilder(
+    column: $table.nomePosto,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bandeiraPosto => $composableBuilder(
+    column: $table.bandeiraPosto,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VeiculosTableFilterComposer get veiculoId {
+    final $$VeiculosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableFilterComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableFilterComposer get jornadaId {
+    final $$JornadasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableFilterComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AbastecimentosTableOrderingComposer
+    extends Composer<_$AppDatabase, $AbastecimentosTable> {
+  $$AbastecimentosTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get odometro => $composableBuilder(
+    column: $table.odometro,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tipoCombustivel => $composableBuilder(
+    column: $table.tipoCombustivel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get volumeMililitros => $composableBuilder(
+    column: $table.volumeMililitros,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get valorTotalPagoCentavos => $composableBuilder(
+    column: $table.valorTotalPagoCentavos,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get precoBombaMilesimosRealPorLitro =>
+      $composableBuilder(
+        column: $table.precoBombaMilesimosRealPorLitro,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<bool> get tanqueCheio => $composableBuilder(
+    column: $table.tanqueCheio,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cidade => $composableBuilder(
+    column: $table.cidade,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nomePosto => $composableBuilder(
+    column: $table.nomePosto,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bandeiraPosto => $composableBuilder(
+    column: $table.bandeiraPosto,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VeiculosTableOrderingComposer get veiculoId {
+    final $$VeiculosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableOrderingComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableOrderingComposer get jornadaId {
+    final $$JornadasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableOrderingComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AbastecimentosTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AbastecimentosTable> {
+  $$AbastecimentosTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dataHora =>
+      $composableBuilder(column: $table.dataHora, builder: (column) => column);
+
+  GeneratedColumn<int> get odometro =>
+      $composableBuilder(column: $table.odometro, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<TipoCombustivel, String>
+  get tipoCombustivel => $composableBuilder(
+    column: $table.tipoCombustivel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get volumeMililitros => $composableBuilder(
+    column: $table.volumeMililitros,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get valorTotalPagoCentavos => $composableBuilder(
+    column: $table.valorTotalPagoCentavos,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get precoBombaMilesimosRealPorLitro =>
+      $composableBuilder(
+        column: $table.precoBombaMilesimosRealPorLitro,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<bool> get tanqueCheio => $composableBuilder(
+    column: $table.tanqueCheio,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cidade =>
+      $composableBuilder(column: $table.cidade, builder: (column) => column);
+
+  GeneratedColumn<String> get nomePosto =>
+      $composableBuilder(column: $table.nomePosto, builder: (column) => column);
+
+  GeneratedColumn<String> get bandeiraPosto => $composableBuilder(
+    column: $table.bandeiraPosto,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => column,
+  );
+
+  $$VeiculosTableAnnotationComposer get veiculoId {
+    final $$VeiculosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableAnnotationComposer get jornadaId {
+    final $$JornadasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AbastecimentosTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AbastecimentosTable,
+          Abastecimento,
+          $$AbastecimentosTableFilterComposer,
+          $$AbastecimentosTableOrderingComposer,
+          $$AbastecimentosTableAnnotationComposer,
+          $$AbastecimentosTableCreateCompanionBuilder,
+          $$AbastecimentosTableUpdateCompanionBuilder,
+          (Abastecimento, $$AbastecimentosTableReferences),
+          Abastecimento,
+          PrefetchHooks Function({bool veiculoId, bool jornadaId})
+        > {
+  $$AbastecimentosTableTableManager(
+    _$AppDatabase db,
+    $AbastecimentosTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AbastecimentosTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AbastecimentosTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AbastecimentosTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> veiculoId = const Value.absent(),
+                Value<int?> jornadaId = const Value.absent(),
+                Value<DateTime> dataHora = const Value.absent(),
+                Value<int> odometro = const Value.absent(),
+                Value<TipoCombustivel> tipoCombustivel = const Value.absent(),
+                Value<int> volumeMililitros = const Value.absent(),
+                Value<int> valorTotalPagoCentavos = const Value.absent(),
+                Value<int?> precoBombaMilesimosRealPorLitro =
+                    const Value.absent(),
+                Value<bool> tanqueCheio = const Value.absent(),
+                Value<String?> cidade = const Value.absent(),
+                Value<String?> nomePosto = const Value.absent(),
+                Value<String?> bandeiraPosto = const Value.absent(),
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+              }) => AbastecimentosCompanion(
+                id: id,
+                veiculoId: veiculoId,
+                jornadaId: jornadaId,
+                dataHora: dataHora,
+                odometro: odometro,
+                tipoCombustivel: tipoCombustivel,
+                volumeMililitros: volumeMililitros,
+                valorTotalPagoCentavos: valorTotalPagoCentavos,
+                precoBombaMilesimosRealPorLitro:
+                    precoBombaMilesimosRealPorLitro,
+                tanqueCheio: tanqueCheio,
+                cidade: cidade,
+                nomePosto: nomePosto,
+                bandeiraPosto: bandeiraPosto,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int veiculoId,
+                Value<int?> jornadaId = const Value.absent(),
+                required DateTime dataHora,
+                required int odometro,
+                required TipoCombustivel tipoCombustivel,
+                required int volumeMililitros,
+                required int valorTotalPagoCentavos,
+                Value<int?> precoBombaMilesimosRealPorLitro =
+                    const Value.absent(),
+                Value<bool> tanqueCheio = const Value.absent(),
+                Value<String?> cidade = const Value.absent(),
+                Value<String?> nomePosto = const Value.absent(),
+                Value<String?> bandeiraPosto = const Value.absent(),
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+              }) => AbastecimentosCompanion.insert(
+                id: id,
+                veiculoId: veiculoId,
+                jornadaId: jornadaId,
+                dataHora: dataHora,
+                odometro: odometro,
+                tipoCombustivel: tipoCombustivel,
+                volumeMililitros: volumeMililitros,
+                valorTotalPagoCentavos: valorTotalPagoCentavos,
+                precoBombaMilesimosRealPorLitro:
+                    precoBombaMilesimosRealPorLitro,
+                tanqueCheio: tanqueCheio,
+                cidade: cidade,
+                nomePosto: nomePosto,
+                bandeiraPosto: bandeiraPosto,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AbastecimentosTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({veiculoId = false, jornadaId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (veiculoId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.veiculoId,
+                                referencedTable: $$AbastecimentosTableReferences
+                                    ._veiculoIdTable(db),
+                                referencedColumn:
+                                    $$AbastecimentosTableReferences
+                                        ._veiculoIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (jornadaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.jornadaId,
+                                referencedTable: $$AbastecimentosTableReferences
+                                    ._jornadaIdTable(db),
+                                referencedColumn:
+                                    $$AbastecimentosTableReferences
+                                        ._jornadaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AbastecimentosTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AbastecimentosTable,
+      Abastecimento,
+      $$AbastecimentosTableFilterComposer,
+      $$AbastecimentosTableOrderingComposer,
+      $$AbastecimentosTableAnnotationComposer,
+      $$AbastecimentosTableCreateCompanionBuilder,
+      $$AbastecimentosTableUpdateCompanionBuilder,
+      (Abastecimento, $$AbastecimentosTableReferences),
+      Abastecimento,
+      PrefetchHooks Function({bool veiculoId, bool jornadaId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -9296,4 +11037,6 @@ class $AppDatabaseManager {
         _db,
         _db.lancamentosGanhoIndividual,
       );
+  $$AbastecimentosTableTableManager get abastecimentos =>
+      $$AbastecimentosTableTableManager(_db, _db.abastecimentos);
 }

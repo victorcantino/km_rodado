@@ -78,3 +78,18 @@ criação. Não criar snapshots acumulados artificiais nem odômetro por viagem.
 
 Motivo: um lançamento pode representar várias viagens sem revelar valores
 unitários. Seus totais são somas factuais e não sofrem regras de reset.
+
+## ADR-011 — Precisão inteira nos Abastecimentos
+
+Decisão: armazenar total pago em centavos, volume em mililitros e preço por
+litro em milésimos de real. O preço efetivo é calculado de total e volume.
+
+Motivo: representar os valores operacionais sem usar ponto flutuante como fonte
+de verdade e sem persistir informação derivada. O abastecimento pertence ao
+veículo e associa-se automaticamente à Jornada aberta, permanecendo possível
+fora dela.
+
+O instante operacional (`dataHora`) é separado do instante técnico de criação
+para permitir lançamentos retroativos. A progressão do odômetro é validada pela
+posição cronológica do evento, e não pelo maior valor existente no momento da
+digitação.
