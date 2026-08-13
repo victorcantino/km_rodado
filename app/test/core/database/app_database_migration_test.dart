@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('migra schema 1 vazio para schema 4', () async {
+  test('migra schema 1 vazio para schema 6', () async {
     _criarBancoSchema1(arquivoBanco);
 
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
@@ -34,11 +34,13 @@ void main() {
     expect(await _contar(database, 'pausas'), 0);
     expect(await _contar(database, 'leituras_ganhos'), 0);
     expect(await _contar(database, 'leituras_ganho_plataforma'), 0);
-    expect(await _userVersion(database), 4);
+    expect(await _userVersion(database), 6);
     expect(
       await _tabelaExiste(database, 'lancamentos_ganho_individual'),
       isTrue,
     );
+    expect(await _tabelaExiste(database, 'abastecimentos'), isTrue);
+    expect(await _contar(database, 'abastecimentos'), 0);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(
       await _indiceExiste(database, 'idx_leituras_ganhos_jornada_data_hora'),
@@ -90,7 +92,7 @@ void main() {
       plataformas.map((plataforma) => plataforma.tipoRegistroGanhos).toSet(),
       {TipoRegistroGanhos.acumulado},
     );
-    expect(await _userVersion(database), 4);
+    expect(await _userVersion(database), 6);
     expect(await _contar(database, 'lancamentos_ganho_individual'), 0);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -198,9 +200,50 @@ void main() {
     addTearDown(database.close);
     final pausa = (await database.select(database.pausas).get()).single;
 
-    expect(await _userVersion(database), 4);
+    expect(await _userVersion(database), 6);
     expect(pausa.odometroInicio, isNull);
     expect(pausa.odometroFim, isNull);
+  });
+
+  test('migra schema 5 preservando abastecimento e sua criação', () async {
+    final banco = sqlite.sqlite3.open(arquivoBanco.path);
+    banco.execute('''
+      CREATE TABLE veiculos (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE jornadas (id INTEGER NOT NULL PRIMARY KEY);
+      INSERT INTO veiculos VALUES (1);
+      CREATE TABLE abastecimentos (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        veiculo_id INTEGER NOT NULL REFERENCES veiculos (id),
+        jornada_id INTEGER NULL REFERENCES jornadas (id),
+        odometro INTEGER NOT NULL CHECK (odometro >= 0),
+        tipo_combustivel TEXT NOT NULL,
+        volume_mililitros INTEGER NOT NULL CHECK (volume_mililitros > 0),
+        valor_total_pago_centavos INTEGER NOT NULL CHECK (valor_total_pago_centavos >= 0),
+        preco_bomba_milesimos_real_por_litro INTEGER NULL,
+        tanque_cheio INTEGER NOT NULL DEFAULT 1 CHECK (tanque_cheio IN (0, 1)),
+        cidade TEXT NULL,
+        nome_posto TEXT NULL,
+        bandeira_posto TEXT NULL,
+        observacao TEXT NULL,
+        data_criacao INTEGER NOT NULL
+      );
+      INSERT INTO abastecimentos VALUES (
+        1, 1, NULL, 123456, 'gasolina', 10000, 6299, 6500, 1,
+        'Curitiba', 'Posto', NULL, NULL, 1786608000
+      );
+      PRAGMA user_version = 5;
+    ''');
+    banco.close();
+
+    final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
+    addTearDown(database.close);
+    final abastecimento =
+        (await database.select(database.abastecimentos).get()).single;
+
+    expect(await _userVersion(database), 6);
+    expect(abastecimento.odometro, 123456);
+    expect(abastecimento.dataHora, abastecimento.dataCriacao);
+    expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
 }
 

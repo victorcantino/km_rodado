@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import '../constants/enums/status_jornada.dart';
 import '../constants/enums/tipo_leitura_ganhos.dart';
 import '../constants/enums/tipo_registro_ganhos.dart';
+import '../constants/enums/tipo_combustivel.dart';
 import 'tables/usuario.dart';
 import 'tables/veiculo.dart';
 import 'tables/configuracao.dart';
@@ -17,11 +18,13 @@ import 'tables/plataforma.dart';
 import 'tables/leitura_ganhos.dart';
 import 'tables/leitura_ganho_plataforma.dart';
 import 'tables/lancamento_ganho_individual.dart';
+import 'tables/abastecimento.dart';
 
 import 'daos/jornada_dao.dart';
 import 'daos/leitura_ganhos_dao.dart';
 import 'daos/pausa_dao.dart';
 import 'daos/ganho_individual_dao.dart';
+import 'daos/abastecimento_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -36,8 +39,15 @@ part 'app_database.g.dart';
     LeiturasGanhos,
     LeiturasGanhoPlataforma,
     LancamentosGanhoIndividual,
+    Abastecimentos,
   ],
-  daos: [JornadaDao, PausaDao, LeituraGanhosDao, GanhoIndividualDao],
+  daos: [
+    JornadaDao,
+    PausaDao,
+    LeituraGanhosDao,
+    GanhoIndividualDao,
+    AbastecimentoDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -45,7 +55,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -61,11 +71,39 @@ class AppDatabase extends _$AppDatabase {
       if (from < 4) {
         await migrator.createTable(lancamentosGanhoIndividual);
       }
+      if (from < 5) {
+        await migrator.createTable(abastecimentos);
+      }
+      if (from == 5) {
+        await _migrarSchema5Para6(migrator);
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },
   );
+
+  Future<void> _migrarSchema5Para6(Migrator migrator) async {
+    await customStatement(
+      'ALTER TABLE abastecimentos RENAME TO abastecimentos_schema_5',
+    );
+    await migrator.createTable(abastecimentos);
+    await customStatement('''
+      INSERT INTO abastecimentos (
+        id, veiculo_id, jornada_id, data_hora, odometro, tipo_combustivel,
+        volume_mililitros, valor_total_pago_centavos,
+        preco_bomba_milesimos_real_por_litro, tanque_cheio, cidade,
+        nome_posto, bandeira_posto, observacao, data_criacao
+      )
+      SELECT
+        id, veiculo_id, jornada_id, data_criacao, odometro, tipo_combustivel,
+        volume_mililitros, valor_total_pago_centavos,
+        preco_bomba_milesimos_real_por_litro, tanque_cheio, cidade,
+        nome_posto, bandeira_posto, observacao, data_criacao
+      FROM abastecimentos_schema_5
+    ''');
+    await customStatement('DROP TABLE abastecimentos_schema_5');
+  }
 
   Future<void> _migrarSchema1Para2(Migrator migrator) async {
     final pausasLegadas = await _contarRegistros('pausas');

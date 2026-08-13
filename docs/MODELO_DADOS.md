@@ -325,7 +325,8 @@ R$50
 
 # 8. Abastecimento
 
-Controle de combustível.
+Registro factual de combustível. Integra o schema 6. `data_hora` representa o
+momento do abastecimento; `data_criacao`, o momento técnico do lançamento.
 
 ```
 ABASTECIMENTO
@@ -335,21 +336,25 @@ id
 veiculo_id
 jornada_id (opcional)
 
-data
+data_hora
+data_criacao
 
 odometro
 
-combustivel
+tipo_combustivel
 
-litros
+volume_mililitros
 
-valor_litro
+preco_bomba_milesimos_real_por_litro (opcional)
 
-valor_total
+valor_total_pago_centavos
 
-km_litro
+tanque_cheio
 
-autonomia_estimada
+cidade (opcional)
+nome_posto (opcional)
+bandeira_posto (opcional)
+observacao (opcional)
 ```
 
 Combustível:
@@ -359,6 +364,10 @@ ETANOL
 GASOLINA
 OUTRO
 ```
+
+Preço efetivo, consumo, autonomia e custo por quilômetro são derivados e não
+são persistidos. Volume, dinheiro e preço por litro usam inteiros para evitar
+imprecisão binária.
 
 ---
 

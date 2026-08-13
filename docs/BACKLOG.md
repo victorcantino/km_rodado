@@ -7,7 +7,6 @@
 - Plataformas
 - Criar fluxo seguro de edição/exclusão e correção histórica de lançamentos
   individuais, sem improvisar perda de rastreabilidade
-- Abastecimentos
 - Manutenções e abastecimentos com Jornada opcional
 - Eficiência diária
 - Obter cidade de origem pela localização do aparelho, mantendo edição manual
@@ -15,6 +14,16 @@
 - Criar fluxo de correção de odômetro com motivo obrigatório
 
 # Futuro
+
+- Evoluir Abastecimentos com edição/exclusão histórica segura, cadastro de
+  postos, integração de localização e filtros/histórico completo
+- Calcular consumo somente após ao menos três ciclos válidos delimitados por
+  tanque cheio, tratando abastecimentos parciais sem inventar autonomia
+- Usar capacidade real/configurável do tanque antes de oferecer autonomia,
+  custo por quilômetro ou previsão de próximo abastecimento; manter esses
+  indicadores derivados
+- Priorizar depois de Abastecimentos o registro de passes e demais custos
+  operacionais necessários ao uso real
 
 - Revisar autofocus e redução de toques nos demais inputs operacionais após
   acumular experiência de uso em campo

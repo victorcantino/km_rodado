@@ -544,17 +544,35 @@ e somente serão interpretados pela futura conferência/reconciliação.
 
 Cada abastecimento deve registrar:
 
-* data;
+* veículo e data de criação;
 * odômetro;
 * combustível;
-* litros;
-* valor pago.
+* volume em mililitros;
+* valor total pago em centavos;
+* indicação de tanque cheio ou parcial.
+
+A Jornada é associada automaticamente quando estiver aberta e permanece
+opcional fora do trabalho. O registro guarda separadamente quando o
+abastecimento ocorreu e quando foi criado no aplicativo, permitindo lançamento
+retroativo. O odômetro deve ser coerente com os fatos operacionais anteriores e
+posteriores à data e hora informadas; igualdade é válida. Preço da bomba,
+cidade, posto, bandeira e observação são opcionais e textos são normalizados
+com remoção apenas dos espaços nas extremidades.
+
+Preço efetivo é derivado de total e volume. Os comandos de cálculo entre
+volume, preço e total são explícitos e não substituem silenciosamente o valor
+realmente pago. Valores promocionais podem fazer o preço efetivo divergir do
+preço exibido na bomba.
 
 ---
 
 ## 8.2 Cálculo de Consumo
 
-O sistema deve calcular:
+O cálculo de consumo fica adiado até existirem pelo menos três ciclos válidos
+entre abastecimentos de tanque cheio. Não inferir consumo a partir de um único
+registro ou abastecimento parcial.
+
+Quando implementado, o sistema deverá calcular:
 
 ```
 quilômetros percorridos /

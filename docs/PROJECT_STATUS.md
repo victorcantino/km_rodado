@@ -2,12 +2,11 @@
 
 ## Funcionalidade em desenvolvimento
 
-Ganhos individuais.
+Abastecimentos.
 
 ## Objetivo atual
 
-Permitir lançamentos factuais de plataformas individuais e integrá-los à
-operação e ao resumo.
+Permitir o registro operacional de abastecimentos dentro ou fora da Jornada.
 
 ## Já implementado
 
@@ -91,14 +90,26 @@ operação e ao resumo.
 - Schema 4 com lançamentos de ganhos individuais e Jornada opcional
 - Registro rápido individual durante Jornada, inclusive durante Pausa
 - Totais individuais por plataforma derivados por soma e integrados ao resumo
+- Schema 5 com Abastecimentos associados ao veículo e opcionalmente à Jornada
+- Valores de abastecimento persistidos em centavos, mililitros e milésimos de
+  real por litro
+- Registro rápido com combustível, odômetro, volume, total, tanque cheio e
+  dados opcionais de posto
+- Associação automática à Jornada aberta e proteção contra regressão do
+  odômetro operacional
+- Consulta do último abastecimento e cálculos auxiliares sem `double`
+- Schema 6 com `dataHora` operacional separado de `dataCriacao`, incluindo
+  migração preservadora dos abastecimentos já registrados no schema 5
+- Lançamento retroativo validado pelos odômetros anteriores e posteriores ao
+  instante informado e sugestão do último combustível usado pelo veículo
 
 ## Em andamento
 
-- Validação operacional dos ganhos individuais no Android
+- Validação operacional de Abastecimentos
 
 ## Próximo passo
 
-Validar lançamentos individuais em uso operacional.
+Validar abastecimentos no Android em uso operacional.
 
 ## Decisões temporárias
 
