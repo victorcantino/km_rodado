@@ -6477,6 +6477,536 @@ class PassesPlataformaCompanion extends UpdateCompanion<PassesPlataformaData> {
   }
 }
 
+class $BonusPromocoesTable extends BonusPromocoes
+    with TableInfo<$BonusPromocoesTable, BonusPromocao> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BonusPromocoesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _plataformaIdMeta = const VerificationMeta(
+    'plataformaId',
+  );
+  @override
+  late final GeneratedColumn<int> plataformaId = GeneratedColumn<int>(
+    'plataforma_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES plataformas (id)',
+    ),
+  );
+  static const VerificationMeta _jornadaIdMeta = const VerificationMeta(
+    'jornadaId',
+  );
+  @override
+  late final GeneratedColumn<int> jornadaId = GeneratedColumn<int>(
+    'jornada_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES jornadas (id)',
+    ),
+  );
+  static const VerificationMeta _dataHoraMeta = const VerificationMeta(
+    'dataHora',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataHora = GeneratedColumn<DateTime>(
+    'data_hora',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valorCentavosMeta = const VerificationMeta(
+    'valorCentavos',
+  );
+  @override
+  late final GeneratedColumn<int> valorCentavos = GeneratedColumn<int>(
+    'valor_centavos',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<TipoBonusPromocao, String> tipo =
+      GeneratedColumn<String>(
+        'tipo',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<TipoBonusPromocao>($BonusPromocoesTable.$convertertipo);
+  static const VerificationMeta _observacaoMeta = const VerificationMeta(
+    'observacao',
+  );
+  @override
+  late final GeneratedColumn<String> observacao = GeneratedColumn<String>(
+    'observacao',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dataCriacaoMeta = const VerificationMeta(
+    'dataCriacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataCriacao = GeneratedColumn<DateTime>(
+    'data_criacao',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    plataformaId,
+    jornadaId,
+    dataHora,
+    valorCentavos,
+    tipo,
+    observacao,
+    dataCriacao,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'bonus_promocoes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BonusPromocao> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('plataforma_id')) {
+      context.handle(
+        _plataformaIdMeta,
+        plataformaId.isAcceptableOrUnknown(
+          data['plataforma_id']!,
+          _plataformaIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_plataformaIdMeta);
+    }
+    if (data.containsKey('jornada_id')) {
+      context.handle(
+        _jornadaIdMeta,
+        jornadaId.isAcceptableOrUnknown(data['jornada_id']!, _jornadaIdMeta),
+      );
+    }
+    if (data.containsKey('data_hora')) {
+      context.handle(
+        _dataHoraMeta,
+        dataHora.isAcceptableOrUnknown(data['data_hora']!, _dataHoraMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dataHoraMeta);
+    }
+    if (data.containsKey('valor_centavos')) {
+      context.handle(
+        _valorCentavosMeta,
+        valorCentavos.isAcceptableOrUnknown(
+          data['valor_centavos']!,
+          _valorCentavosMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_valorCentavosMeta);
+    }
+    if (data.containsKey('observacao')) {
+      context.handle(
+        _observacaoMeta,
+        observacao.isAcceptableOrUnknown(data['observacao']!, _observacaoMeta),
+      );
+    }
+    if (data.containsKey('data_criacao')) {
+      context.handle(
+        _dataCriacaoMeta,
+        dataCriacao.isAcceptableOrUnknown(
+          data['data_criacao']!,
+          _dataCriacaoMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BonusPromocao map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BonusPromocao(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      plataformaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}plataforma_id'],
+      )!,
+      jornadaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}jornada_id'],
+      ),
+      dataHora: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_hora'],
+      )!,
+      valorCentavos: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_centavos'],
+      )!,
+      tipo: $BonusPromocoesTable.$convertertipo.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}tipo'],
+        )!,
+      ),
+      observacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}observacao'],
+      ),
+      dataCriacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_criacao'],
+      )!,
+    );
+  }
+
+  @override
+  $BonusPromocoesTable createAlias(String alias) {
+    return $BonusPromocoesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<TipoBonusPromocao, String, String> $convertertipo =
+      const EnumNameConverter<TipoBonusPromocao>(TipoBonusPromocao.values);
+}
+
+class BonusPromocao extends DataClass implements Insertable<BonusPromocao> {
+  final int id;
+  final int plataformaId;
+  final int? jornadaId;
+  final DateTime dataHora;
+  final int valorCentavos;
+  final TipoBonusPromocao tipo;
+  final String? observacao;
+  final DateTime dataCriacao;
+  const BonusPromocao({
+    required this.id,
+    required this.plataformaId,
+    this.jornadaId,
+    required this.dataHora,
+    required this.valorCentavos,
+    required this.tipo,
+    this.observacao,
+    required this.dataCriacao,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['plataforma_id'] = Variable<int>(plataformaId);
+    if (!nullToAbsent || jornadaId != null) {
+      map['jornada_id'] = Variable<int>(jornadaId);
+    }
+    map['data_hora'] = Variable<DateTime>(dataHora);
+    map['valor_centavos'] = Variable<int>(valorCentavos);
+    {
+      map['tipo'] = Variable<String>(
+        $BonusPromocoesTable.$convertertipo.toSql(tipo),
+      );
+    }
+    if (!nullToAbsent || observacao != null) {
+      map['observacao'] = Variable<String>(observacao);
+    }
+    map['data_criacao'] = Variable<DateTime>(dataCriacao);
+    return map;
+  }
+
+  BonusPromocoesCompanion toCompanion(bool nullToAbsent) {
+    return BonusPromocoesCompanion(
+      id: Value(id),
+      plataformaId: Value(plataformaId),
+      jornadaId: jornadaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(jornadaId),
+      dataHora: Value(dataHora),
+      valorCentavos: Value(valorCentavos),
+      tipo: Value(tipo),
+      observacao: observacao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(observacao),
+      dataCriacao: Value(dataCriacao),
+    );
+  }
+
+  factory BonusPromocao.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BonusPromocao(
+      id: serializer.fromJson<int>(json['id']),
+      plataformaId: serializer.fromJson<int>(json['plataformaId']),
+      jornadaId: serializer.fromJson<int?>(json['jornadaId']),
+      dataHora: serializer.fromJson<DateTime>(json['dataHora']),
+      valorCentavos: serializer.fromJson<int>(json['valorCentavos']),
+      tipo: $BonusPromocoesTable.$convertertipo.fromJson(
+        serializer.fromJson<String>(json['tipo']),
+      ),
+      observacao: serializer.fromJson<String?>(json['observacao']),
+      dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'plataformaId': serializer.toJson<int>(plataformaId),
+      'jornadaId': serializer.toJson<int?>(jornadaId),
+      'dataHora': serializer.toJson<DateTime>(dataHora),
+      'valorCentavos': serializer.toJson<int>(valorCentavos),
+      'tipo': serializer.toJson<String>(
+        $BonusPromocoesTable.$convertertipo.toJson(tipo),
+      ),
+      'observacao': serializer.toJson<String?>(observacao),
+      'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
+    };
+  }
+
+  BonusPromocao copyWith({
+    int? id,
+    int? plataformaId,
+    Value<int?> jornadaId = const Value.absent(),
+    DateTime? dataHora,
+    int? valorCentavos,
+    TipoBonusPromocao? tipo,
+    Value<String?> observacao = const Value.absent(),
+    DateTime? dataCriacao,
+  }) => BonusPromocao(
+    id: id ?? this.id,
+    plataformaId: plataformaId ?? this.plataformaId,
+    jornadaId: jornadaId.present ? jornadaId.value : this.jornadaId,
+    dataHora: dataHora ?? this.dataHora,
+    valorCentavos: valorCentavos ?? this.valorCentavos,
+    tipo: tipo ?? this.tipo,
+    observacao: observacao.present ? observacao.value : this.observacao,
+    dataCriacao: dataCriacao ?? this.dataCriacao,
+  );
+  BonusPromocao copyWithCompanion(BonusPromocoesCompanion data) {
+    return BonusPromocao(
+      id: data.id.present ? data.id.value : this.id,
+      plataformaId: data.plataformaId.present
+          ? data.plataformaId.value
+          : this.plataformaId,
+      jornadaId: data.jornadaId.present ? data.jornadaId.value : this.jornadaId,
+      dataHora: data.dataHora.present ? data.dataHora.value : this.dataHora,
+      valorCentavos: data.valorCentavos.present
+          ? data.valorCentavos.value
+          : this.valorCentavos,
+      tipo: data.tipo.present ? data.tipo.value : this.tipo,
+      observacao: data.observacao.present
+          ? data.observacao.value
+          : this.observacao,
+      dataCriacao: data.dataCriacao.present
+          ? data.dataCriacao.value
+          : this.dataCriacao,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BonusPromocao(')
+          ..write('id: $id, ')
+          ..write('plataformaId: $plataformaId, ')
+          ..write('jornadaId: $jornadaId, ')
+          ..write('dataHora: $dataHora, ')
+          ..write('valorCentavos: $valorCentavos, ')
+          ..write('tipo: $tipo, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    plataformaId,
+    jornadaId,
+    dataHora,
+    valorCentavos,
+    tipo,
+    observacao,
+    dataCriacao,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BonusPromocao &&
+          other.id == this.id &&
+          other.plataformaId == this.plataformaId &&
+          other.jornadaId == this.jornadaId &&
+          other.dataHora == this.dataHora &&
+          other.valorCentavos == this.valorCentavos &&
+          other.tipo == this.tipo &&
+          other.observacao == this.observacao &&
+          other.dataCriacao == this.dataCriacao);
+}
+
+class BonusPromocoesCompanion extends UpdateCompanion<BonusPromocao> {
+  final Value<int> id;
+  final Value<int> plataformaId;
+  final Value<int?> jornadaId;
+  final Value<DateTime> dataHora;
+  final Value<int> valorCentavos;
+  final Value<TipoBonusPromocao> tipo;
+  final Value<String?> observacao;
+  final Value<DateTime> dataCriacao;
+  const BonusPromocoesCompanion({
+    this.id = const Value.absent(),
+    this.plataformaId = const Value.absent(),
+    this.jornadaId = const Value.absent(),
+    this.dataHora = const Value.absent(),
+    this.valorCentavos = const Value.absent(),
+    this.tipo = const Value.absent(),
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+  });
+  BonusPromocoesCompanion.insert({
+    this.id = const Value.absent(),
+    required int plataformaId,
+    this.jornadaId = const Value.absent(),
+    required DateTime dataHora,
+    required int valorCentavos,
+    required TipoBonusPromocao tipo,
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+  }) : plataformaId = Value(plataformaId),
+       dataHora = Value(dataHora),
+       valorCentavos = Value(valorCentavos),
+       tipo = Value(tipo);
+  static Insertable<BonusPromocao> custom({
+    Expression<int>? id,
+    Expression<int>? plataformaId,
+    Expression<int>? jornadaId,
+    Expression<DateTime>? dataHora,
+    Expression<int>? valorCentavos,
+    Expression<String>? tipo,
+    Expression<String>? observacao,
+    Expression<DateTime>? dataCriacao,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (plataformaId != null) 'plataforma_id': plataformaId,
+      if (jornadaId != null) 'jornada_id': jornadaId,
+      if (dataHora != null) 'data_hora': dataHora,
+      if (valorCentavos != null) 'valor_centavos': valorCentavos,
+      if (tipo != null) 'tipo': tipo,
+      if (observacao != null) 'observacao': observacao,
+      if (dataCriacao != null) 'data_criacao': dataCriacao,
+    });
+  }
+
+  BonusPromocoesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? plataformaId,
+    Value<int?>? jornadaId,
+    Value<DateTime>? dataHora,
+    Value<int>? valorCentavos,
+    Value<TipoBonusPromocao>? tipo,
+    Value<String?>? observacao,
+    Value<DateTime>? dataCriacao,
+  }) {
+    return BonusPromocoesCompanion(
+      id: id ?? this.id,
+      plataformaId: plataformaId ?? this.plataformaId,
+      jornadaId: jornadaId ?? this.jornadaId,
+      dataHora: dataHora ?? this.dataHora,
+      valorCentavos: valorCentavos ?? this.valorCentavos,
+      tipo: tipo ?? this.tipo,
+      observacao: observacao ?? this.observacao,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (plataformaId.present) {
+      map['plataforma_id'] = Variable<int>(plataformaId.value);
+    }
+    if (jornadaId.present) {
+      map['jornada_id'] = Variable<int>(jornadaId.value);
+    }
+    if (dataHora.present) {
+      map['data_hora'] = Variable<DateTime>(dataHora.value);
+    }
+    if (valorCentavos.present) {
+      map['valor_centavos'] = Variable<int>(valorCentavos.value);
+    }
+    if (tipo.present) {
+      map['tipo'] = Variable<String>(
+        $BonusPromocoesTable.$convertertipo.toSql(tipo.value),
+      );
+    }
+    if (observacao.present) {
+      map['observacao'] = Variable<String>(observacao.value);
+    }
+    if (dataCriacao.present) {
+      map['data_criacao'] = Variable<DateTime>(dataCriacao.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BonusPromocoesCompanion(')
+          ..write('id: $id, ')
+          ..write('plataformaId: $plataformaId, ')
+          ..write('jornadaId: $jornadaId, ')
+          ..write('dataHora: $dataHora, ')
+          ..write('valorCentavos: $valorCentavos, ')
+          ..write('tipo: $tipo, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -6495,6 +7025,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PassesPlataformaTable passesPlataforma = $PassesPlataformaTable(
     this,
   );
+  late final $BonusPromocoesTable bonusPromocoes = $BonusPromocoesTable(this);
   late final JornadaDao jornadaDao = JornadaDao(this as AppDatabase);
   late final PausaDao pausaDao = PausaDao(this as AppDatabase);
   late final LeituraGanhosDao leituraGanhosDao = LeituraGanhosDao(
@@ -6507,6 +7038,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this as AppDatabase,
   );
   late final PassePlataformaDao passePlataformaDao = PassePlataformaDao(
+    this as AppDatabase,
+  );
+  late final BonusPromocaoDao bonusPromocaoDao = BonusPromocaoDao(
     this as AppDatabase,
   );
   @override
@@ -6525,6 +7059,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     lancamentosGanhoIndividual,
     abastecimentos,
     passesPlataforma,
+    bonusPromocoes,
   ];
 }
 
@@ -7785,6 +8320,24 @@ final class $$JornadasTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$BonusPromocoesTable, List<BonusPromocao>>
+  _bonusPromocoesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.bonusPromocoes,
+    aliasName: 'jornadas__id__bonus_promocoes__jornada_id',
+  );
+
+  $$BonusPromocoesTableProcessedTableManager get bonusPromocoesRefs {
+    final manager = $$BonusPromocoesTableTableManager(
+      $_db,
+      $_db.bonusPromocoes,
+    ).filter((f) => f.jornadaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_bonusPromocoesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$JornadasTableFilterComposer
@@ -8026,6 +8579,31 @@ class $$JornadasTableFilterComposer
           }) => $$PassesPlataformaTableFilterComposer(
             $db: $db,
             $table: $db.passesPlataforma,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> bonusPromocoesRefs(
+    Expression<bool> Function($$BonusPromocoesTableFilterComposer f) f,
+  ) {
+    final $$BonusPromocoesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.bonusPromocoes,
+      getReferencedColumn: (t) => t.jornadaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BonusPromocoesTableFilterComposer(
+            $db: $db,
+            $table: $db.bonusPromocoes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -8401,6 +8979,31 @@ class $$JornadasTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> bonusPromocoesRefs<T extends Object>(
+    Expression<T> Function($$BonusPromocoesTableAnnotationComposer a) f,
+  ) {
+    final $$BonusPromocoesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.bonusPromocoes,
+      getReferencedColumn: (t) => t.jornadaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BonusPromocoesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.bonusPromocoes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$JornadasTableTableManager
@@ -8424,6 +9027,7 @@ class $$JornadasTableTableManager
             bool lancamentosGanhoIndividualRefs,
             bool abastecimentosRefs,
             bool passesPlataformaRefs,
+            bool bonusPromocoesRefs,
           })
         > {
   $$JornadasTableTableManager(_$AppDatabase db, $JornadasTable table)
@@ -8522,6 +9126,7 @@ class $$JornadasTableTableManager
                 lancamentosGanhoIndividualRefs = false,
                 abastecimentosRefs = false,
                 passesPlataformaRefs = false,
+                bonusPromocoesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -8532,6 +9137,7 @@ class $$JornadasTableTableManager
                       db.lancamentosGanhoIndividual,
                     if (abastecimentosRefs) db.abastecimentos,
                     if (passesPlataformaRefs) db.passesPlataforma,
+                    if (bonusPromocoesRefs) db.bonusPromocoes,
                   ],
                   addJoins:
                       <
@@ -8685,6 +9291,27 @@ class $$JornadasTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (bonusPromocoesRefs)
+                        await $_getPrefetchedData<
+                          Jornada,
+                          $JornadasTable,
+                          BonusPromocao
+                        >(
+                          currentTable: table,
+                          referencedTable: $$JornadasTableReferences
+                              ._bonusPromocoesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$JornadasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).bonusPromocoesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.jornadaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -8713,6 +9340,7 @@ typedef $$JornadasTableProcessedTableManager =
         bool lancamentosGanhoIndividualRefs,
         bool abastecimentosRefs,
         bool passesPlataformaRefs,
+        bool bonusPromocoesRefs,
       })
     >;
 typedef $$PausasTableCreateCompanionBuilder =
@@ -9298,6 +9926,24 @@ final class $$PlataformasTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$BonusPromocoesTable, List<BonusPromocao>>
+  _bonusPromocoesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.bonusPromocoes,
+    aliasName: 'plataformas__id__bonus_promocoes__plataforma_id',
+  );
+
+  $$BonusPromocoesTableProcessedTableManager get bonusPromocoesRefs {
+    final manager = $$BonusPromocoesTableTableManager(
+      $_db,
+      $_db.bonusPromocoes,
+    ).filter((f) => f.plataformaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_bonusPromocoesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$PlataformasTableFilterComposer
@@ -9419,6 +10065,31 @@ class $$PlataformasTableFilterComposer
           }) => $$PassesPlataformaTableFilterComposer(
             $db: $db,
             $table: $db.passesPlataforma,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> bonusPromocoesRefs(
+    Expression<bool> Function($$BonusPromocoesTableFilterComposer f) f,
+  ) {
+    final $$BonusPromocoesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.bonusPromocoes,
+      getReferencedColumn: (t) => t.plataformaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BonusPromocoesTableFilterComposer(
+            $db: $db,
+            $table: $db.bonusPromocoes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -9597,6 +10268,31 @@ class $$PlataformasTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> bonusPromocoesRefs<T extends Object>(
+    Expression<T> Function($$BonusPromocoesTableAnnotationComposer a) f,
+  ) {
+    final $$BonusPromocoesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.bonusPromocoes,
+      getReferencedColumn: (t) => t.plataformaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BonusPromocoesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.bonusPromocoes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$PlataformasTableTableManager
@@ -9616,6 +10312,7 @@ class $$PlataformasTableTableManager
             bool leiturasGanhoPlataformaRefs,
             bool lancamentosGanhoIndividualRefs,
             bool passesPlataformaRefs,
+            bool bonusPromocoesRefs,
           })
         > {
   $$PlataformasTableTableManager(_$AppDatabase db, $PlataformasTable table)
@@ -9683,6 +10380,7 @@ class $$PlataformasTableTableManager
                 leiturasGanhoPlataformaRefs = false,
                 lancamentosGanhoIndividualRefs = false,
                 passesPlataformaRefs = false,
+                bonusPromocoesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -9691,6 +10389,7 @@ class $$PlataformasTableTableManager
                     if (lancamentosGanhoIndividualRefs)
                       db.lancamentosGanhoIndividual,
                     if (passesPlataformaRefs) db.passesPlataforma,
+                    if (bonusPromocoesRefs) db.bonusPromocoes,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -9758,6 +10457,27 @@ class $$PlataformasTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (bonusPromocoesRefs)
+                        await $_getPrefetchedData<
+                          Plataforma,
+                          $PlataformasTable,
+                          BonusPromocao
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlataformasTableReferences
+                              ._bonusPromocoesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlataformasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).bonusPromocoesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.plataformaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -9782,6 +10502,7 @@ typedef $$PlataformasTableProcessedTableManager =
         bool leiturasGanhoPlataformaRefs,
         bool lancamentosGanhoIndividualRefs,
         bool passesPlataformaRefs,
+        bool bonusPromocoesRefs,
       })
     >;
 typedef $$LeiturasGanhosTableCreateCompanionBuilder =
@@ -12375,6 +13096,476 @@ typedef $$PassesPlataformaTableProcessedTableManager =
       PassesPlataformaData,
       PrefetchHooks Function({bool plataformaId, bool jornadaId})
     >;
+typedef $$BonusPromocoesTableCreateCompanionBuilder =
+    BonusPromocoesCompanion Function({
+      Value<int> id,
+      required int plataformaId,
+      Value<int?> jornadaId,
+      required DateTime dataHora,
+      required int valorCentavos,
+      required TipoBonusPromocao tipo,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+    });
+typedef $$BonusPromocoesTableUpdateCompanionBuilder =
+    BonusPromocoesCompanion Function({
+      Value<int> id,
+      Value<int> plataformaId,
+      Value<int?> jornadaId,
+      Value<DateTime> dataHora,
+      Value<int> valorCentavos,
+      Value<TipoBonusPromocao> tipo,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+    });
+
+final class $$BonusPromocoesTableReferences
+    extends BaseReferences<_$AppDatabase, $BonusPromocoesTable, BonusPromocao> {
+  $$BonusPromocoesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PlataformasTable _plataformaIdTable(_$AppDatabase db) => db
+      .plataformas
+      .createAlias('bonus_promocoes__plataforma_id__plataformas__id');
+
+  $$PlataformasTableProcessedTableManager get plataformaId {
+    final $_column = $_itemColumn<int>('plataforma_id')!;
+
+    final manager = $$PlataformasTableTableManager(
+      $_db,
+      $_db.plataformas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_plataformaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $JornadasTable _jornadaIdTable(_$AppDatabase db) =>
+      db.jornadas.createAlias('bonus_promocoes__jornada_id__jornadas__id');
+
+  $$JornadasTableProcessedTableManager? get jornadaId {
+    final $_column = $_itemColumn<int>('jornada_id');
+    if ($_column == null) return null;
+    final manager = $$JornadasTableTableManager(
+      $_db,
+      $_db.jornadas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_jornadaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$BonusPromocoesTableFilterComposer
+    extends Composer<_$AppDatabase, $BonusPromocoesTable> {
+  $$BonusPromocoesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get valorCentavos => $composableBuilder(
+    column: $table.valorCentavos,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<TipoBonusPromocao, TipoBonusPromocao, String>
+  get tipo => $composableBuilder(
+    column: $table.tipo,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PlataformasTableFilterComposer get plataformaId {
+    final $$PlataformasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableFilterComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableFilterComposer get jornadaId {
+    final $$JornadasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableFilterComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BonusPromocoesTableOrderingComposer
+    extends Composer<_$AppDatabase, $BonusPromocoesTable> {
+  $$BonusPromocoesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get valorCentavos => $composableBuilder(
+    column: $table.valorCentavos,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tipo => $composableBuilder(
+    column: $table.tipo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PlataformasTableOrderingComposer get plataformaId {
+    final $$PlataformasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableOrderingComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableOrderingComposer get jornadaId {
+    final $$JornadasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableOrderingComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BonusPromocoesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BonusPromocoesTable> {
+  $$BonusPromocoesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dataHora =>
+      $composableBuilder(column: $table.dataHora, builder: (column) => column);
+
+  GeneratedColumn<int> get valorCentavos => $composableBuilder(
+    column: $table.valorCentavos,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<TipoBonusPromocao, String> get tipo =>
+      $composableBuilder(column: $table.tipo, builder: (column) => column);
+
+  GeneratedColumn<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => column,
+  );
+
+  $$PlataformasTableAnnotationComposer get plataformaId {
+    final $$PlataformasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableAnnotationComposer get jornadaId {
+    final $$JornadasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BonusPromocoesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BonusPromocoesTable,
+          BonusPromocao,
+          $$BonusPromocoesTableFilterComposer,
+          $$BonusPromocoesTableOrderingComposer,
+          $$BonusPromocoesTableAnnotationComposer,
+          $$BonusPromocoesTableCreateCompanionBuilder,
+          $$BonusPromocoesTableUpdateCompanionBuilder,
+          (BonusPromocao, $$BonusPromocoesTableReferences),
+          BonusPromocao,
+          PrefetchHooks Function({bool plataformaId, bool jornadaId})
+        > {
+  $$BonusPromocoesTableTableManager(
+    _$AppDatabase db,
+    $BonusPromocoesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BonusPromocoesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BonusPromocoesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BonusPromocoesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> plataformaId = const Value.absent(),
+                Value<int?> jornadaId = const Value.absent(),
+                Value<DateTime> dataHora = const Value.absent(),
+                Value<int> valorCentavos = const Value.absent(),
+                Value<TipoBonusPromocao> tipo = const Value.absent(),
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+              }) => BonusPromocoesCompanion(
+                id: id,
+                plataformaId: plataformaId,
+                jornadaId: jornadaId,
+                dataHora: dataHora,
+                valorCentavos: valorCentavos,
+                tipo: tipo,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int plataformaId,
+                Value<int?> jornadaId = const Value.absent(),
+                required DateTime dataHora,
+                required int valorCentavos,
+                required TipoBonusPromocao tipo,
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+              }) => BonusPromocoesCompanion.insert(
+                id: id,
+                plataformaId: plataformaId,
+                jornadaId: jornadaId,
+                dataHora: dataHora,
+                valorCentavos: valorCentavos,
+                tipo: tipo,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$BonusPromocoesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({plataformaId = false, jornadaId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (plataformaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.plataformaId,
+                                referencedTable: $$BonusPromocoesTableReferences
+                                    ._plataformaIdTable(db),
+                                referencedColumn:
+                                    $$BonusPromocoesTableReferences
+                                        ._plataformaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (jornadaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.jornadaId,
+                                referencedTable: $$BonusPromocoesTableReferences
+                                    ._jornadaIdTable(db),
+                                referencedColumn:
+                                    $$BonusPromocoesTableReferences
+                                        ._jornadaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$BonusPromocoesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BonusPromocoesTable,
+      BonusPromocao,
+      $$BonusPromocoesTableFilterComposer,
+      $$BonusPromocoesTableOrderingComposer,
+      $$BonusPromocoesTableAnnotationComposer,
+      $$BonusPromocoesTableCreateCompanionBuilder,
+      $$BonusPromocoesTableUpdateCompanionBuilder,
+      (BonusPromocao, $$BonusPromocoesTableReferences),
+      BonusPromocao,
+      PrefetchHooks Function({bool plataformaId, bool jornadaId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -12408,4 +13599,6 @@ class $AppDatabaseManager {
       $$AbastecimentosTableTableManager(_db, _db.abastecimentos);
   $$PassesPlataformaTableTableManager get passesPlataforma =>
       $$PassesPlataformaTableTableManager(_db, _db.passesPlataforma);
+  $$BonusPromocoesTableTableManager get bonusPromocoes =>
+      $$BonusPromocoesTableTableManager(_db, _db.bonusPromocoes);
 }

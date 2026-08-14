@@ -9,6 +9,7 @@ import '../constants/enums/status_jornada.dart';
 import '../constants/enums/tipo_leitura_ganhos.dart';
 import '../constants/enums/tipo_registro_ganhos.dart';
 import '../constants/enums/tipo_combustivel.dart';
+import '../constants/enums/tipo_bonus_promocao.dart';
 import 'tables/usuario.dart';
 import 'tables/veiculo.dart';
 import 'tables/configuracao.dart';
@@ -20,6 +21,7 @@ import 'tables/leitura_ganho_plataforma.dart';
 import 'tables/lancamento_ganho_individual.dart';
 import 'tables/abastecimento.dart';
 import 'tables/passe_plataforma.dart';
+import 'tables/bonus_promocao.dart';
 
 import 'daos/jornada_dao.dart';
 import 'daos/leitura_ganhos_dao.dart';
@@ -27,6 +29,7 @@ import 'daos/pausa_dao.dart';
 import 'daos/ganho_individual_dao.dart';
 import 'daos/abastecimento_dao.dart';
 import 'daos/passe_plataforma_dao.dart';
+import 'daos/bonus_promocao_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -43,6 +46,7 @@ part 'app_database.g.dart';
     LancamentosGanhoIndividual,
     Abastecimentos,
     PassesPlataforma,
+    BonusPromocoes,
   ],
   daos: [
     JornadaDao,
@@ -51,6 +55,7 @@ part 'app_database.g.dart';
     GanhoIndividualDao,
     AbastecimentoDao,
     PassePlataformaDao,
+    BonusPromocaoDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -59,7 +64,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -83,6 +88,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 7) {
         await migrator.createTable(passesPlataforma);
+      }
+      if (from < 8) {
+        await migrator.createTable(bonusPromocoes);
       }
     },
     beforeOpen: (details) async {

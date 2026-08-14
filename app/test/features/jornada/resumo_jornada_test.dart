@@ -4,12 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:km_rodado/core/constants/enums/status_jornada.dart';
 import 'package:km_rodado/core/constants/enums/tipo_leitura_ganhos.dart';
 import 'package:km_rodado/core/constants/enums/tipo_registro_ganhos.dart';
+import 'package:km_rodado/core/constants/enums/tipo_bonus_promocao.dart';
 import 'package:km_rodado/core/database/app_database.dart';
 import 'package:km_rodado/core/database/daos/jornada_dao.dart';
 import 'package:km_rodado/core/database/daos/ganho_individual_dao.dart';
 import 'package:km_rodado/core/database/daos/leitura_ganhos_dao.dart';
 import 'package:km_rodado/core/database/daos/pausa_dao.dart';
 import 'package:km_rodado/core/database/daos/passe_plataforma_dao.dart';
+import 'package:km_rodado/core/database/daos/bonus_promocao_dao.dart';
 import 'package:km_rodado/core/database/seeds/seed.dart';
 import 'package:km_rodado/features/jornada/data/jornada_repository.dart';
 import 'package:km_rodado/features/ganho_individual/data/ganho_individual_repository.dart';
@@ -17,6 +19,7 @@ import 'package:km_rodado/features/jornada/data/jornada_service.dart';
 import 'package:km_rodado/features/leitura_ganhos/data/leitura_ganhos_repository.dart';
 import 'package:km_rodado/features/pausa/data/pausa_repository.dart';
 import 'package:km_rodado/features/passe_plataforma/data/passe_plataforma_repository.dart';
+import 'package:km_rodado/features/bonus_promocao/data/bonus_promocao_repository.dart';
 
 void main() {
   late AppDatabase database;
@@ -25,6 +28,7 @@ void main() {
   late LeituraGanhosRepository leituraRepository;
   late GanhoIndividualRepository ganhoIndividualRepository;
   late PassePlataformaRepository passeRepository;
+  late BonusPromocaoRepository bonusRepository;
   late JornadaService service;
 
   setUp(() async {
@@ -37,12 +41,14 @@ void main() {
       GanhoIndividualDao(database),
     );
     passeRepository = PassePlataformaRepository(PassePlataformaDao(database));
+    bonusRepository = BonusPromocaoRepository(BonusPromocaoDao(database));
     service = JornadaService(
       jornadaRepository,
       pausaRepository,
       leituraRepository,
       ganhoIndividualRepository,
       passeRepository,
+      bonusRepository,
     );
   });
 
@@ -131,6 +137,23 @@ void main() {
           );
     }
   }
+
+  Future<int> inserirBonus(
+    int jornadaId,
+    int plataformaId,
+    DateTime dataHora,
+    int valor,
+  ) => database
+      .into(database.bonusPromocoes)
+      .insert(
+        BonusPromocoesCompanion.insert(
+          plataformaId: plataformaId,
+          jornadaId: Value(jornadaId),
+          dataHora: dataHora,
+          valorCentavos: valor,
+          tipo: TipoBonusPromocao.bonus,
+        ),
+      );
 
   test('calcula resumo completo com múltiplas Pausas e plataformas', () async {
     final jornadaId = await inserirJornada();
@@ -344,16 +367,20 @@ void main() {
       DateTime(2026, 8, 10, 16),
       {uberId: (3500, 4)},
     );
+    await inserirBonus(jornadaId, uberId, DateTime(2026, 8, 10, 12), 500);
 
     final novoService = JornadaService(
       JornadaRepository(JornadaDao(database)),
       PausaRepository(PausaDao(database)),
       LeituraGanhosRepository(LeituraGanhosDao(database)),
       GanhoIndividualRepository(GanhoIndividualDao(database)),
+      PassePlataformaRepository(PassePlataformaDao(database)),
+      BonusPromocaoRepository(BonusPromocaoDao(database)),
     );
     final resumo = (await novoService.resumoUltimaJornada())!;
 
-    expect(resumo.receitaTotalCentavos, 2500);
+    expect(resumo.receitaTotalCentavos, 2000);
+    expect(resumo.bonusPromocoesCentavos, 500);
     expect(resumo.quantidadeTotalViagens, 3);
   });
 
@@ -395,6 +422,7 @@ void main() {
             valorTotalCentavos: 12500,
           ),
         );
+    await inserirBonus(jornadaId, particularId, DateTime(2026, 8, 10, 9), 500);
 
     final resumo = (await service.resumoUltimaJornada())!;
     final particular = resumo.resultadosPlataformas.singleWhere(
@@ -402,6 +430,8 @@ void main() {
     );
 
     expect(particular.receitaCentavos, 12500);
+    expect(particular.bonusPromocoesCentavos, 500);
+    expect(particular.resultadoOperacionalCentavos, 13000);
     expect(particular.quantidadeViagens, 3);
     expect(particular.ticketMedio, closeTo(41.666, 0.001));
     expect(resumo.receitaTotalCentavos, 16500);
@@ -409,6 +439,184 @@ void main() {
     expect(resumo.ticketMedioGeral, 33);
     expect(resumo.receitaPorHoraAtiva, 82.5);
     expect(resumo.receitaPorKmAtivo, 1.65);
+  });
+
+  test('reconcilia bônus e exclui crédito do ticket médio', () async {
+    final jornadaId = await inserirJornada();
+    final plataformaId = await inserirPlataforma('Acumulada');
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.inicial,
+      DateTime(2026, 8, 10, 8),
+      {plataformaId: (10000, 5)},
+    );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.finalDaJornada,
+      DateTime(2026, 8, 10, 16),
+      {plataformaId: (18000, 10)},
+    );
+    await inserirBonus(
+      jornadaId,
+      plataformaId,
+      DateTime(2026, 8, 10, 12),
+      2000,
+    );
+    await database
+        .into(database.bonusPromocoes)
+        .insert(
+          BonusPromocoesCompanion.insert(
+            plataformaId: plataformaId,
+            dataHora: DateTime(2026, 8, 10, 13),
+            valorCentavos: 3000,
+            tipo: TipoBonusPromocao.bonus,
+          ),
+        );
+
+    final resumo = (await service.resumoUltimaJornada())!;
+    final resultado = resumo.resultadosPlataformas.single;
+    expect(resultado.receitaCentavos, 6000);
+    expect(resultado.bonusPromocoesCentavos, 2000);
+    expect(resultado.ticketMedio, 12);
+    expect(resultado.resultadoOperacionalCentavos, 8000);
+    expect(resumo.bonusPromocoesCentavos, 2000);
+    expect(resumo.resultadoOperacionalCentavos, 8000);
+  });
+
+  test('sem bônus mantém a variação integral como receita', () async {
+    final jornadaId = await inserirJornada();
+    final plataformaId = await inserirPlataforma('Acumulada');
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.inicial,
+      DateTime(2026, 8, 10, 8),
+      {plataformaId: (10000, 5)},
+    );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.finalDaJornada,
+      DateTime(2026, 8, 10, 16),
+      {plataformaId: (18000, 10)},
+    );
+    expect(
+      (await service.resumoUltimaJornada())!
+          .resultadosPlataformas
+          .single
+          .receitaCentavos,
+      8000,
+    );
+  });
+
+  test(
+    'distribui múltiplos bônus entre intervalos sem dupla contagem',
+    () async {
+      final jornadaId = await inserirJornada();
+      final plataformaId = await inserirPlataforma('Acumulada');
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.inicial,
+        DateTime(2026, 8, 10, 8),
+        {plataformaId: (10000, 5)},
+      );
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.parcial,
+        DateTime(2026, 8, 10, 12),
+        {plataformaId: (15000, 8)},
+      );
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.finalDaJornada,
+        DateTime(2026, 8, 10, 16),
+        {plataformaId: (21000, 12)},
+      );
+      await inserirBonus(
+        jornadaId,
+        plataformaId,
+        DateTime(2026, 8, 10, 10),
+        1000,
+      );
+      await inserirBonus(
+        jornadaId,
+        plataformaId,
+        DateTime(2026, 8, 10, 11),
+        500,
+      );
+      await inserirBonus(
+        jornadaId,
+        plataformaId,
+        DateTime(2026, 8, 10, 14),
+        2000,
+      );
+
+      final resultado =
+          (await service.resumoUltimaJornada())!.resultadosPlataformas.single;
+      expect(resultado.receitaCentavos, 7500);
+      expect(resultado.bonusPromocoesCentavos, 3500);
+      expect(resultado.quantidadeViagens, 7);
+    },
+  );
+
+  test('fronteira é aberta no anterior e fechada no posterior', () async {
+    final jornadaId = await inserirJornada();
+    final plataformaId = await inserirPlataforma('Acumulada');
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.inicial,
+      DateTime(2026, 8, 10, 8),
+      {plataformaId: (10000, 5)},
+    );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.parcial,
+      DateTime(2026, 8, 10, 12),
+      {plataformaId: (15000, 8)},
+    );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.finalDaJornada,
+      DateTime(2026, 8, 10, 16),
+      {plataformaId: (20000, 10)},
+    );
+    await inserirBonus(jornadaId, plataformaId, DateTime(2026, 8, 10, 8), 1000);
+    await inserirBonus(
+      jornadaId,
+      plataformaId,
+      DateTime(2026, 8, 10, 12),
+      2000,
+    );
+
+    final resultado =
+        (await service.resumoUltimaJornada())!.resultadosPlataformas.single;
+    expect(resultado.receitaCentavos, 8000);
+    expect(resultado.bonusPromocoesCentavos, 2000);
+  });
+
+  test('bônus maior que variação mantém revisão', () async {
+    final jornadaId = await inserirJornada();
+    final plataformaId = await inserirPlataforma('Acumulada');
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.inicial,
+      DateTime(2026, 8, 10, 8),
+      {plataformaId: (10000, 5)},
+    );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.finalDaJornada,
+      DateTime(2026, 8, 10, 16),
+      {plataformaId: (11000, 6)},
+    );
+    await inserirBonus(
+      jornadaId,
+      plataformaId,
+      DateTime(2026, 8, 10, 12),
+      2000,
+    );
+    final resultado =
+        (await service.resumoUltimaJornada())!.resultadosPlataformas.single;
+    expect(resultado.calculavel, isFalse);
+    expect(resultado.resultadoOperacionalCentavos, isNull);
   });
 
   test('passe exige conferência sem reduzir ticket médio', () async {
@@ -439,6 +647,12 @@ void main() {
             valorPagoCentavos: 1000,
           ),
         );
+    await inserirBonus(
+      jornadaId,
+      plataformaId,
+      DateTime(2026, 8, 10, 9, 30),
+      500,
+    );
 
     final resumo = (await service.resumoUltimaJornada())!;
     expect(resumo.resultadosPlataformas.single.calculavel, isFalse);
@@ -447,5 +661,7 @@ void main() {
     expect(resumo.ticketMedioGeral, isNull);
     expect(resumo.custoPassesCentavos, 1000);
     expect(resumo.passes, hasLength(1));
+    expect(resumo.bonusPromocoesCentavos, 500);
+    expect(resumo.resultadoOperacionalCentavos, isNull);
   });
 }

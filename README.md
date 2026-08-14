@@ -7,6 +7,12 @@ O projeto está em desenvolvimento ativo e passa por testes operacionais reais
 em Android. Funciona localmente e offline, com Flutter/Dart e Drift sobre
 SQLite.
 
+O KM Rodado nasceu de uma necessidade operacional real, teve uma versão de uso
+em AppSheet e está sendo reescrito e evoluído em Flutter. O objetivo é
+transformar registros reais em uma referência econômica pessoal de quanto o
+motorista precisa receber por quilômetro e por hora para cobrir custos e atingir
+a margem desejada.
+
 ## Funcionalidades atuais
 
 - abertura e fechamento de Jornada, odômetros e localização textual;
@@ -17,6 +23,8 @@ SQLite.
 - resumo analítico derivado, com conferência de snapshots inconsistentes;
 - Abastecimentos atuais ou retroativos;
 - Passes de plataforma como custos separados do faturamento.
+- Bônus/promoções como créditos separados e reconciliação conservadora da
+  receita de viagens.
 
 ## Arquitetura
 

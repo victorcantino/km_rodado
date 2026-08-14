@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('migra schema 1 vazio para schema 7', () async {
+  test('migra schema 1 vazio para schema 8', () async {
     _criarBancoSchema1(arquivoBanco);
 
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
@@ -34,7 +34,7 @@ void main() {
     expect(await _contar(database, 'pausas'), 0);
     expect(await _contar(database, 'leituras_ganhos'), 0);
     expect(await _contar(database, 'leituras_ganho_plataforma'), 0);
-    expect(await _userVersion(database), 7);
+    expect(await _userVersion(database), 8);
     expect(
       await _tabelaExiste(database, 'lancamentos_ganho_individual'),
       isTrue,
@@ -42,6 +42,7 @@ void main() {
     expect(await _tabelaExiste(database, 'abastecimentos'), isTrue);
     expect(await _contar(database, 'abastecimentos'), 0);
     expect(await _tabelaExiste(database, 'passes_plataforma'), isTrue);
+    expect(await _tabelaExiste(database, 'bonus_promocoes'), isTrue);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(
       await _indiceExiste(database, 'idx_leituras_ganhos_jornada_data_hora'),
@@ -93,7 +94,7 @@ void main() {
       plataformas.map((plataforma) => plataforma.tipoRegistroGanhos).toSet(),
       {TipoRegistroGanhos.acumulado},
     );
-    expect(await _userVersion(database), 7);
+    expect(await _userVersion(database), 8);
     expect(await _contar(database, 'lancamentos_ganho_individual'), 0);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -201,7 +202,7 @@ void main() {
     addTearDown(database.close);
     final pausa = (await database.select(database.pausas).get()).single;
 
-    expect(await _userVersion(database), 7);
+    expect(await _userVersion(database), 8);
     expect(pausa.odometroInicio, isNull);
     expect(pausa.odometroFim, isNull);
   });
@@ -241,7 +242,7 @@ void main() {
     final abastecimento =
         (await database.select(database.abastecimentos).get()).single;
 
-    expect(await _userVersion(database), 7);
+    expect(await _userVersion(database), 8);
     expect(abastecimento.odometro, 123456);
     expect(abastecimento.dataHora, abastecimento.dataCriacao);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -282,12 +283,48 @@ void main() {
     final abastecimento =
         (await database.select(database.abastecimentos).get()).single;
 
-    expect(await _userVersion(database), 7);
+    expect(await _userVersion(database), 8);
     expect(abastecimento.id, 7);
     expect(abastecimento.odometro, 123456);
     expect(abastecimento.dataHora, isNot(abastecimento.dataCriacao));
     expect(await _tabelaExiste(database, 'passes_plataforma'), isTrue);
     expect(await _contar(database, 'passes_plataforma'), 0);
+    expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
+  });
+
+  test('migra schema 7 preservando Passe e cria Bônus/Promoções', () async {
+    final banco = sqlite.sqlite3.open(arquivoBanco.path);
+    banco.execute('''
+      PRAGMA foreign_keys = ON;
+      CREATE TABLE jornadas (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE plataformas (id INTEGER NOT NULL PRIMARY KEY);
+      INSERT INTO plataformas VALUES (3);
+      CREATE TABLE passes_plataforma (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        plataforma_id INTEGER NOT NULL REFERENCES plataformas (id),
+        jornada_id INTEGER NULL REFERENCES jornadas (id),
+        data_hora INTEGER NOT NULL,
+        valor_pago_centavos INTEGER NOT NULL CHECK (valor_pago_centavos > 0),
+        modalidade TEXT NULL,
+        validade_ate INTEGER NULL,
+        limite_faturamento_centavos INTEGER NULL,
+        observacao TEXT NULL,
+        data_criacao INTEGER NOT NULL
+      );
+      INSERT INTO passes_plataforma VALUES (
+        9, 3, NULL, 1786600000, 1500, 'Diário', NULL, NULL, NULL, 1786608000
+      );
+      PRAGMA user_version = 7;
+    ''');
+    banco.close();
+
+    final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
+    addTearDown(database.close);
+
+    expect(await _userVersion(database), 8);
+    expect(await _contar(database, 'passes_plataforma'), 1);
+    expect(await _tabelaExiste(database, 'bonus_promocoes'), isTrue);
+    expect(await _contar(database, 'bonus_promocoes'), 0);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
 }

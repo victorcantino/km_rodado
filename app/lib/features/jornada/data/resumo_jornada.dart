@@ -1,20 +1,29 @@
 import '../../../core/database/app_database.dart';
 import '../../../core/database/daos/passe_plataforma_dao.dart';
+import '../../../core/database/daos/bonus_promocao_dao.dart';
 
 class ResultadoPlataformaJornada {
   final int plataformaId;
   final String nome;
   final int? receitaCentavos;
   final int? quantidadeViagens;
+  final int bonusPromocoesCentavos;
+  final int custoPassesCentavos;
 
   const ResultadoPlataformaJornada({
     required this.plataformaId,
     required this.nome,
     required this.receitaCentavos,
     required this.quantidadeViagens,
+    this.bonusPromocoesCentavos = 0,
+    this.custoPassesCentavos = 0,
   });
 
   bool get calculavel => receitaCentavos != null && quantidadeViagens != null;
+
+  int? get resultadoOperacionalCentavos => calculavel
+      ? receitaCentavos! + bonusPromocoesCentavos - custoPassesCentavos
+      : null;
 
   double? get ticketMedio {
     final receita = receitaCentavos;
@@ -34,6 +43,7 @@ class ResumoJornada {
   final int? quilometrosAtivos;
   final List<ResultadoPlataformaJornada> resultadosPlataformas;
   final List<PasseComPlataforma> passes;
+  final List<BonusPromocaoComPlataforma> bonusPromocoes;
 
   const ResumoJornada({
     required this.jornada,
@@ -45,12 +55,25 @@ class ResumoJornada {
     required this.quilometrosAtivos,
     required this.resultadosPlataformas,
     this.passes = const [],
+    this.bonusPromocoes = const [],
   });
 
   int get custoPassesCentavos => passes.fold<int>(
     0,
     (total, item) => total + item.passe.valorPagoCentavos.toInt(),
   );
+
+  int get bonusPromocoesCentavos => bonusPromocoes.fold<int>(
+    0,
+    (total, item) => total + item.bonusPromocao.valorCentavos,
+  );
+
+  int? get resultadoOperacionalCentavos => financeiroCompleto
+      ? resultadosPlataformas.fold<int>(
+          0,
+          (total, resultado) => total + resultado.resultadoOperacionalCentavos!,
+        )
+      : null;
 
   bool get financeiroCompleto =>
       resultadosPlataformas.isNotEmpty &&

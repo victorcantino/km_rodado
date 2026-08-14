@@ -105,3 +105,14 @@ receita acumulada daquela plataforma dependente de conferência.
 
 Motivo: o efeito observado varia entre plataformas. O custo é conhecido, mas a
 reconciliação da receita exige regras explícitas ainda não formalizadas.
+
+## ADR-013 — Créditos promocionais factuais e reconciliação por intervalos
+
+Decisão: persistir Bônus/Promoções observados como fatos especializados,
+separados dos snapshots, e reconciliar plataformas acumuladas por intervalos
+consecutivos `(snapshot anterior, snapshot posterior]`. A receita de viagens é
+a variação menos créditos conhecidos; Passes e inconsistências mantêm revisão.
+
+Motivo: preservar fatos brutos, evitar dupla contagem nas fronteiras e separar
+com segurança faturamento de viagens, créditos e custos sem motor financeiro
+genérico ou regras por nome de Plataforma.

@@ -1,14 +1,14 @@
-# Tarefa atual — Correção de Pausas
+# Tarefa atual — Bônus/Promoções e reconciliação
 
 ## Estado
 
-Implementada a edição completa de Pausas pelo lápis existente. Título,
-observação, instantes e odômetros são validados em conjunto antes de uma única
-atualização, considerando Jornada, Pausas adjacentes e Abastecimentos. Pausas
-abertas permanecem abertas e Leituras vinculadas são preservadas.
+Implementada a primeira versão de créditos promocionais observados, com
+cadastro retroativo, Jornada opcional e apresentação separada no resumo.
+Plataformas acumuladas são reconciliadas por intervalos consecutivos; ticket
+médio usa somente receita atribuível às viagens.
 
-O schema permanece na versão 7. Esta etapa não inclui auditoria/versionamento,
-exclusão histórica nem correção de ganhos.
+O schema evolui de 7 para 8 com migração preservadora. Esta etapa não infere
+resets nem o efeito de Passes sobre snapshots.
 
 ## Validação
 
