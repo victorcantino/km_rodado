@@ -17,6 +17,12 @@ class JornadaDao extends DatabaseAccessor<AppDatabase> with _$JornadaDaoMixin {
         .getSingleOrNull();
   }
 
+  Future<Jornada?> buscarPorId(int id) {
+    return (select(
+      jornadas,
+    )..where((jornada) => jornada.id.equals(id))).getSingleOrNull();
+  }
+
   /// Retorna a Jornada finalizada mais recentemente, se existir.
   Future<Jornada?> buscarUltimaJornadaFinalizada() {
     return (select(jornadas)

@@ -27,6 +27,22 @@ deverão exigir justificativa e rastreabilidade.
 - Título é opcional, normalizado com `trim`; nulo usa `Pausa 1`, `Pausa 2` etc.
 - Iniciar Pausa persiste primeiro o evento e então oferece leitura parcial.
 - Salvar ou cancelar uma leitura não encerra nem apaga a Pausa.
+- O lápis edita a Pausa existente de forma integral e atômica, sem criar outro
+  registro. Pausa aberta continua aberta; somente Retomar Jornada define fim e
+  odômetro final.
+- A edição aceita duração zero e odômetros iguais, coerente com os fluxos
+  operacionais atuais. Início não pode anteceder a Jornada; fim não pode
+  anteceder o início nem ultrapassar o fim de uma Jornada finalizada. Em
+  Jornada aberta, os instantes editados não podem estar no futuro.
+- Uma Pausa editada não pode sobrepor Pausas cronologicamente anterior ou
+  posterior. A validação usa horários, não IDs.
+- Odômetros presentes devem ser não regressivos entre o início/fim da Jornada,
+  as demais Pausas e os Abastecimentos do mesmo veículo ocorridos no intervalo
+  da Jornada. Fatos anteriores limitam o mínimo e fatos posteriores limitam o
+  máximo. Registros históricos nullable permanecem nullable quando não forem
+  explicitamente corrigidos.
+- Editar a Pausa preserva seu ID e qualquer Leitura de Ganhos vinculada; horário
+  e valores da Leitura não são movidos ou alterados automaticamente.
 
 ## Plataformas e ganhos
 

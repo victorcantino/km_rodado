@@ -1,12 +1,15 @@
-# Tarefa atual — Sincronização documental
+# Tarefa atual — Correção de Pausas
 
 ## Estado
 
-Concluída a auditoria dos documentos contra o código e o schema 7 da `main`.
-README, arquitetura, modelo, regras, decisões, estado e backlog foram
-sincronizados; documentos vazios foram removidos e o template de PR foi criado.
+Implementada a edição completa de Pausas pelo lápis existente. Título,
+observação, instantes e odômetros são validados em conjunto antes de uma única
+atualização, considerando Jornada, Pausas adjacentes e Abastecimentos. Pausas
+abertas permanecem abertas e Leituras vinculadas são preservadas.
 
-## Próxima tarefa de produto
+O schema permanece na versão 7. Esta etapa não inclui auditoria/versionamento,
+exclusão histórica nem correção de ganhos.
 
-Ainda não iniciada. A próxima prioridade será escolhida a partir do uso
-operacional e do `BACKLOG.md`.
+## Validação
+
+Aguardando validação operacional no Android após a suíte automatizada.

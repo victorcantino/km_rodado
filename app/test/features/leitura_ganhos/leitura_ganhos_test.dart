@@ -7,10 +7,12 @@ import 'package:km_rodado/core/constants/enums/tipo_leitura_ganhos.dart';
 import 'package:km_rodado/core/constants/enums/tipo_registro_ganhos.dart';
 import 'package:km_rodado/core/database/app_database.dart';
 import 'package:km_rodado/core/database/daos/jornada_dao.dart';
+import 'package:km_rodado/core/database/daos/abastecimento_dao.dart';
 import 'package:km_rodado/core/database/daos/leitura_ganhos_dao.dart';
 import 'package:km_rodado/core/database/daos/pausa_dao.dart';
 import 'package:km_rodado/core/database/seeds/seed.dart';
 import 'package:km_rodado/features/jornada/data/jornada_repository.dart';
+import 'package:km_rodado/features/abastecimento/data/abastecimento_repository.dart';
 import 'package:km_rodado/features/jornada/data/jornada_service.dart';
 import 'package:km_rodado/features/leitura_ganhos/data/leitura_ganhos_repository.dart';
 import 'package:km_rodado/features/leitura_ganhos/data/leitura_ganhos_service.dart';
@@ -35,7 +37,11 @@ void main() {
     jornadaRepository = JornadaRepository(JornadaDao(database));
     pausaRepository = PausaRepository(PausaDao(database));
     jornadaService = JornadaService(jornadaRepository, pausaRepository);
-    pausaService = PausaService(pausaRepository, jornadaRepository);
+    pausaService = PausaService(
+      pausaRepository,
+      jornadaRepository,
+      AbastecimentoRepository(AbastecimentoDao(database)),
+    );
     leituraRepository = LeituraGanhosRepository(LeituraGanhosDao(database));
     leituraService = LeituraGanhosService(
       leituraRepository,

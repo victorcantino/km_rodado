@@ -27,6 +27,29 @@ class AbastecimentoDao extends DatabaseAccessor<AppDatabase>
             ..limit(1))
           .getSingleOrNull();
 
+  Future<List<Abastecimento>> listarPorVeiculoNoIntervalo(
+    int veiculoId,
+    DateTime inicio,
+    DateTime? fim,
+  ) {
+    final consulta = select(abastecimentos)
+      ..where(
+        (abastecimento) =>
+            abastecimento.veiculoId.equals(veiculoId) &
+            abastecimento.dataHora.isBiggerOrEqualValue(inicio),
+      )
+      ..orderBy([
+        (abastecimento) => OrderingTerm.asc(abastecimento.dataHora),
+        (abastecimento) => OrderingTerm.asc(abastecimento.id),
+      ]);
+    if (fim != null) {
+      consulta.where(
+        (abastecimento) => abastecimento.dataHora.isSmallerOrEqualValue(fim),
+      );
+    }
+    return consulta.get();
+  }
+
   Future<LimitesOdometro> buscarLimitesOdometro(
     int veiculoId,
     DateTime dataHora,
