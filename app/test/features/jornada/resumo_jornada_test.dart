@@ -9,12 +9,14 @@ import 'package:km_rodado/core/database/daos/jornada_dao.dart';
 import 'package:km_rodado/core/database/daos/ganho_individual_dao.dart';
 import 'package:km_rodado/core/database/daos/leitura_ganhos_dao.dart';
 import 'package:km_rodado/core/database/daos/pausa_dao.dart';
+import 'package:km_rodado/core/database/daos/passe_plataforma_dao.dart';
 import 'package:km_rodado/core/database/seeds/seed.dart';
 import 'package:km_rodado/features/jornada/data/jornada_repository.dart';
 import 'package:km_rodado/features/ganho_individual/data/ganho_individual_repository.dart';
 import 'package:km_rodado/features/jornada/data/jornada_service.dart';
 import 'package:km_rodado/features/leitura_ganhos/data/leitura_ganhos_repository.dart';
 import 'package:km_rodado/features/pausa/data/pausa_repository.dart';
+import 'package:km_rodado/features/passe_plataforma/data/passe_plataforma_repository.dart';
 
 void main() {
   late AppDatabase database;
@@ -22,6 +24,7 @@ void main() {
   late PausaRepository pausaRepository;
   late LeituraGanhosRepository leituraRepository;
   late GanhoIndividualRepository ganhoIndividualRepository;
+  late PassePlataformaRepository passeRepository;
   late JornadaService service;
 
   setUp(() async {
@@ -33,11 +36,13 @@ void main() {
     ganhoIndividualRepository = GanhoIndividualRepository(
       GanhoIndividualDao(database),
     );
+    passeRepository = PassePlataformaRepository(PassePlataformaDao(database));
     service = JornadaService(
       jornadaRepository,
       pausaRepository,
       leituraRepository,
       ganhoIndividualRepository,
+      passeRepository,
     );
   });
 
@@ -404,5 +409,43 @@ void main() {
     expect(resumo.ticketMedioGeral, 33);
     expect(resumo.receitaPorHoraAtiva, 82.5);
     expect(resumo.receitaPorKmAtivo, 1.65);
+  });
+
+  test('passe exige conferência sem reduzir ticket médio', () async {
+    final jornadaId = await inserirJornada(
+      inicio: DateTime(2026, 8, 10, 8),
+      fim: DateTime(2026, 8, 10, 10),
+    );
+    final plataformaId = await inserirPlataforma('Acumulada');
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.inicial,
+      DateTime(2026, 8, 10, 8),
+      {plataformaId: (1000, 1)},
+    );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.finalDaJornada,
+      DateTime(2026, 8, 10, 10),
+      {plataformaId: (5000, 3)},
+    );
+    await database
+        .into(database.passesPlataforma)
+        .insert(
+          PassesPlataformaCompanion.insert(
+            plataformaId: plataformaId,
+            jornadaId: Value(jornadaId),
+            dataHora: DateTime(2026, 8, 10, 9),
+            valorPagoCentavos: 1000,
+          ),
+        );
+
+    final resumo = (await service.resumoUltimaJornada())!;
+    expect(resumo.resultadosPlataformas.single.calculavel, isFalse);
+    expect(resumo.resultadosPlataformas.single.ticketMedio, isNull);
+    expect(resumo.receitaTotalCentavos, isNull);
+    expect(resumo.ticketMedioGeral, isNull);
+    expect(resumo.custoPassesCentavos, 1000);
+    expect(resumo.passes, hasLength(1));
   });
 }

@@ -2,11 +2,12 @@
 
 ## Funcionalidade em desenvolvimento
 
-Abastecimentos.
+Passes de Plataforma.
 
 ## Objetivo atual
 
-Permitir o registro operacional de abastecimentos dentro ou fora da Jornada.
+Registrar custos de passes e preservar a segurança do resumo diante de efeitos
+desconhecidos nos snapshots acumulados.
 
 ## Já implementado
 
@@ -102,6 +103,11 @@ Permitir o registro operacional de abastecimentos dentro ou fora da Jornada.
   migração preservadora dos abastecimentos já registrados no schema 5
 - Lançamento retroativo validado pelos odômetros anteriores e posteriores ao
   instante informado e sugestão do último combustível usado pelo veículo
+- Schema 7 com Passes de Plataforma sobre a base schema 6 de Abastecimentos
+- Passe retroativo em centavos, associado automaticamente à Jornada aberta
+- Custos de passes separados do faturamento e do ticket médio no Resumo
+- Receita acumulada sinalizada para conferência quando houver passe da
+  plataforma entre as leituras inicial e final
 
 ## Em andamento
 

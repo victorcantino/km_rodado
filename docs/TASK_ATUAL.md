@@ -1,22 +1,22 @@
-# Tarefa atual — Abastecimentos
+# Tarefa atual — Passes de Plataforma
 
 ## Objetivo
 
-Registrar abastecimentos de forma rápida no uso operacional, dentro ou fora de
-uma Jornada.
+Registrar passes como custos operacionais factuais das plataformas e integrá-los
+com segurança ao Resumo da Jornada.
 
 ## Escopo
 
-- dados monetários, volume e preço armazenados como inteiros;
-- associação automática à Jornada aberta, quando existir;
-- progressão do odômetro protegida pela regra de negócio;
-- cálculo auxiliar explícito entre volume, preço e total;
-- schema 6, instante operacional distinto da criação e consulta do último
-  abastecimento.
+- valor em centavos, data operacional e data de criação separadas;
+- Plataforma obrigatória e Jornada automática/opcional;
+- modalidade, validade, limite de faturamento e observação opcionais;
+- ação rápida durante Jornada aberta;
+- custo separado do faturamento e conferência segura dos snapshots;
+- schema 7 preservando o schema 6 de Abastecimentos.
 
 ## Fora do escopo
 
-- edição e exclusão histórica;
-- consumo, autonomia, custo por quilômetro e previsões;
-- cadastro próprio de postos e integração com localização;
-- módulo financeiro geral e redesign.
+- bônus e promoções;
+- regras específicas por nome de plataforma;
+- catálogo das quatro modalidades;
+- edição histórica completa e dashboard geral.

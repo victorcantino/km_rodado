@@ -1,4 +1,5 @@
 import '../../../core/database/app_database.dart';
+import '../../../core/database/daos/passe_plataforma_dao.dart';
 
 class ResultadoPlataformaJornada {
   final int plataformaId;
@@ -32,6 +33,7 @@ class ResumoJornada {
   final int? quilometrosEmPausa;
   final int? quilometrosAtivos;
   final List<ResultadoPlataformaJornada> resultadosPlataformas;
+  final List<PasseComPlataforma> passes;
 
   const ResumoJornada({
     required this.jornada,
@@ -42,7 +44,13 @@ class ResumoJornada {
     required this.quilometrosEmPausa,
     required this.quilometrosAtivos,
     required this.resultadosPlataformas,
+    this.passes = const [],
   });
+
+  int get custoPassesCentavos => passes.fold<int>(
+    0,
+    (total, item) => total + item.passe.valorPagoCentavos.toInt(),
+  );
 
   bool get financeiroCompleto =>
       resultadosPlataformas.isNotEmpty &&

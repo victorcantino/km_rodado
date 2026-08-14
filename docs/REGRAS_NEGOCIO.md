@@ -377,7 +377,19 @@ corridas. O resultado operacional poderá considerar separadamente:
 faturamento de corridas + bônus - passes e custos da plataforma
 ```
 
-Esses eventos e sua reconciliação não fazem parte do resumo atual.
+Na primeira versão operacional, Passe possui Plataforma obrigatória, Jornada
+opcional, `dataHora` da compra, `dataCriacao`, valor positivo em centavos e
+modalidade, validade, limite de faturamento e observação opcionais. A Jornada
+aberta é associada automaticamente.
+
+O custo do passe é exibido separadamente no resumo. Se houver passe de uma
+plataforma acumulada entre a leitura inicial e a final, sua receita exige
+conferência; não se calcula `final - inicial + passe`. O ticket médio e os
+totais gerais permanecem indisponíveis enquanto a receita estiver incompleta.
+
+Foi observado que a 99 pode reduzir o acumulado visível e a Uber pode gerar
+débito interno que afeta ganhos posteriores. Essas observações não são regras
+por nome. Bônus e a reconciliação detalhada permanecem futuros.
 
 ## 5.7 Lançamentos individuais
 

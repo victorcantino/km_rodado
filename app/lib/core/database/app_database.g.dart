@@ -5827,6 +5827,656 @@ class AbastecimentosCompanion extends UpdateCompanion<Abastecimento> {
   }
 }
 
+class $PassesPlataformaTable extends PassesPlataforma
+    with TableInfo<$PassesPlataformaTable, PassesPlataformaData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PassesPlataformaTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _plataformaIdMeta = const VerificationMeta(
+    'plataformaId',
+  );
+  @override
+  late final GeneratedColumn<int> plataformaId = GeneratedColumn<int>(
+    'plataforma_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES plataformas (id)',
+    ),
+  );
+  static const VerificationMeta _jornadaIdMeta = const VerificationMeta(
+    'jornadaId',
+  );
+  @override
+  late final GeneratedColumn<int> jornadaId = GeneratedColumn<int>(
+    'jornada_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES jornadas (id)',
+    ),
+  );
+  static const VerificationMeta _dataHoraMeta = const VerificationMeta(
+    'dataHora',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataHora = GeneratedColumn<DateTime>(
+    'data_hora',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valorPagoCentavosMeta = const VerificationMeta(
+    'valorPagoCentavos',
+  );
+  @override
+  late final GeneratedColumn<int> valorPagoCentavos = GeneratedColumn<int>(
+    'valor_pago_centavos',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _modalidadeMeta = const VerificationMeta(
+    'modalidade',
+  );
+  @override
+  late final GeneratedColumn<String> modalidade = GeneratedColumn<String>(
+    'modalidade',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _validadeAteMeta = const VerificationMeta(
+    'validadeAte',
+  );
+  @override
+  late final GeneratedColumn<DateTime> validadeAte = GeneratedColumn<DateTime>(
+    'validade_ate',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _limiteFaturamentoCentavosMeta =
+      const VerificationMeta('limiteFaturamentoCentavos');
+  @override
+  late final GeneratedColumn<int> limiteFaturamentoCentavos =
+      GeneratedColumn<int>(
+        'limite_faturamento_centavos',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _observacaoMeta = const VerificationMeta(
+    'observacao',
+  );
+  @override
+  late final GeneratedColumn<String> observacao = GeneratedColumn<String>(
+    'observacao',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dataCriacaoMeta = const VerificationMeta(
+    'dataCriacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataCriacao = GeneratedColumn<DateTime>(
+    'data_criacao',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    plataformaId,
+    jornadaId,
+    dataHora,
+    valorPagoCentavos,
+    modalidade,
+    validadeAte,
+    limiteFaturamentoCentavos,
+    observacao,
+    dataCriacao,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'passes_plataforma';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PassesPlataformaData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('plataforma_id')) {
+      context.handle(
+        _plataformaIdMeta,
+        plataformaId.isAcceptableOrUnknown(
+          data['plataforma_id']!,
+          _plataformaIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_plataformaIdMeta);
+    }
+    if (data.containsKey('jornada_id')) {
+      context.handle(
+        _jornadaIdMeta,
+        jornadaId.isAcceptableOrUnknown(data['jornada_id']!, _jornadaIdMeta),
+      );
+    }
+    if (data.containsKey('data_hora')) {
+      context.handle(
+        _dataHoraMeta,
+        dataHora.isAcceptableOrUnknown(data['data_hora']!, _dataHoraMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dataHoraMeta);
+    }
+    if (data.containsKey('valor_pago_centavos')) {
+      context.handle(
+        _valorPagoCentavosMeta,
+        valorPagoCentavos.isAcceptableOrUnknown(
+          data['valor_pago_centavos']!,
+          _valorPagoCentavosMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_valorPagoCentavosMeta);
+    }
+    if (data.containsKey('modalidade')) {
+      context.handle(
+        _modalidadeMeta,
+        modalidade.isAcceptableOrUnknown(data['modalidade']!, _modalidadeMeta),
+      );
+    }
+    if (data.containsKey('validade_ate')) {
+      context.handle(
+        _validadeAteMeta,
+        validadeAte.isAcceptableOrUnknown(
+          data['validade_ate']!,
+          _validadeAteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('limite_faturamento_centavos')) {
+      context.handle(
+        _limiteFaturamentoCentavosMeta,
+        limiteFaturamentoCentavos.isAcceptableOrUnknown(
+          data['limite_faturamento_centavos']!,
+          _limiteFaturamentoCentavosMeta,
+        ),
+      );
+    }
+    if (data.containsKey('observacao')) {
+      context.handle(
+        _observacaoMeta,
+        observacao.isAcceptableOrUnknown(data['observacao']!, _observacaoMeta),
+      );
+    }
+    if (data.containsKey('data_criacao')) {
+      context.handle(
+        _dataCriacaoMeta,
+        dataCriacao.isAcceptableOrUnknown(
+          data['data_criacao']!,
+          _dataCriacaoMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PassesPlataformaData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PassesPlataformaData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      plataformaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}plataforma_id'],
+      )!,
+      jornadaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}jornada_id'],
+      ),
+      dataHora: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_hora'],
+      )!,
+      valorPagoCentavos: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_pago_centavos'],
+      )!,
+      modalidade: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}modalidade'],
+      ),
+      validadeAte: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}validade_ate'],
+      ),
+      limiteFaturamentoCentavos: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}limite_faturamento_centavos'],
+      ),
+      observacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}observacao'],
+      ),
+      dataCriacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_criacao'],
+      )!,
+    );
+  }
+
+  @override
+  $PassesPlataformaTable createAlias(String alias) {
+    return $PassesPlataformaTable(attachedDatabase, alias);
+  }
+}
+
+class PassesPlataformaData extends DataClass
+    implements Insertable<PassesPlataformaData> {
+  final int id;
+  final int plataformaId;
+  final int? jornadaId;
+  final DateTime dataHora;
+  final int valorPagoCentavos;
+  final String? modalidade;
+  final DateTime? validadeAte;
+  final int? limiteFaturamentoCentavos;
+  final String? observacao;
+  final DateTime dataCriacao;
+  const PassesPlataformaData({
+    required this.id,
+    required this.plataformaId,
+    this.jornadaId,
+    required this.dataHora,
+    required this.valorPagoCentavos,
+    this.modalidade,
+    this.validadeAte,
+    this.limiteFaturamentoCentavos,
+    this.observacao,
+    required this.dataCriacao,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['plataforma_id'] = Variable<int>(plataformaId);
+    if (!nullToAbsent || jornadaId != null) {
+      map['jornada_id'] = Variable<int>(jornadaId);
+    }
+    map['data_hora'] = Variable<DateTime>(dataHora);
+    map['valor_pago_centavos'] = Variable<int>(valorPagoCentavos);
+    if (!nullToAbsent || modalidade != null) {
+      map['modalidade'] = Variable<String>(modalidade);
+    }
+    if (!nullToAbsent || validadeAte != null) {
+      map['validade_ate'] = Variable<DateTime>(validadeAte);
+    }
+    if (!nullToAbsent || limiteFaturamentoCentavos != null) {
+      map['limite_faturamento_centavos'] = Variable<int>(
+        limiteFaturamentoCentavos,
+      );
+    }
+    if (!nullToAbsent || observacao != null) {
+      map['observacao'] = Variable<String>(observacao);
+    }
+    map['data_criacao'] = Variable<DateTime>(dataCriacao);
+    return map;
+  }
+
+  PassesPlataformaCompanion toCompanion(bool nullToAbsent) {
+    return PassesPlataformaCompanion(
+      id: Value(id),
+      plataformaId: Value(plataformaId),
+      jornadaId: jornadaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(jornadaId),
+      dataHora: Value(dataHora),
+      valorPagoCentavos: Value(valorPagoCentavos),
+      modalidade: modalidade == null && nullToAbsent
+          ? const Value.absent()
+          : Value(modalidade),
+      validadeAte: validadeAte == null && nullToAbsent
+          ? const Value.absent()
+          : Value(validadeAte),
+      limiteFaturamentoCentavos:
+          limiteFaturamentoCentavos == null && nullToAbsent
+          ? const Value.absent()
+          : Value(limiteFaturamentoCentavos),
+      observacao: observacao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(observacao),
+      dataCriacao: Value(dataCriacao),
+    );
+  }
+
+  factory PassesPlataformaData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PassesPlataformaData(
+      id: serializer.fromJson<int>(json['id']),
+      plataformaId: serializer.fromJson<int>(json['plataformaId']),
+      jornadaId: serializer.fromJson<int?>(json['jornadaId']),
+      dataHora: serializer.fromJson<DateTime>(json['dataHora']),
+      valorPagoCentavos: serializer.fromJson<int>(json['valorPagoCentavos']),
+      modalidade: serializer.fromJson<String?>(json['modalidade']),
+      validadeAte: serializer.fromJson<DateTime?>(json['validadeAte']),
+      limiteFaturamentoCentavos: serializer.fromJson<int?>(
+        json['limiteFaturamentoCentavos'],
+      ),
+      observacao: serializer.fromJson<String?>(json['observacao']),
+      dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'plataformaId': serializer.toJson<int>(plataformaId),
+      'jornadaId': serializer.toJson<int?>(jornadaId),
+      'dataHora': serializer.toJson<DateTime>(dataHora),
+      'valorPagoCentavos': serializer.toJson<int>(valorPagoCentavos),
+      'modalidade': serializer.toJson<String?>(modalidade),
+      'validadeAte': serializer.toJson<DateTime?>(validadeAte),
+      'limiteFaturamentoCentavos': serializer.toJson<int?>(
+        limiteFaturamentoCentavos,
+      ),
+      'observacao': serializer.toJson<String?>(observacao),
+      'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
+    };
+  }
+
+  PassesPlataformaData copyWith({
+    int? id,
+    int? plataformaId,
+    Value<int?> jornadaId = const Value.absent(),
+    DateTime? dataHora,
+    int? valorPagoCentavos,
+    Value<String?> modalidade = const Value.absent(),
+    Value<DateTime?> validadeAte = const Value.absent(),
+    Value<int?> limiteFaturamentoCentavos = const Value.absent(),
+    Value<String?> observacao = const Value.absent(),
+    DateTime? dataCriacao,
+  }) => PassesPlataformaData(
+    id: id ?? this.id,
+    plataformaId: plataformaId ?? this.plataformaId,
+    jornadaId: jornadaId.present ? jornadaId.value : this.jornadaId,
+    dataHora: dataHora ?? this.dataHora,
+    valorPagoCentavos: valorPagoCentavos ?? this.valorPagoCentavos,
+    modalidade: modalidade.present ? modalidade.value : this.modalidade,
+    validadeAte: validadeAte.present ? validadeAte.value : this.validadeAte,
+    limiteFaturamentoCentavos: limiteFaturamentoCentavos.present
+        ? limiteFaturamentoCentavos.value
+        : this.limiteFaturamentoCentavos,
+    observacao: observacao.present ? observacao.value : this.observacao,
+    dataCriacao: dataCriacao ?? this.dataCriacao,
+  );
+  PassesPlataformaData copyWithCompanion(PassesPlataformaCompanion data) {
+    return PassesPlataformaData(
+      id: data.id.present ? data.id.value : this.id,
+      plataformaId: data.plataformaId.present
+          ? data.plataformaId.value
+          : this.plataformaId,
+      jornadaId: data.jornadaId.present ? data.jornadaId.value : this.jornadaId,
+      dataHora: data.dataHora.present ? data.dataHora.value : this.dataHora,
+      valorPagoCentavos: data.valorPagoCentavos.present
+          ? data.valorPagoCentavos.value
+          : this.valorPagoCentavos,
+      modalidade: data.modalidade.present
+          ? data.modalidade.value
+          : this.modalidade,
+      validadeAte: data.validadeAte.present
+          ? data.validadeAte.value
+          : this.validadeAte,
+      limiteFaturamentoCentavos: data.limiteFaturamentoCentavos.present
+          ? data.limiteFaturamentoCentavos.value
+          : this.limiteFaturamentoCentavos,
+      observacao: data.observacao.present
+          ? data.observacao.value
+          : this.observacao,
+      dataCriacao: data.dataCriacao.present
+          ? data.dataCriacao.value
+          : this.dataCriacao,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PassesPlataformaData(')
+          ..write('id: $id, ')
+          ..write('plataformaId: $plataformaId, ')
+          ..write('jornadaId: $jornadaId, ')
+          ..write('dataHora: $dataHora, ')
+          ..write('valorPagoCentavos: $valorPagoCentavos, ')
+          ..write('modalidade: $modalidade, ')
+          ..write('validadeAte: $validadeAte, ')
+          ..write('limiteFaturamentoCentavos: $limiteFaturamentoCentavos, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    plataformaId,
+    jornadaId,
+    dataHora,
+    valorPagoCentavos,
+    modalidade,
+    validadeAte,
+    limiteFaturamentoCentavos,
+    observacao,
+    dataCriacao,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PassesPlataformaData &&
+          other.id == this.id &&
+          other.plataformaId == this.plataformaId &&
+          other.jornadaId == this.jornadaId &&
+          other.dataHora == this.dataHora &&
+          other.valorPagoCentavos == this.valorPagoCentavos &&
+          other.modalidade == this.modalidade &&
+          other.validadeAte == this.validadeAte &&
+          other.limiteFaturamentoCentavos == this.limiteFaturamentoCentavos &&
+          other.observacao == this.observacao &&
+          other.dataCriacao == this.dataCriacao);
+}
+
+class PassesPlataformaCompanion extends UpdateCompanion<PassesPlataformaData> {
+  final Value<int> id;
+  final Value<int> plataformaId;
+  final Value<int?> jornadaId;
+  final Value<DateTime> dataHora;
+  final Value<int> valorPagoCentavos;
+  final Value<String?> modalidade;
+  final Value<DateTime?> validadeAte;
+  final Value<int?> limiteFaturamentoCentavos;
+  final Value<String?> observacao;
+  final Value<DateTime> dataCriacao;
+  const PassesPlataformaCompanion({
+    this.id = const Value.absent(),
+    this.plataformaId = const Value.absent(),
+    this.jornadaId = const Value.absent(),
+    this.dataHora = const Value.absent(),
+    this.valorPagoCentavos = const Value.absent(),
+    this.modalidade = const Value.absent(),
+    this.validadeAte = const Value.absent(),
+    this.limiteFaturamentoCentavos = const Value.absent(),
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+  });
+  PassesPlataformaCompanion.insert({
+    this.id = const Value.absent(),
+    required int plataformaId,
+    this.jornadaId = const Value.absent(),
+    required DateTime dataHora,
+    required int valorPagoCentavos,
+    this.modalidade = const Value.absent(),
+    this.validadeAte = const Value.absent(),
+    this.limiteFaturamentoCentavos = const Value.absent(),
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+  }) : plataformaId = Value(plataformaId),
+       dataHora = Value(dataHora),
+       valorPagoCentavos = Value(valorPagoCentavos);
+  static Insertable<PassesPlataformaData> custom({
+    Expression<int>? id,
+    Expression<int>? plataformaId,
+    Expression<int>? jornadaId,
+    Expression<DateTime>? dataHora,
+    Expression<int>? valorPagoCentavos,
+    Expression<String>? modalidade,
+    Expression<DateTime>? validadeAte,
+    Expression<int>? limiteFaturamentoCentavos,
+    Expression<String>? observacao,
+    Expression<DateTime>? dataCriacao,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (plataformaId != null) 'plataforma_id': plataformaId,
+      if (jornadaId != null) 'jornada_id': jornadaId,
+      if (dataHora != null) 'data_hora': dataHora,
+      if (valorPagoCentavos != null) 'valor_pago_centavos': valorPagoCentavos,
+      if (modalidade != null) 'modalidade': modalidade,
+      if (validadeAte != null) 'validade_ate': validadeAte,
+      if (limiteFaturamentoCentavos != null)
+        'limite_faturamento_centavos': limiteFaturamentoCentavos,
+      if (observacao != null) 'observacao': observacao,
+      if (dataCriacao != null) 'data_criacao': dataCriacao,
+    });
+  }
+
+  PassesPlataformaCompanion copyWith({
+    Value<int>? id,
+    Value<int>? plataformaId,
+    Value<int?>? jornadaId,
+    Value<DateTime>? dataHora,
+    Value<int>? valorPagoCentavos,
+    Value<String?>? modalidade,
+    Value<DateTime?>? validadeAte,
+    Value<int?>? limiteFaturamentoCentavos,
+    Value<String?>? observacao,
+    Value<DateTime>? dataCriacao,
+  }) {
+    return PassesPlataformaCompanion(
+      id: id ?? this.id,
+      plataformaId: plataformaId ?? this.plataformaId,
+      jornadaId: jornadaId ?? this.jornadaId,
+      dataHora: dataHora ?? this.dataHora,
+      valorPagoCentavos: valorPagoCentavos ?? this.valorPagoCentavos,
+      modalidade: modalidade ?? this.modalidade,
+      validadeAte: validadeAte ?? this.validadeAte,
+      limiteFaturamentoCentavos:
+          limiteFaturamentoCentavos ?? this.limiteFaturamentoCentavos,
+      observacao: observacao ?? this.observacao,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (plataformaId.present) {
+      map['plataforma_id'] = Variable<int>(plataformaId.value);
+    }
+    if (jornadaId.present) {
+      map['jornada_id'] = Variable<int>(jornadaId.value);
+    }
+    if (dataHora.present) {
+      map['data_hora'] = Variable<DateTime>(dataHora.value);
+    }
+    if (valorPagoCentavos.present) {
+      map['valor_pago_centavos'] = Variable<int>(valorPagoCentavos.value);
+    }
+    if (modalidade.present) {
+      map['modalidade'] = Variable<String>(modalidade.value);
+    }
+    if (validadeAte.present) {
+      map['validade_ate'] = Variable<DateTime>(validadeAte.value);
+    }
+    if (limiteFaturamentoCentavos.present) {
+      map['limite_faturamento_centavos'] = Variable<int>(
+        limiteFaturamentoCentavos.value,
+      );
+    }
+    if (observacao.present) {
+      map['observacao'] = Variable<String>(observacao.value);
+    }
+    if (dataCriacao.present) {
+      map['data_criacao'] = Variable<DateTime>(dataCriacao.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PassesPlataformaCompanion(')
+          ..write('id: $id, ')
+          ..write('plataformaId: $plataformaId, ')
+          ..write('jornadaId: $jornadaId, ')
+          ..write('dataHora: $dataHora, ')
+          ..write('valorPagoCentavos: $valorPagoCentavos, ')
+          ..write('modalidade: $modalidade, ')
+          ..write('validadeAte: $validadeAte, ')
+          ..write('limiteFaturamentoCentavos: $limiteFaturamentoCentavos, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5842,6 +6492,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $LancamentosGanhoIndividualTable lancamentosGanhoIndividual =
       $LancamentosGanhoIndividualTable(this);
   late final $AbastecimentosTable abastecimentos = $AbastecimentosTable(this);
+  late final $PassesPlataformaTable passesPlataforma = $PassesPlataformaTable(
+    this,
+  );
   late final JornadaDao jornadaDao = JornadaDao(this as AppDatabase);
   late final PausaDao pausaDao = PausaDao(this as AppDatabase);
   late final LeituraGanhosDao leituraGanhosDao = LeituraGanhosDao(
@@ -5851,6 +6504,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this as AppDatabase,
   );
   late final AbastecimentoDao abastecimentoDao = AbastecimentoDao(
+    this as AppDatabase,
+  );
+  late final PassePlataformaDao passePlataformaDao = PassePlataformaDao(
     this as AppDatabase,
   );
   @override
@@ -5868,6 +6524,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     leiturasGanhoPlataforma,
     lancamentosGanhoIndividual,
     abastecimentos,
+    passesPlataforma,
   ];
 }
 
@@ -7108,6 +7765,26 @@ final class $$JornadasTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$PassesPlataformaTable, List<PassesPlataformaData>>
+  _passesPlataformaRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.passesPlataforma,
+    aliasName: 'jornadas__id__passes_plataforma__jornada_id',
+  );
+
+  $$PassesPlataformaTableProcessedTableManager get passesPlataformaRefs {
+    final manager = $$PassesPlataformaTableTableManager(
+      $_db,
+      $_db.passesPlataforma,
+    ).filter((f) => f.jornadaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _passesPlataformaRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$JornadasTableFilterComposer
@@ -7324,6 +8001,31 @@ class $$JornadasTableFilterComposer
           }) => $$AbastecimentosTableFilterComposer(
             $db: $db,
             $table: $db.abastecimentos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> passesPlataformaRefs(
+    Expression<bool> Function($$PassesPlataformaTableFilterComposer f) f,
+  ) {
+    final $$PassesPlataformaTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.passesPlataforma,
+      getReferencedColumn: (t) => t.jornadaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PassesPlataformaTableFilterComposer(
+            $db: $db,
+            $table: $db.passesPlataforma,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -7674,6 +8376,31 @@ class $$JornadasTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> passesPlataformaRefs<T extends Object>(
+    Expression<T> Function($$PassesPlataformaTableAnnotationComposer a) f,
+  ) {
+    final $$PassesPlataformaTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.passesPlataforma,
+      getReferencedColumn: (t) => t.jornadaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PassesPlataformaTableAnnotationComposer(
+            $db: $db,
+            $table: $db.passesPlataforma,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$JornadasTableTableManager
@@ -7696,6 +8423,7 @@ class $$JornadasTableTableManager
             bool leiturasGanhosRefs,
             bool lancamentosGanhoIndividualRefs,
             bool abastecimentosRefs,
+            bool passesPlataformaRefs,
           })
         > {
   $$JornadasTableTableManager(_$AppDatabase db, $JornadasTable table)
@@ -7793,6 +8521,7 @@ class $$JornadasTableTableManager
                 leiturasGanhosRefs = false,
                 lancamentosGanhoIndividualRefs = false,
                 abastecimentosRefs = false,
+                passesPlataformaRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -7802,6 +8531,7 @@ class $$JornadasTableTableManager
                     if (lancamentosGanhoIndividualRefs)
                       db.lancamentosGanhoIndividual,
                     if (abastecimentosRefs) db.abastecimentos,
+                    if (passesPlataformaRefs) db.passesPlataforma,
                   ],
                   addJoins:
                       <
@@ -7934,6 +8664,27 @@ class $$JornadasTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (passesPlataformaRefs)
+                        await $_getPrefetchedData<
+                          Jornada,
+                          $JornadasTable,
+                          PassesPlataformaData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$JornadasTableReferences
+                              ._passesPlataformaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$JornadasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).passesPlataformaRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.jornadaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -7961,6 +8712,7 @@ typedef $$JornadasTableProcessedTableManager =
         bool leiturasGanhosRefs,
         bool lancamentosGanhoIndividualRefs,
         bool abastecimentosRefs,
+        bool passesPlataformaRefs,
       })
     >;
 typedef $$PausasTableCreateCompanionBuilder =
@@ -8526,6 +9278,26 @@ final class $$PlataformasTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$PassesPlataformaTable, List<PassesPlataformaData>>
+  _passesPlataformaRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.passesPlataforma,
+    aliasName: 'plataformas__id__passes_plataforma__plataforma_id',
+  );
+
+  $$PassesPlataformaTableProcessedTableManager get passesPlataformaRefs {
+    final manager = $$PassesPlataformaTableTableManager(
+      $_db,
+      $_db.passesPlataforma,
+    ).filter((f) => f.plataformaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _passesPlataformaRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$PlataformasTableFilterComposer
@@ -8628,6 +9400,31 @@ class $$PlataformasTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> passesPlataformaRefs(
+    Expression<bool> Function($$PassesPlataformaTableFilterComposer f) f,
+  ) {
+    final $$PassesPlataformaTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.passesPlataforma,
+      getReferencedColumn: (t) => t.plataformaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PassesPlataformaTableFilterComposer(
+            $db: $db,
+            $table: $db.passesPlataforma,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -8775,6 +9572,31 @@ class $$PlataformasTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> passesPlataformaRefs<T extends Object>(
+    Expression<T> Function($$PassesPlataformaTableAnnotationComposer a) f,
+  ) {
+    final $$PassesPlataformaTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.passesPlataforma,
+      getReferencedColumn: (t) => t.plataformaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PassesPlataformaTableAnnotationComposer(
+            $db: $db,
+            $table: $db.passesPlataforma,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$PlataformasTableTableManager
@@ -8793,6 +9615,7 @@ class $$PlataformasTableTableManager
           PrefetchHooks Function({
             bool leiturasGanhoPlataformaRefs,
             bool lancamentosGanhoIndividualRefs,
+            bool passesPlataformaRefs,
           })
         > {
   $$PlataformasTableTableManager(_$AppDatabase db, $PlataformasTable table)
@@ -8859,6 +9682,7 @@ class $$PlataformasTableTableManager
               ({
                 leiturasGanhoPlataformaRefs = false,
                 lancamentosGanhoIndividualRefs = false,
+                passesPlataformaRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -8866,6 +9690,7 @@ class $$PlataformasTableTableManager
                     if (leiturasGanhoPlataformaRefs) db.leiturasGanhoPlataforma,
                     if (lancamentosGanhoIndividualRefs)
                       db.lancamentosGanhoIndividual,
+                    if (passesPlataformaRefs) db.passesPlataforma,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -8912,6 +9737,27 @@ class $$PlataformasTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (passesPlataformaRefs)
+                        await $_getPrefetchedData<
+                          Plataforma,
+                          $PlataformasTable,
+                          PassesPlataformaData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlataformasTableReferences
+                              ._passesPlataformaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlataformasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).passesPlataformaRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.plataformaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -8935,6 +9781,7 @@ typedef $$PlataformasTableProcessedTableManager =
       PrefetchHooks Function({
         bool leiturasGanhoPlataformaRefs,
         bool lancamentosGanhoIndividualRefs,
+        bool passesPlataformaRefs,
       })
     >;
 typedef $$LeiturasGanhosTableCreateCompanionBuilder =
@@ -11008,6 +11855,526 @@ typedef $$AbastecimentosTableProcessedTableManager =
       Abastecimento,
       PrefetchHooks Function({bool veiculoId, bool jornadaId})
     >;
+typedef $$PassesPlataformaTableCreateCompanionBuilder =
+    PassesPlataformaCompanion Function({
+      Value<int> id,
+      required int plataformaId,
+      Value<int?> jornadaId,
+      required DateTime dataHora,
+      required int valorPagoCentavos,
+      Value<String?> modalidade,
+      Value<DateTime?> validadeAte,
+      Value<int?> limiteFaturamentoCentavos,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+    });
+typedef $$PassesPlataformaTableUpdateCompanionBuilder =
+    PassesPlataformaCompanion Function({
+      Value<int> id,
+      Value<int> plataformaId,
+      Value<int?> jornadaId,
+      Value<DateTime> dataHora,
+      Value<int> valorPagoCentavos,
+      Value<String?> modalidade,
+      Value<DateTime?> validadeAte,
+      Value<int?> limiteFaturamentoCentavos,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+    });
+
+final class $$PassesPlataformaTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $PassesPlataformaTable,
+          PassesPlataformaData
+        > {
+  $$PassesPlataformaTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PlataformasTable _plataformaIdTable(_$AppDatabase db) => db
+      .plataformas
+      .createAlias('passes_plataforma__plataforma_id__plataformas__id');
+
+  $$PlataformasTableProcessedTableManager get plataformaId {
+    final $_column = $_itemColumn<int>('plataforma_id')!;
+
+    final manager = $$PlataformasTableTableManager(
+      $_db,
+      $_db.plataformas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_plataformaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $JornadasTable _jornadaIdTable(_$AppDatabase db) =>
+      db.jornadas.createAlias('passes_plataforma__jornada_id__jornadas__id');
+
+  $$JornadasTableProcessedTableManager? get jornadaId {
+    final $_column = $_itemColumn<int>('jornada_id');
+    if ($_column == null) return null;
+    final manager = $$JornadasTableTableManager(
+      $_db,
+      $_db.jornadas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_jornadaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PassesPlataformaTableFilterComposer
+    extends Composer<_$AppDatabase, $PassesPlataformaTable> {
+  $$PassesPlataformaTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get valorPagoCentavos => $composableBuilder(
+    column: $table.valorPagoCentavos,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get modalidade => $composableBuilder(
+    column: $table.modalidade,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get validadeAte => $composableBuilder(
+    column: $table.validadeAte,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get limiteFaturamentoCentavos => $composableBuilder(
+    column: $table.limiteFaturamentoCentavos,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PlataformasTableFilterComposer get plataformaId {
+    final $$PlataformasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableFilterComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableFilterComposer get jornadaId {
+    final $$JornadasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableFilterComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PassesPlataformaTableOrderingComposer
+    extends Composer<_$AppDatabase, $PassesPlataformaTable> {
+  $$PassesPlataformaTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get valorPagoCentavos => $composableBuilder(
+    column: $table.valorPagoCentavos,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get modalidade => $composableBuilder(
+    column: $table.modalidade,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get validadeAte => $composableBuilder(
+    column: $table.validadeAte,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get limiteFaturamentoCentavos => $composableBuilder(
+    column: $table.limiteFaturamentoCentavos,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PlataformasTableOrderingComposer get plataformaId {
+    final $$PlataformasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableOrderingComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableOrderingComposer get jornadaId {
+    final $$JornadasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableOrderingComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PassesPlataformaTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PassesPlataformaTable> {
+  $$PassesPlataformaTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dataHora =>
+      $composableBuilder(column: $table.dataHora, builder: (column) => column);
+
+  GeneratedColumn<int> get valorPagoCentavos => $composableBuilder(
+    column: $table.valorPagoCentavos,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get modalidade => $composableBuilder(
+    column: $table.modalidade,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get validadeAte => $composableBuilder(
+    column: $table.validadeAte,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get limiteFaturamentoCentavos => $composableBuilder(
+    column: $table.limiteFaturamentoCentavos,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => column,
+  );
+
+  $$PlataformasTableAnnotationComposer get plataformaId {
+    final $$PlataformasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$JornadasTableAnnotationComposer get jornadaId {
+    final $$JornadasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.jornadaId,
+      referencedTable: $db.jornadas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$JornadasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PassesPlataformaTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PassesPlataformaTable,
+          PassesPlataformaData,
+          $$PassesPlataformaTableFilterComposer,
+          $$PassesPlataformaTableOrderingComposer,
+          $$PassesPlataformaTableAnnotationComposer,
+          $$PassesPlataformaTableCreateCompanionBuilder,
+          $$PassesPlataformaTableUpdateCompanionBuilder,
+          (PassesPlataformaData, $$PassesPlataformaTableReferences),
+          PassesPlataformaData,
+          PrefetchHooks Function({bool plataformaId, bool jornadaId})
+        > {
+  $$PassesPlataformaTableTableManager(
+    _$AppDatabase db,
+    $PassesPlataformaTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PassesPlataformaTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PassesPlataformaTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PassesPlataformaTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> plataformaId = const Value.absent(),
+                Value<int?> jornadaId = const Value.absent(),
+                Value<DateTime> dataHora = const Value.absent(),
+                Value<int> valorPagoCentavos = const Value.absent(),
+                Value<String?> modalidade = const Value.absent(),
+                Value<DateTime?> validadeAte = const Value.absent(),
+                Value<int?> limiteFaturamentoCentavos = const Value.absent(),
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+              }) => PassesPlataformaCompanion(
+                id: id,
+                plataformaId: plataformaId,
+                jornadaId: jornadaId,
+                dataHora: dataHora,
+                valorPagoCentavos: valorPagoCentavos,
+                modalidade: modalidade,
+                validadeAte: validadeAte,
+                limiteFaturamentoCentavos: limiteFaturamentoCentavos,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int plataformaId,
+                Value<int?> jornadaId = const Value.absent(),
+                required DateTime dataHora,
+                required int valorPagoCentavos,
+                Value<String?> modalidade = const Value.absent(),
+                Value<DateTime?> validadeAte = const Value.absent(),
+                Value<int?> limiteFaturamentoCentavos = const Value.absent(),
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+              }) => PassesPlataformaCompanion.insert(
+                id: id,
+                plataformaId: plataformaId,
+                jornadaId: jornadaId,
+                dataHora: dataHora,
+                valorPagoCentavos: valorPagoCentavos,
+                modalidade: modalidade,
+                validadeAte: validadeAte,
+                limiteFaturamentoCentavos: limiteFaturamentoCentavos,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PassesPlataformaTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({plataformaId = false, jornadaId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (plataformaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.plataformaId,
+                                referencedTable:
+                                    $$PassesPlataformaTableReferences
+                                        ._plataformaIdTable(db),
+                                referencedColumn:
+                                    $$PassesPlataformaTableReferences
+                                        ._plataformaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (jornadaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.jornadaId,
+                                referencedTable:
+                                    $$PassesPlataformaTableReferences
+                                        ._jornadaIdTable(db),
+                                referencedColumn:
+                                    $$PassesPlataformaTableReferences
+                                        ._jornadaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PassesPlataformaTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PassesPlataformaTable,
+      PassesPlataformaData,
+      $$PassesPlataformaTableFilterComposer,
+      $$PassesPlataformaTableOrderingComposer,
+      $$PassesPlataformaTableAnnotationComposer,
+      $$PassesPlataformaTableCreateCompanionBuilder,
+      $$PassesPlataformaTableUpdateCompanionBuilder,
+      (PassesPlataformaData, $$PassesPlataformaTableReferences),
+      PassesPlataformaData,
+      PrefetchHooks Function({bool plataformaId, bool jornadaId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -11039,4 +12406,6 @@ class $AppDatabaseManager {
       );
   $$AbastecimentosTableTableManager get abastecimentos =>
       $$AbastecimentosTableTableManager(_db, _db.abastecimentos);
+  $$PassesPlataformaTableTableManager get passesPlataforma =>
+      $$PassesPlataformaTableTableManager(_db, _db.passesPlataforma);
 }

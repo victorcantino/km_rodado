@@ -208,6 +208,28 @@ transições de Jornada e Pausa. Nenhum reset é aplicado a esses fatos.
 
 ---
 
+# 5.8 Passe de Plataforma
+
+```
+PASSE_PLATAFORMA
+---------
+id
+plataforma_id
+jornada_id (opcional)
+data_hora
+valor_pago_centavos
+modalidade (opcional)
+validade_ate (opcional)
+limite_faturamento_centavos (opcional)
+observacao (opcional)
+data_criacao
+```
+
+Integra o schema 7. É custo factual separado do faturamento e não persiste
+efeito inferido sobre snapshots.
+
+---
+
 # 6. Evento Financeiro
 
 Representa movimentações financeiras.

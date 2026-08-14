@@ -9,6 +9,7 @@ import '../../../../core/database/daos/abastecimento_dao.dart';
 import '../../../../core/database/daos/ganho_individual_dao.dart';
 import '../../../../core/database/daos/leitura_ganhos_dao.dart';
 import '../../../../core/database/daos/pausa_dao.dart';
+import '../../../../core/database/daos/passe_plataforma_dao.dart';
 import '../../../../core/database/seeds/seed.dart';
 import '../../../../core/database/seeds/plataformas_seed.dart';
 import '../../../leitura_ganhos/data/leitura_ganhos_repository.dart';
@@ -29,6 +30,10 @@ import '../../../pausa/presentation/controllers/pausa_controller.dart';
 import '../../../pausa/presentation/pausa_formatters.dart';
 import '../../../pausa/presentation/widgets/odometro_pausa_dialog.dart';
 import '../../../pausa/presentation/widgets/editar_titulo_pausa_dialog.dart';
+import '../../../passe_plataforma/data/passe_plataforma_repository.dart';
+import '../../../passe_plataforma/data/passe_plataforma_service.dart';
+import '../../../passe_plataforma/presentation/controllers/passe_plataforma_controller.dart';
+import '../../../passe_plataforma/presentation/widgets/registrar_passe_dialog.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
 import '../../data/resumo_jornada.dart';
@@ -49,6 +54,7 @@ class _JornadaPageState extends State<JornadaPage> {
   PausaController? pausaController;
   GanhoIndividualController? ganhoIndividualController;
   AbastecimentoController? abastecimentoController;
+  PassePlataformaController? passePlataformaController;
   late final AppDatabase database;
   Timer? atualizadorDuracao;
 
@@ -83,11 +89,15 @@ class _JornadaPageState extends State<JornadaPage> {
     final ganhoIndividualRepository = GanhoIndividualRepository(
       GanhoIndividualDao(database),
     );
+    final passeRepository = PassePlataformaRepository(
+      PassePlataformaDao(database),
+    );
     final service = JornadaService(
       repository,
       pausaRepository,
       leituraGanhosRepository,
       ganhoIndividualRepository,
+      passeRepository,
     );
     final pausaService = PausaService(pausaRepository, repository);
     final leituraGanhosService = LeituraGanhosService(
@@ -109,6 +119,9 @@ class _JornadaPageState extends State<JornadaPage> {
     final novoAbastecimentoController = AbastecimentoController(
       AbastecimentoService(abastecimentoRepository, repository),
     );
+    final novoPasseController = PassePlataformaController(
+      PassePlataformaService(passeRepository, repository),
+    );
 
     setState(() {
       controller = novoController;
@@ -116,6 +129,7 @@ class _JornadaPageState extends State<JornadaPage> {
       pausaController = novoPausaController;
       ganhoIndividualController = novoGanhoIndividualController;
       abastecimentoController = novoAbastecimentoController;
+      passePlataformaController = novoPasseController;
     });
 
     await novoController.carregarJornadaAberta();
@@ -129,6 +143,41 @@ class _JornadaPageState extends State<JornadaPage> {
     await novoAbastecimentoController.carregar(
       novoController.jornadaAtual?.veiculoId ?? 1,
     );
+    await novoPasseController.carregar();
+  }
+
+  Future<void> _registrarPasse() async {
+    final passeController = passePlataformaController;
+    if (passeController == null || passeController.plataformas.isEmpty) return;
+    final resultado = await showDialog<RegistrarPasseResultado>(
+      context: context,
+      builder: (_) =>
+          RegistrarPasseDialog(plataformas: passeController.plataformas),
+    );
+    if (!mounted || resultado == null) return;
+    try {
+      await passeController.registrar(
+        plataformaId: resultado.plataformaId,
+        dataHora: resultado.dataHora,
+        valorPagoCentavos: resultado.valorPagoCentavos,
+        modalidade: resultado.modalidade,
+        validadeAte: resultado.validadeAte,
+        limiteFaturamentoCentavos: resultado.limiteFaturamentoCentavos,
+        observacao: resultado.observacao,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Passe registrado.')));
+    } catch (error, stackTrace) {
+      if (!mounted) return;
+      _apresentarErro(
+        operacao: 'registrar o passe',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível registrar o passe.',
+      );
+    }
   }
 
   Future<void> _registrarAbastecimento() async {
@@ -622,12 +671,14 @@ class _JornadaPageState extends State<JornadaPage> {
     final pausaController = this.pausaController;
     final ganhoIndividualController = this.ganhoIndividualController;
     final abastecimentoController = this.abastecimentoController;
+    final passePlataformaController = this.passePlataformaController;
 
     if (controller == null ||
         leituraGanhosController == null ||
         pausaController == null ||
         ganhoIndividualController == null ||
-        abastecimentoController == null) {
+        abastecimentoController == null ||
+        passePlataformaController == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
@@ -647,13 +698,15 @@ class _JornadaPageState extends State<JornadaPage> {
           leituraGanhosController,
           ganhoIndividualController,
           abastecimentoController,
+          passePlataformaController,
         ]),
         builder: (context, _) {
           if (controller.carregando ||
               pausaController.carregando ||
               leituraGanhosController.carregando ||
               ganhoIndividualController.carregando ||
-              abastecimentoController.carregando) {
+              abastecimentoController.carregando ||
+              passePlataformaController.carregando) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -701,6 +754,14 @@ class _JornadaPageState extends State<JornadaPage> {
                           ? ganhoIndividualController.plataformas.single.nome
                           : 'Ganho individual',
                     ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                if (passePlataformaController.plataformas.isNotEmpty) ...[
+                  OutlinedButton.icon(
+                    onPressed: _registrarPasse,
+                    icon: const Icon(Icons.confirmation_number_outlined),
+                    label: const Text('Passe'),
                   ),
                   const SizedBox(height: 8),
                 ],
@@ -850,6 +911,7 @@ class _JornadaPageState extends State<JornadaPage> {
     pausaController?.dispose();
     ganhoIndividualController?.dispose();
     abastecimentoController?.dispose();
+    passePlataformaController?.dispose();
     controller?.dispose();
     database.close();
     super.dispose();
@@ -927,6 +989,22 @@ class _ResumoJornadaConcluida extends StatelessWidget {
                   ),
           ),
         const SizedBox(height: 12),
+        if (resumo.passes.isNotEmpty) ...[
+          Text(
+            'Passes registrados',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          for (final item in resumo.passes)
+            Text(
+              '${item.plataforma.nome}: '
+              '${moeda.format(item.passe.valorPagoCentavos / 100)}',
+            ),
+          Text(
+            'Custo total de passes: '
+            '${moeda.format(resumo.custoPassesCentavos / 100)}',
+          ),
+          const SizedBox(height: 12),
+        ],
         _SecaoResumo(
           titulo: 'Tempo',
           linhas: [

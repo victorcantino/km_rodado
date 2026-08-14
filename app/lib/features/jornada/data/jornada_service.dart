@@ -3,9 +3,11 @@ import '../../../core/constants/enums/status_jornada.dart';
 import '../../../core/constants/enums/tipo_leitura_ganhos.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/database/daos/leitura_ganhos_dao.dart';
+import '../../../core/database/daos/passe_plataforma_dao.dart';
 import '../../leitura_ganhos/data/leitura_ganhos_repository.dart';
 import '../../ganho_individual/data/ganho_individual_repository.dart';
 import '../../pausa/data/pausa_repository.dart';
+import '../../passe_plataforma/data/passe_plataforma_repository.dart';
 
 import 'jornada_repository.dart';
 import 'resumo_jornada.dart';
@@ -15,12 +17,14 @@ class JornadaService {
   final PausaRepository _pausaRepository;
   final LeituraGanhosRepository? _leituraGanhosRepository;
   final GanhoIndividualRepository? _ganhoIndividualRepository;
+  final PassePlataformaRepository? _passePlataformaRepository;
 
   JornadaService(
     this._repository,
     this._pausaRepository, [
     this._leituraGanhosRepository,
     this._ganhoIndividualRepository,
+    this._passePlataformaRepository,
   ]);
 
   Future<Jornada?> jornadaAberta() {
@@ -47,6 +51,9 @@ class JornadaService {
     );
     final totaisIndividuais =
         await _ganhoIndividualRepository?.totalizarPorJornada(jornada.id) ??
+        const [];
+    final passes =
+        await _passePlataformaRepository?.listarPorJornada(jornada.id) ??
         const [];
     final duracaoTotal = _duracaoNaoNegativa(
       jornada.dataHoraFim!.difference(jornada.dataHoraInicio),
@@ -83,7 +90,7 @@ class JornadaService {
       quilometrosEmPausa: quilometrosEmPausa,
       quilometrosAtivos: quilometrosAtivos,
       resultadosPlataformas: [
-        ..._calcularResultadosPlataformas(snapshots),
+        ..._calcularResultadosPlataformas(snapshots, passes),
         for (final total in totaisIndividuais)
           ResultadoPlataformaJornada(
             plataformaId: total.plataforma.id,
@@ -92,11 +99,13 @@ class JornadaService {
             quantidadeViagens: total.quantidadeViagens,
           ),
       ]..sort((a, b) => a.nome.compareTo(b.nome)),
+      passes: passes,
     );
   }
 
   List<ResultadoPlataformaJornada> _calcularResultadosPlataformas(
     List<SnapshotPlataforma> snapshots,
+    List<PasseComPlataforma> passes,
   ) {
     final leituras = <int, LeiturasGanho>{};
     for (final snapshot in snapshots) {
@@ -116,6 +125,16 @@ class JornadaService {
     if (indiceInicial < 0 || indiceFinal < indiceInicial) return const [];
 
     final sequencia = ordenadas.sublist(indiceInicial, indiceFinal + 1);
+    final inicio = sequencia.first.dataHora;
+    final fim = sequencia.last.dataHora;
+    final plataformasComPasse = passes
+        .where(
+          (item) =>
+              !item.passe.dataHora.isBefore(inicio) &&
+              !item.passe.dataHora.isAfter(fim),
+        )
+        .map<int>((item) => item.passe.plataformaId)
+        .toSet();
     final idsSequencia = sequencia.map((leitura) => leitura.id).toSet();
     final itensPorLeitura = <int, Map<int, SnapshotPlataforma>>{};
     for (final snapshot in snapshots) {
@@ -129,18 +148,24 @@ class JornadaService {
 
     return [
       for (final inicial in itensIniciais.values)
-        _calcularResultadoPlataforma(inicial, sequencia, itensPorLeitura),
+        _calcularResultadoPlataforma(
+          inicial,
+          sequencia,
+          itensPorLeitura,
+          possuiPasse: plataformasComPasse.contains(inicial.plataforma.id),
+        ),
     ]..sort((a, b) => a.nome.compareTo(b.nome));
   }
 
   ResultadoPlataformaJornada _calcularResultadoPlataforma(
     SnapshotPlataforma inicial,
     List<LeiturasGanho> sequencia,
-    Map<int, Map<int, SnapshotPlataforma>> itensPorLeitura,
-  ) {
+    Map<int, Map<int, SnapshotPlataforma>> itensPorLeitura, {
+    required bool possuiPasse,
+  }) {
     var valorAnterior = inicial.item.valorAcumuladoCentavos;
     var viagensAnteriores = inicial.item.quantidadeViagensAcumulada;
-    var calculavel = true;
+    var calculavel = !possuiPasse;
     SnapshotPlataforma? finalSnapshot;
 
     for (final leitura in sequencia) {
