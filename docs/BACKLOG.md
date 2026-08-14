@@ -51,6 +51,10 @@
 ## Plataforma e análises
 
 - Evoluir reconciliação de resets, Passes e outras movimentações conhecidas.
+- Formalizar Passe com mecanismo `tempo | faturamento` e campos coerentes de
+  duração/validade ou limite, mantendo preços e ofertas como dados variáveis.
+- Avaliar competência/origem econômica de bônus creditados em dia diferente
+  daquele em que foram conquistados, sem modelar missão/meta antecipadamente.
 - Resultado operacional separando faturamento, bônus, passes e custos, sem
   alterar ticket médio das viagens.
 - Eficiência diária, relatórios e timeline por projeção de tabelas especializadas.
