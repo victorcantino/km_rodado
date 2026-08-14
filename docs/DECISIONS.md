@@ -4,18 +4,20 @@ Decisão: utilizar Drift com SQLite.
 
 Motivo: funcionamento offline, consultas tipadas e migrações.
 
-## ADR-002 — Estado inicial da aplicação
+## ADR-002 — Estado da interface
 
-Decisão: utilizar ChangeNotifier e AnimatedBuilder na primeira feature.
+Decisão: manter `ChangeNotifier` e `AnimatedBuilder` enquanto atenderem aos
+fluxos atuais.
 
-Motivo: aprender o funcionamento nativo do Flutter antes de
-introduzir bibliotecas de gerenciamento de estado.
+Motivo: a solução nativa continua suficiente; adicionar outra biblioteca sem
+necessidade concreta aumentaria a arquitetura.
 
 ## ADR-003 — Injeção de dependências
 
-Decisão: realizar injeção manual durante a implementação da Jornada.
+Decisão: manter injeção manual nas features atuais.
 
-Revisar após a conclusão da primeira feature.
+Motivo: a composição está concentrada e explícita na `JornadaPage`; um
+container de dependências ainda não resolveria um problema concreto.
 
 ## ADR-004 — Leituras de ganhos normalizadas
 

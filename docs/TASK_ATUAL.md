@@ -1,22 +1,12 @@
-# Tarefa atual — Passes de Plataforma
+# Tarefa atual — Sincronização documental
 
-## Objetivo
+## Estado
 
-Registrar passes como custos operacionais factuais das plataformas e integrá-los
-com segurança ao Resumo da Jornada.
+Concluída a auditoria dos documentos contra o código e o schema 7 da `main`.
+README, arquitetura, modelo, regras, decisões, estado e backlog foram
+sincronizados; documentos vazios foram removidos e o template de PR foi criado.
 
-## Escopo
+## Próxima tarefa de produto
 
-- valor em centavos, data operacional e data de criação separadas;
-- Plataforma obrigatória e Jornada automática/opcional;
-- modalidade, validade, limite de faturamento e observação opcionais;
-- ação rápida durante Jornada aberta;
-- custo separado do faturamento e conferência segura dos snapshots;
-- schema 7 preservando o schema 6 de Abastecimentos.
-
-## Fora do escopo
-
-- bônus e promoções;
-- regras específicas por nome de plataforma;
-- catálogo das quatro modalidades;
-- edição histórica completa e dashboard geral.
+Ainda não iniciada. A próxima prioridade será escolhida a partir do uso
+operacional e do `BACKLOG.md`.

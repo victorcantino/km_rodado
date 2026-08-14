@@ -29,6 +29,10 @@ de negócio e arquitetura.
 - Preservar regras de negócio já documentadas.
 - Usar nomes em português no domínio do negócio.
 - Explicar decisões importantes em linguagem acessível.
+- Alterações materiais de feature devem atualizar os documentos afetados.
+- Revisar o README quando mudar significativamente o conjunto público de
+  funcionalidades.
+- Nunca declarar documentação atualizada sem confrontá-la com código e schema.
 
 ## Flutter e Dart
 
@@ -36,7 +40,7 @@ de negócio e arquitetura.
 - Executar flutter analyze antes de concluir.
 - Executar testes relacionados quando existirem.
 - Quando tabelas ou DAOs do Drift mudarem, executar:
-  dart run build_runner build --delete-conflicting-outputs
+  dart run build_runner build
 
 ## Git
 
@@ -44,6 +48,9 @@ de negócio e arquitetura.
 - Não fazer commit sem solicitação do usuário.
 - Antes do commit, apresentar resumo dos arquivos alterados.
 - Não descartar alterações existentes do usuário.
+- Pull requests devem ter título e descrição.
+- Quando houver mudança de banco, a PR deve registrar o schema anterior, o novo
+  schema e a estratégia de migração.
 
 ## Definição de concluído
 

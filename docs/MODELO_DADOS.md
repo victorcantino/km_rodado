@@ -1,677 +1,110 @@
-# Modelo de Dados — KM Rodado
+# Modelo de dados — KM Rodado
 
-## 1. Usuário
+O schema Drift atual é **7**. Esta seção separa o que existe no SQLite do que é
+derivado ou apenas planejado.
 
-Representa o usuário do aplicativo.
+## Tabelas persistidas
 
-```
-USUARIO
----------
-id
-nome
-email
-senha
-data_criacao
-```
+### Usuarios
 
----
+`id`, `nome`, `email?`, `senha?`, `dataCriacao`, `ativo`.
 
-# 2. Veículo
+### Veiculos
 
-Representa o veículo utilizado na operação.
+`id`, `usuarioId`, `marca`, `modelo`, `ano`, `placa?`, `dataCompra?`,
+`quilometragemCompra?`, `valorCompra?`, `valorVendaEstimado?`,
+`capacidadeTanque`, `ativo`, `observacoes?`.
 
-```
-VEICULO
----------
-id
-usuario_id
+O vínculo com usuário ainda não possui FK Drift. Alguns campos legados usam
+`REAL`; features novas monetárias usam inteiros.
 
-marca
-modelo
-ano
-placa
+### Configuracoes
 
-data_compra
-quilometragem_compra
-valor_compra
+`id`, `usuarioId`, `custoKmBase`, `metaKmDia`, `capacidadeTanque`,
+`cidadePadrao?`. Integra o schema, mas ainda não possui fluxo de interface.
 
-valor_venda_estimado
+### Jornadas
 
-capacidade_tanque
+`id`, `usuarioId` → Usuarios, `veiculoId` → Veiculos, `dataHoraInicio`,
+`dataHoraFim?`, `odometroInicio`, `odometroFim?`, `cidadeOrigem`,
+`cidadeDestino?`, `status`, `odometroAlterado`, `observacoes?`, `dataCriacao`,
+`dataAtualizacao`, `quilometrosPercorridos?`.
 
-ativo
-observacoes
-```
+### Pausas
 
----
+`id`, `jornadaId` → Jornadas, `inicio`, `fim?`, `odometroInicio?`,
+`odometroFim?`, `titulo?`, `observacao?`, `dataCriacao`.
 
-# 3. Jornada
+Odômetros são obrigatórios no fluxo atual, mas nullable no schema para
+preservar dados históricos anteriores ao schema 3.
 
-Representa o período de trabalho do motorista.
+### Plataformas
 
-É a entidade principal da operação.
+`id`, `nome`, `tipoRegistroGanhos`, `icone?`, `cor?`, `ativa`, `ordem`,
+`dataCriacao`. O tipo é `acumulado` ou `individual`.
 
-```
-JORNADA
----------
-id
-usuario_id
-veiculo_id
+### LeiturasGanhos
 
-data_inicio
-hora_inicio
+`id`, `jornadaId` → Jornadas, `pausaId?` → Pausas, `dataHora`, `tipo`,
+`dataCriacao`. Tipos: `inicial`, `parcial` e `finalDaJornada`.
 
-data_fim
-hora_fim
+### LeiturasGanhoPlataforma
 
-odometro_inicio
-odometro_fim
+`id`, `leituraGanhosId` → LeiturasGanhos, `plataformaId` → Plataformas,
+`valorAcumuladoCentavos`, `quantidadeViagensAcumulada`.
 
-cidade_origem
-cidade_destino
+O par leitura/plataforma é único; valor e quantidade não podem ser negativos.
 
-status
+### LancamentosGanhoIndividual
 
-observacoes
-```
+`id`, `plataformaId` → Plataformas, `jornadaId?` → Jornadas,
+`quantidadeViagens`, `valorTotalCentavos`, `observacao?`, `dataCriacao`.
 
-Status:
+Quantidade é pelo menos 1. Um lançamento pode agrupar viagens sem inferir
+valores unitários.
 
-```
-ABERTA
-PAUSADA
-FINALIZADA
-```
+### Abastecimentos
 
-Uma jornada pode conter:
+`id`, `veiculoId` → Veiculos, `jornadaId?` → Jornadas, `dataHora`, `odometro`,
+`tipoCombustivel`, `volumeMililitros`, `valorTotalPagoCentavos`,
+`precoBombaMilesimosRealPorLitro?`, `tanqueCheio`, `cidade?`, `nomePosto?`,
+`bandeiraPosto?`, `observacao?`, `dataCriacao`.
 
-* pausas
-* registros de ganhos
-* eventos
-* informações automáticas
-* alertas
+Combustíveis atuais: gasolina, etanol e outro. `dataHora` é o instante
+operacional; `dataCriacao`, o instante técnico do cadastro.
 
----
+### PassesPlataforma
 
-# 4. Pausa da Jornada
+`id`, `plataformaId` → Plataformas, `jornadaId?` → Jornadas, `dataHora`,
+`valorPagoCentavos`, `modalidade?`, `validadeAte?`,
+`limiteFaturamentoCentavos?`, `observacao?`, `dataCriacao`.
 
-Pausa a atividade do motorista como um todo, não uma plataforma específica.
+O valor pago deve ser positivo. O efeito sobre snapshots não é persistido nem
+inferido.
 
-```
-PAUSA
----------
-id
+## Relações principais
 
-jornada_id
-
-inicio
-fim
-
-odometro_inicio
-odometro_fim
-
-titulo
-
-observacao
-data_criacao
+```text
+Usuario ──< Jornada >── Veiculo
+Jornada ──< Pausa
+Jornada ──< LeituraGanhos ──< LeituraGanhoPlataforma >── Plataforma
+Jornada? ──< LancamentoGanhoIndividual >── Plataforma
+Jornada? ──< Abastecimento >── Veiculo
+Jornada? ──< PassePlataforma >── Plataforma
 ```
 
-`fim` e `titulo` são opcionais. Sem título, a interface pode apresentar
-`Pausa 1`, `Pausa 2` etc. A duração é derivada e não é persistida.
-
----
-
-# 5. Leituras de ganhos
-
-Uma leitura representa uma única observação dos acumulados exibidos pelas
-plataformas naquele momento. Ela exige Jornada e pode estar associada a uma
-Pausa.
-
-```
-LEITURA_GANHOS
---------------
-id
-jornada_id
-pausa_id (opcional)
-data_hora
-tipo
-data_criacao
-```
-
-Tipos: `INICIAL`, `PARCIAL` e `FINAL_DA_JORNADA`. A leitura inicial estabelece
-a base, a parcial registra o estado durante a Jornada e a final antecede seu
-fechamento.
-
-Cada plataforma observada é um item da leitura:
-
-```
-LEITURA_GANHO_PLATAFORMA
-------------------------
-id
-leitura_ganhos_id
-plataforma_id
-valor_acumulado_centavos
-quantidade_viagens_acumulada
-```
-
-Dinheiro é persistido em centavos. Valores e viagens do período são derivados
-da diferença entre leituras. Uma plataforma acumulada pode reaparecer sem
-mudança em outra leitura, mas somente uma vez dentro da mesma leitura.
-
-## 5.1 Plataforma e forma de registro
-
-```
-PLATAFORMA
-----------
-id
-nome
-tipo_registro_ganhos
-icone
-cor
-ativa
-ordem
-data_criacao
-```
-
-`tipo_registro_ganhos` pode ser `ACUMULADO` ou `INDIVIDUAL`. Uber, 99 e
-inDrive usam o mecanismo acumulado. Particular continua sendo plataforma e
-fonte de ganho, mas usa o mecanismo individual. Nenhuma regra depende do nome
-da plataforma.
-
-Plataformas individuais continuarão aparecendo com as demais em dashboards,
-pausas, fechamento e relatórios. A diferença é somente a fonte dos totais.
-
-## 5.2 Lançamento individual
-
-```
-LANCAMENTO_GANHO_INDIVIDUAL
----------------------------
-id
-plataforma_id
-jornada_id (opcional)
-quantidade_viagens
-valor_total_centavos
-observacao (opcional)
-data_criacao
-```
-
-Não haverá `data_hora` separado no fluxo normal: `data_criacao` será o momento
-operacional do lançamento. Um lançamento poderá representar uma ou várias
-viagens, sem inferir ou persistir valores individuais. Durante uma Jornada, os
-totais serão derivados por `SUM(valor_total_centavos)` e
-`SUM(quantidade_viagens)` para a plataforma e a Jornada correspondentes.
-
-A tabela integra o schema 4. `jornada_id` permanece opcional no modelo para
-lançamentos legítimos fora do trabalho, embora a primeira interface exija uma
-Jornada aberta. Não existe odômetro por viagem: odômetros pertencem às
-transições de Jornada e Pausa. Nenhum reset é aplicado a esses fatos.
-
----
-
-# 5.8 Passe de Plataforma
-
-```
-PASSE_PLATAFORMA
----------
-id
-plataforma_id
-jornada_id (opcional)
-data_hora
-valor_pago_centavos
-modalidade (opcional)
-validade_ate (opcional)
-limite_faturamento_centavos (opcional)
-observacao (opcional)
-data_criacao
-```
-
-Integra o schema 7. É custo factual separado do faturamento e não persiste
-efeito inferido sobre snapshots.
-
----
-
-# 6. Evento Financeiro
-
-Representa movimentações financeiras.
-
-Exemplos:
-
-* compra de passe Uber
-* compra de passe 99
-* crédito inDrive
-* pedágio
-* estacionamento
-* multa
-* outros custos
-
-```
-EVENTO_FINANCEIRO
----------
-id
-
-usuario_id
-veiculo_id
-
-jornada_id (opcional)
-
-data_hora
-
-categoria
-
-plataforma
-
-tipo_movimento
-
-valor
-
-descricao
-```
-
-Categorias:
-
-```
-PASSE_UBER
-PASSE_99
-CREDITO_INDRIVE
-
-ABASTECIMENTO
-MANUTENCAO
-PEDAGIO
-ESTACIONAMENTO
-MULTA
-OUTROS
-```
-
-Tipo:
-
-```
-ENTRADA
-SAIDA
-CREDITO
-DEBITO
-```
-
----
-
-# 7. Carteira Plataforma
-
-Controla créditos, passes e saldos das plataformas.
-
-```
-CARTEIRA_PLATAFORMA
----------
-id
-
-usuario_id
-
-plataforma
-
-tipo
-
-saldo_atual
-
-limite_contratado
-
-data_inicio
-
-data_fim
-```
-
-Exemplos:
-
-Uber:
-
-```
-Passe:
-R$30 pago
-
-Limite:
-R$125 faturamento
-```
-
-99:
-
-```
-Passe:
--R$16,99
-```
-
-inDrive:
-
-```
-Crédito:
-R$50
-```
-
----
-
-# 8. Abastecimento
-
-Registro factual de combustível. Integra o schema 6. `data_hora` representa o
-momento do abastecimento; `data_criacao`, o momento técnico do lançamento.
-
-```
-ABASTECIMENTO
----------
-id
-
-veiculo_id
-jornada_id (opcional)
-
-data_hora
-data_criacao
-
-odometro
-
-tipo_combustivel
-
-volume_mililitros
-
-preco_bomba_milesimos_real_por_litro (opcional)
-
-valor_total_pago_centavos
-
-tanque_cheio
-
-cidade (opcional)
-nome_posto (opcional)
-bandeira_posto (opcional)
-observacao (opcional)
-```
-
-Combustível:
-
-```
-ETANOL
-GASOLINA
-OUTRO
-```
-
-Preço efetivo, consumo, autonomia e custo por quilômetro são derivados e não
-são persistidos. Volume, dinheiro e preço por litro usam inteiros para evitar
-imprecisão binária.
-
----
-
-# 9. Manutenção
-
-Registro de manutenções realizadas.
-
-```
-MANUTENCAO
----------
-id
-
-veiculo_id
-jornada_id (opcional)
-
-data
-
-odometro
-
-categoria
-
-item
-
-descricao
-
-valor
-
-vida_util_km
-
-proxima_km
-```
-
-Exemplos:
-
-* troca de óleo
-* pneus
-* freios
-* filtros
-* bateria
-
----
-
-# 10. Item de Manutenção
-
-Controle preventivo dos componentes.
-
-```
-ITEM_MANUTENCAO
----------
-id
-
-veiculo_id
-
-nome
-
-ultima_troca_km
-
-vida_prevista_km
-
-proxima_troca_km
-
-observacoes
-```
-
-Exemplos:
-
-```
-PNEU
-OLEO
-FILTRO
-PASTILHA
-DISCO
-BATERIA
-PALHETA
-LAMPADA
-```
-
----
-
-# 11. Registro de Contexto
-
-Informações coletadas automaticamente.
-
-Exemplos:
-
-* temperatura
-* clima
-* localização
-* Bluetooth conectado
-* veículo em movimento
-
-```
-CONTEXTO
----------
-id
-
-jornada_id
-
-data_hora
-
-tipo
-
-dados
-```
-
-Tipos:
-
-```
-CLIMA
-LOCALIZACAO
-MOVIMENTO
-BLUETOOTH
-SENSOR
-```
-
-Campo dados:
-
-Formato JSON.
-
-Exemplo:
-
-```
-{
- temperatura:18,
- condicao:"Nublado",
- umidade:80
-}
-```
-
----
-
-# 12. Alerta
-
-Sistema de notificações.
-
-Exemplos:
-
-* manutenção próxima
-* dados incompletos
-* saldo negativo
-* erro de registro
-
-```
-ALERTA
----------
-id
-
-usuario_id
-
-veiculo_id
-
-jornada_id (opcional)
-
-tipo
-
-nivel
-
-titulo
-
-mensagem
-
-data_criacao
-
-resolvido
-```
-
-Tipos:
-
-```
-MANUTENCAO
-FINANCEIRO
-OPERACIONAL
-DADOS_INCOMPLETOS
-```
-
-Níveis:
-
-```
-INFO
-ATENCAO
-CRITICO
-```
-
----
-
-# 13. Configuração
-
-Preferências e parâmetros do usuário.
-
-```
-CONFIGURACAO
----------
-id
-
-usuario_id
-
-custo_km_base
-
-meta_km_dia
-
-capacidade_tanque
-
-cidade_padrao
-
-```
-
----
-
-# Relacionamentos
-
-```
-USUARIO
- |
- |
- +---- VEICULO
-          |
-          |
-          +---- JORNADA
-          |        |
-          |        +---- PAUSA
-          |        |
-          |        +---- LEITURA_GANHOS
-          |        |        |
-          |        |        +---- LEITURA_GANHO_PLATAFORMA
-          |        |
-          |        +---- CONTEXTO
-          |        |
-          |        +---- ALERTA
-          |
-          +---- ABASTECIMENTO
-          |
-          +---- MANUTENCAO
-          |
-          +---- ITEM_MANUTENCAO
-          |
-          +---- EVENTO_FINANCEIRO
-                    |
-                    +---- CARTEIRA_PLATAFORMA
-```
-
----
-
-# Conceito principal
-
-O KM Rodado é organizado em três áreas:
-
-## Operação
-
-Responsável pela jornada:
-
-* quilômetros
-* pausas
-* leituras de ganhos acumulados
-* produtividade
-
-## Financeiro
-
-Responsável pelo dinheiro:
-
-* receitas
-* custos
-* passes
-* créditos
-* despesas
-
-## Inteligência
-
-Responsável pelas análises:
-
-* custo por km
-* lucro por km
-* alertas
-* previsões
-* indicadores
-
-```
-JORNADA
-   |
-   |
-OPERAÇÃO
-   |
-   +---- FINANCEIRO
-   |
-   +---- INTELIGÊNCIA
-```
+## Dados derivados, não persistidos
+
+- duração da Jornada, Pausas e tempo ativo;
+- quilômetros ativos e em Pausa;
+- diferenças de receita/viagens entre snapshots;
+- totais de ganhos individuais;
+- ticket médio, receita por hora e receita por quilômetro ativo;
+- custo total de passes;
+- preço efetivo do combustível.
+
+## Planejado, sem tabela atual
+
+Manutenção, bônus/promoções, evento financeiro genérico, carteira de
+plataforma, alertas, clima, localização e sincronização não fazem parte do
+schema 7. Suas decisões e ideias permanecem no backlog e nas regras futuras.

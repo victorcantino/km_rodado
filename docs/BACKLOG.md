@@ -1,87 +1,59 @@
-# Agora
+# Backlog
 
-# Depois
+## Candidatas à próxima prioridade
 
-- Leitura inicial de ganhos ao abrir a Jornada
-- Leitura final de ganhos antes de fechar a Jornada
-- Plataformas
-- Criar fluxo seguro de edição/exclusão e correção histórica de lançamentos
-  individuais, sem improvisar perda de rastreabilidade
-- Manutenções e abastecimentos com Jornada opcional
-- Eficiência diária
-- Obter cidade de origem pela localização do aparelho, mantendo edição manual
-- Fazer a melhoria visual completa da JornadaPage após concluir o fluxo funcional
-- Criar fluxo de correção de odômetro com motivo obrigatório
+- Correção histórica segura de Pausas.
+- Bônus/promoções e reconciliação explícita de snapshots.
+- Formalização das modalidades de Passe e correção histórica de Passes.
 
-# Futuro
+## Operação e dados históricos
 
-- Evoluir Abastecimentos com edição/exclusão histórica segura, cadastro de
-  postos, integração de localização e filtros/histórico completo
-- Calcular consumo somente após ao menos três ciclos válidos delimitados por
-  tanque cheio, tratando abastecimentos parciais sem inventar autonomia
-- Usar capacidade real/configurável do tanque antes de oferecer autonomia,
-  custo por quilômetro ou previsão de próximo abastecimento; manter esses
-  indicadores derivados
-- Priorizar depois de Abastecimentos o registro de passes e demais custos
-  operacionais necessários ao uso real
+- Fluxo auditável de edição/exclusão e correção histórica de Jornadas, Pausas,
+  ganhos, Abastecimentos e Passes.
+- Correção histórica de Pausas e odômetros com justificativa.
+- Categorias e sugestões editáveis de Pausa, sem substituir o título livre.
+- Importar mais de um ano de dados do AppSheet, preservando originais e
+  rastreabilidade.
+- GPS para sugerir cidade, mantendo edição manual.
 
-- Revisar autofocus e redução de toques nos demais inputs operacionais após
-  acumular experiência de uso em campo
+## Experiência de uso
 
-- Planejar migração histórica de mais de um ano de dados do AppSheet quando o
-  modelo de destino estiver estável, preservando Jornadas, ganhos, odômetros,
-  manutenções, custos e os dados originais para análises históricas
-- Evoluir a interface funcional atual para uma experiência móvel e operacional
-  mais rica, sem antecipar o redesign durante a estabilização dos fluxos
+- Evolução visual móvel/operacional após estabilizar os fluxos.
+- Revisar autofocus e redução de toques nos demais inputs após uso em campo.
 
-- Modelar custos futuros distinguindo custos diretamente associados a uma
-  Jornada, custos ocorridos no dia sem necessariamente pertencer à Jornada e
-  custos independentes de Jornada. Estacionamento e pedágio durante o trabalho
-  podem pertencer à Jornada; manutenção pode ter `jornadaId` quando ocorrer
-  durante o trabalho ou deixá-lo ausente fora dele; IPVA, seguro, licenciamento
-  e financiamento permanecem custos ou obrigações independentes da Jornada
+## Abastecimento
 
-- Permitir que o futuro resumo apresente separadamente, quando houver dados,
-  receita bruta, custos diretamente atribuíveis à Jornada, resultado
-  operacional da Jornada e custos gerais do dia, sem atribuir artificialmente
-  estes últimos à Jornada
+- Histórico completo por posto, bandeira e cidade; preço médio e promoções.
+- Capacidade real/configurável do tanque por veículo.
+- Consumo por pelo menos três ciclos válidos de tanque cheio, tratando parciais.
+- Autonomia, custo/km e previsão do próximo abastecimento como derivados.
 
-- Formalizar as quatro modalidades de passe e suas regras sem inferência pelo
-  nome da plataforma; implementar edição histórica segura dos passes
+## Manutenção e veículo
 
-- Modelar bônus e promoções com plataforma, data/hora e valor como créditos que
-  podem ocorrer ou ser creditados em momentos diferentes, integrando-os à
-  futura reconciliação quando relacionados ao período de uma Jornada
+- Manutenção associável ou não a Jornada.
+- Componentes por posição/lado e mapa visual do veículo (pneus, faróis etc.).
+- Alertas por data e/ou odômetro.
 
-- Conferir regressões e saltos de snapshots considerando resets, passes, bônus
-  e outras movimentações conhecidas, sem concluir automaticamente que a
-  variação seja erro ou reset
+## Custos e obrigações
 
-- Manter o resultado operacional futuro com faturamento, bônus, passes e custos
-  da plataforma apresentados de forma separável, sem alterar o ticket médio já
-  calculado somente sobre o faturamento atribuível às viagens
+- Separar custos diretamente atribuíveis à Jornada, custos gerais do dia e
+  custos independentes.
+- Resumo futuro: receita bruta, custos da Jornada, resultado operacional e
+  custos gerais do dia sem atribuição artificial.
+- Pedágio e estacionamento pré-pagos: separar recarga de consumo efetivo.
+- Multas com valor original, desconto, pago, vencimento e status.
+- IPVA por exercício, à vista/parcelado e regras configuráveis.
+- Licenciamento, seguro e financiamento com parcelas e vencimentos.
 
-- Manutenção com mapa visual do veículo para selecionar regiões e lados, como
-  faróis e pneus dianteiros/traseiros, reduzindo digitação manual
+## Plataforma e análises
 
-- Modelar recarga e consumo efetivo de crédito de pedágio separadamente, sem
-  dupla contabilização de custo; aplicar a mesma distinção a estacionamento
-  pré-pago
+- Bônus/promoções como créditos separados; podem ser creditados posteriormente.
+- Reconciliação de resets, passes, bônus e outras movimentações conhecidas.
+- Resultado operacional separando faturamento, bônus, passes e custos, sem
+  alterar ticket médio das viagens.
+- Eficiência diária, relatórios e timeline por projeção de tabelas especializadas.
 
-- Modelar multas com valor original, desconto eventual, valor pago, vencimento
-  e status, sem percentual universal de desconto
+## Infraestrutura futura
 
-- Modelar IPVA por exercício, vencimentos, pagamento à vista ou parcelado,
-  parcelas e datas-limite configuráveis por ano/jurisdição, sem fixar três
-  parcelas como regra universal
-
-- Preservar licenciamento, seguro e parcelas, financiamento, alertas de
-  vencimento e manutenção por data e/ou quilometragem
-
-- Timeline como projeção de tabelas especializadas, sem tabela genérica Evento
-- Definir regras específicas de reset e movimentações de plataforma somente
-  quando conhecidas
-- Clima
-- Localização
-- Sincronização
-- Backup
+- Clima e localização.
+- Backup, sincronização e nuvem.
