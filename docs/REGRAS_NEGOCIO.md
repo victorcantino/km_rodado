@@ -65,6 +65,10 @@ deverão exigir justificativa e rastreabilidade.
 - A reconciliação percorre intervalos consecutivos de snapshots. Bônus e
   promoções observados são subtraídos da variação para obter somente receita de
   viagens. Cada intervalo é aberto no snapshot anterior e fechado no posterior.
+- Crédito anterior ou exatamente no baseline pode explicar parte do saldo
+  inicial, mas não é subtraído da variação seguinte: o próprio baseline já o
+  exclui da receita da Jornada. Crédito posterior entra no intervalo
+  `(snapshot anterior, snapshot posterior]` correspondente.
 - Regressão de valor ou viagens, item ausente, Passe no intervalo ou bônus maior
   que a variação torna a receita dependente de conferência.
 - Não se infere reset nem efeito financeiro automaticamente.
@@ -125,17 +129,35 @@ válidos de tanque cheio e abastecimentos parciais.
   Não se calcula automaticamente `final - inicial + passe`.
 - Foi observado que a 99 pode reduzir o visível e a Uber pode gerar débito
   interno, mas essas observações não viram hardcode por nome.
+- Há dois mecanismos conhecidos: por tempo e por limite de faturamento. Ofertas
+  concretas, preços, durações e limites são dados observados variáveis, não
+  tipos fixos nem valores hardcoded.
+- Observações atuais da Uber: limite de R$ 125 por R$ 30; limite de R$ 391 por
+  R$ 89; 24 horas por R$ 37; 72 horas por R$ 99. A escolha habitual observada é
+  o limite de R$ 125 por R$ 30.
+- A 99 também oferece duas opções por tempo e duas por faturamento. Está
+  confirmada somente a opção habitual de limite de R$ 200 por R$ 16,98; os
+  demais preços não são tratados como fatos.
 
 ## Bônus e promoções
 
 - Representam créditos positivos efetivamente observados na Plataforma, não
   promessas, metas futuras ou faturamento de viagens.
+- Missão/meta não é modelada nesta fase; registra-se apenas o crédito recebido.
 - Plataforma é obrigatória; Jornada é opcional e associada automaticamente se
   estiver aberta no cadastro. `dataHora` é operacional e pode ser retroativa;
   `dataCriacao` é técnica.
 - São fatos separados para plataformas acumuladas e individuais. Não se cria
   snapshot artificial para plataforma individual e não aumentam ticket médio.
 - Snapshots brutos nunca são alterados.
+- `dataHora` indica quando o crédito apareceu e afetou o contador. Uber foi
+  observada creditando no mesmo dia após a promoção e 99 normalmente no dia
+  seguinte, sem transformar essas observações em regras por Plataforma.
+- A competência ou origem econômica pode anteceder o crédito e permanece
+  futura. Para a reconciliação atual importa o instante em que o contador foi
+  afetado.
+- Bônus anterior à Jornada permanece com `jornadaId` nulo. Se já estiver no
+  baseline, não é associado artificialmente nem subtraído novamente.
 
 ## Escopo operacional do produto
 

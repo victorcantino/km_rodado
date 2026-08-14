@@ -483,6 +483,50 @@ void main() {
     expect(resumo.resultadoOperacionalCentavos, 8000);
   });
 
+  test(
+    'bônus anterior ao baseline não é associado nem subtraído novamente',
+    () async {
+      final jornadaId = await inserirJornada(
+        inicio: DateTime(2026, 8, 10, 8),
+        fim: DateTime(2026, 8, 10, 20),
+      );
+      final plataformaId = await inserirPlataforma('99');
+      final bonusId = await database
+          .into(database.bonusPromocoes)
+          .insert(
+            BonusPromocoesCompanion.insert(
+              plataformaId: plataformaId,
+              dataHora: DateTime(2026, 8, 10, 7, 55),
+              valorCentavos: 800,
+              tipo: TipoBonusPromocao.bonus,
+            ),
+          );
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.inicial,
+        DateTime(2026, 8, 10, 8),
+        {plataformaId: (800, 0)},
+      );
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.finalDaJornada,
+        DateTime(2026, 8, 10, 20),
+        {plataformaId: (10800, 10)},
+      );
+
+      final resumo = (await service.resumoUltimaJornada())!;
+      final bonus = await (database.select(
+        database.bonusPromocoes,
+      )..where((item) => item.id.equals(bonusId))).getSingle();
+
+      expect(bonus.jornadaId, isNull);
+      expect(resumo.resultadosPlataformas.single.receitaCentavos, 10000);
+      expect(resumo.resultadosPlataformas.single.bonusPromocoesCentavos, 0);
+      expect(resumo.bonusPromocoes, isEmpty);
+      expect(resumo.receitaTotalCentavos, 10000);
+    },
+  );
+
   test('sem bônus mantém a variação integral como receita', () async {
     final jornadaId = await inserirJornada();
     final plataformaId = await inserirPlataforma('Acumulada');

@@ -5,7 +5,7 @@
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
 - schema atual: **8**;
-- suíte automatizada: **111 testes aprovados** em 14/08/2026.
+- suíte automatizada: **112 testes aprovados** em 14/08/2026.
 
 ## Implementado
 
@@ -23,6 +23,8 @@
   parcial e associação opcional à Jornada;
 - Passes de plataforma retroativos, custos separados e Jornada opcional;
 - Bônus/promoções retroativos e reconciliação conservadora por intervalos;
+- baseline protege contra dupla subtração de bônus creditado antes da Jornada,
+  sem criar associação cronologicamente falsa;
 - migrações preservadoras até schema 8 e seeds idempotentes.
 
 ## Em teste operacional

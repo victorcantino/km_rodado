@@ -106,6 +106,10 @@ receita acumulada daquela plataforma dependente de conferência.
 Motivo: o efeito observado varia entre plataformas. O custo é conhecido, mas a
 reconciliação da receita exige regras explícitas ainda não formalizadas.
 
+Os mecanismos conhecidos são `tempo` e `faturamento`; duração, validade,
+limite e preço caracterizam a oferta observada. A futura formalização deve usar
+esses mecanismos sem transformar ofertas concretas em enum ou hardcode.
+
 ## ADR-013 — Créditos promocionais factuais e reconciliação por intervalos
 
 Decisão: persistir Bônus/Promoções observados como fatos especializados,
@@ -116,3 +120,8 @@ a variação menos créditos conhecidos; Passes e inconsistências mantêm revis
 Motivo: preservar fatos brutos, evitar dupla contagem nas fronteiras e separar
 com segurança faturamento de viagens, créditos e custos sem motor financeiro
 genérico ou regras por nome de Plataforma.
+
+Crédito anterior ou exatamente no baseline não é subtraído da variação
+seguinte, pois já compõe o saldo inicial. Ele permanece um fato independente e
+não recebe `jornadaId` artificial. A competência econômica da promoção pode ser
+anterior a `dataHora`, mas não é modelada nesta etapa.
