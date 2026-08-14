@@ -46,9 +46,8 @@
   operacional da Jornada e custos gerais do dia, sem atribuir artificialmente
   estes últimos à Jornada
 
-- Modelar compra de passe de plataforma com plataforma, data/hora, modalidade e
-  valor como custo operacional, sem assumir regra universal de subtração sobre
-  saldo ou contador acumulado observado
+- Formalizar as quatro modalidades de passe e suas regras sem inferência pelo
+  nome da plataforma; implementar edição histórica segura dos passes
 
 - Modelar bônus e promoções com plataforma, data/hora e valor como créditos que
   podem ocorrer ou ser creditados em momentos diferentes, integrando-os à

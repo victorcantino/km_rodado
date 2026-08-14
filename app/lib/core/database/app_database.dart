@@ -19,12 +19,14 @@ import 'tables/leitura_ganhos.dart';
 import 'tables/leitura_ganho_plataforma.dart';
 import 'tables/lancamento_ganho_individual.dart';
 import 'tables/abastecimento.dart';
+import 'tables/passe_plataforma.dart';
 
 import 'daos/jornada_dao.dart';
 import 'daos/leitura_ganhos_dao.dart';
 import 'daos/pausa_dao.dart';
 import 'daos/ganho_individual_dao.dart';
 import 'daos/abastecimento_dao.dart';
+import 'daos/passe_plataforma_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -40,6 +42,7 @@ part 'app_database.g.dart';
     LeiturasGanhoPlataforma,
     LancamentosGanhoIndividual,
     Abastecimentos,
+    PassesPlataforma,
   ],
   daos: [
     JornadaDao,
@@ -47,6 +50,7 @@ part 'app_database.g.dart';
     LeituraGanhosDao,
     GanhoIndividualDao,
     AbastecimentoDao,
+    PassePlataformaDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -55,7 +59,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -76,6 +80,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from == 5) {
         await _migrarSchema5Para6(migrator);
+      }
+      if (from < 7) {
+        await migrator.createTable(passesPlataforma);
       }
     },
     beforeOpen: (details) async {

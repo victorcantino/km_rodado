@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('migra schema 1 vazio para schema 6', () async {
+  test('migra schema 1 vazio para schema 7', () async {
     _criarBancoSchema1(arquivoBanco);
 
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
@@ -34,13 +34,14 @@ void main() {
     expect(await _contar(database, 'pausas'), 0);
     expect(await _contar(database, 'leituras_ganhos'), 0);
     expect(await _contar(database, 'leituras_ganho_plataforma'), 0);
-    expect(await _userVersion(database), 6);
+    expect(await _userVersion(database), 7);
     expect(
       await _tabelaExiste(database, 'lancamentos_ganho_individual'),
       isTrue,
     );
     expect(await _tabelaExiste(database, 'abastecimentos'), isTrue);
     expect(await _contar(database, 'abastecimentos'), 0);
+    expect(await _tabelaExiste(database, 'passes_plataforma'), isTrue);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(
       await _indiceExiste(database, 'idx_leituras_ganhos_jornada_data_hora'),
@@ -92,7 +93,7 @@ void main() {
       plataformas.map((plataforma) => plataforma.tipoRegistroGanhos).toSet(),
       {TipoRegistroGanhos.acumulado},
     );
-    expect(await _userVersion(database), 6);
+    expect(await _userVersion(database), 7);
     expect(await _contar(database, 'lancamentos_ganho_individual'), 0);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -200,7 +201,7 @@ void main() {
     addTearDown(database.close);
     final pausa = (await database.select(database.pausas).get()).single;
 
-    expect(await _userVersion(database), 6);
+    expect(await _userVersion(database), 7);
     expect(pausa.odometroInicio, isNull);
     expect(pausa.odometroFim, isNull);
   });
@@ -240,9 +241,53 @@ void main() {
     final abastecimento =
         (await database.select(database.abastecimentos).get()).single;
 
-    expect(await _userVersion(database), 6);
+    expect(await _userVersion(database), 7);
     expect(abastecimento.odometro, 123456);
     expect(abastecimento.dataHora, abastecimento.dataCriacao);
+    expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
+  });
+
+  test('migra schema 6 preservando Abastecimentos e cria Passes', () async {
+    final banco = sqlite.sqlite3.open(arquivoBanco.path);
+    banco.execute('''
+      PRAGMA foreign_keys = ON;
+      CREATE TABLE veiculos (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE jornadas (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE plataformas (id INTEGER NOT NULL PRIMARY KEY);
+      INSERT INTO veiculos VALUES (1);
+      CREATE TABLE abastecimentos (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        veiculo_id INTEGER NOT NULL REFERENCES veiculos (id),
+        jornada_id INTEGER NULL REFERENCES jornadas (id),
+        data_hora INTEGER NOT NULL,
+        odometro INTEGER NOT NULL CHECK (odometro >= 0),
+        tipo_combustivel TEXT NOT NULL,
+        volume_mililitros INTEGER NOT NULL CHECK (volume_mililitros > 0),
+        valor_total_pago_centavos INTEGER NOT NULL CHECK (valor_total_pago_centavos >= 0),
+        preco_bomba_milesimos_real_por_litro INTEGER NULL,
+        tanque_cheio INTEGER NOT NULL DEFAULT 1 CHECK (tanque_cheio IN (0, 1)),
+        cidade TEXT NULL, nome_posto TEXT NULL, bandeira_posto TEXT NULL,
+        observacao TEXT NULL, data_criacao INTEGER NOT NULL
+      );
+      INSERT INTO abastecimentos VALUES (
+        7, 1, NULL, 1786600000, 123456, 'gasolina', 10000, 6299,
+        NULL, 1, 'Curitiba', NULL, NULL, NULL, 1786608000
+      );
+      PRAGMA user_version = 6;
+    ''');
+    banco.close();
+
+    final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
+    addTearDown(database.close);
+    final abastecimento =
+        (await database.select(database.abastecimentos).get()).single;
+
+    expect(await _userVersion(database), 7);
+    expect(abastecimento.id, 7);
+    expect(abastecimento.odometro, 123456);
+    expect(abastecimento.dataHora, isNot(abastecimento.dataCriacao));
+    expect(await _tabelaExiste(database, 'passes_plataforma'), isTrue);
+    expect(await _contar(database, 'passes_plataforma'), 0);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
 }

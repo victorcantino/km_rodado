@@ -93,3 +93,13 @@ O instante operacional (`dataHora`) é separado do instante técnico de criaçã
 para permitir lançamentos retroativos. A progressão do odômetro é validada pela
 posição cronológica do evento, e não pelo maior valor existente no momento da
 digitação.
+
+## ADR-012 — Passes como custo factual separado
+
+Decisão: registrar passes por Plataforma com valor em centavos, instante
+operacional, criação técnica e Jornada opcional. Não ajustar automaticamente
+snapshots nem ticket médio. Um passe entre as leituras inicial e final torna a
+receita acumulada daquela plataforma dependente de conferência.
+
+Motivo: o efeito observado varia entre plataformas. O custo é conhecido, mas a
+reconciliação da receita exige regras explícitas ainda não formalizadas.
