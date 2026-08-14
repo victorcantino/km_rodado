@@ -1,0 +1,1 @@
+enum TipoBonusPromocao { bonus, promocao }

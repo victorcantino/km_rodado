@@ -1,6 +1,6 @@
 # Modelo de dados — KM Rodado
 
-O schema Drift atual é **7**. Esta seção separa o que existe no SQLite do que é
+O schema Drift atual é **8**. Esta seção separa o que existe no SQLite do que é
 derivado ou apenas planejado.
 
 ## Tabelas persistidas
@@ -82,6 +82,14 @@ operacional; `dataCriacao`, o instante técnico do cadastro.
 O valor pago deve ser positivo. O efeito sobre snapshots não é persistido nem
 inferido.
 
+### BonusPromocoes
+
+`id`, `plataformaId` → Plataformas, `jornadaId?` → Jornadas, `dataHora`,
+`valorCentavos`, `tipo`, `observacao?`, `dataCriacao`.
+
+O valor deve ser positivo. Tipos atuais: `bonus` e `promocao`. O registro é um
+crédito observado; receita de viagens reconciliada permanece derivada.
+
 ## Relações principais
 
 ```text
@@ -91,6 +99,7 @@ Jornada ──< LeituraGanhos ──< LeituraGanhoPlataforma >── Plataforma
 Jornada? ──< LancamentoGanhoIndividual >── Plataforma
 Jornada? ──< Abastecimento >── Veiculo
 Jornada? ──< PassePlataforma >── Plataforma
+Jornada? ──< BonusPromocao >── Plataforma
 ```
 
 ## Dados derivados, não persistidos
@@ -101,10 +110,11 @@ Jornada? ──< PassePlataforma >── Plataforma
 - totais de ganhos individuais;
 - ticket médio, receita por hora e receita por quilômetro ativo;
 - custo total de passes;
+- receita de viagens reconciliada e resultado operacional com bônus e Passes;
 - preço efetivo do combustível.
 
 ## Planejado, sem tabela atual
 
-Manutenção, bônus/promoções, evento financeiro genérico, carteira de
+Manutenção, evento financeiro genérico, carteira de
 plataforma, alertas, clima, localização e sincronização não fazem parte do
-schema 7. Suas decisões e ideias permanecem no backlog e nas regras futuras.
+schema 8. Suas decisões e ideias permanecem no backlog e nas regras futuras.

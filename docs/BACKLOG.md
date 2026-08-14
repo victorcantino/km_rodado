@@ -2,7 +2,6 @@
 
 ## Candidatas à próxima prioridade
 
-- Bônus/promoções e reconciliação explícita de snapshots.
 - Formalização das modalidades de Passe e correção histórica de Passes.
 
 ## Operação e dados históricos
@@ -21,6 +20,9 @@
 - Revisar autofocus e redução de toques nos demais inputs após uso em campo.
 - Corrigir globalmente SafeArea/insets no Android para que o conteúdo não fique
   sob a barra inferior do sistema; evitar correção pontual de um único botão.
+- Tela sempre ligada configurável e modo escuro.
+- Onboarding e guias contextuais por módulo, dispensáveis e reabertos sob
+  demanda.
 
 ## Abastecimento
 
@@ -48,11 +50,20 @@
 
 ## Plataforma e análises
 
-- Bônus/promoções como créditos separados; podem ser creditados posteriormente.
-- Reconciliação de resets, passes, bônus e outras movimentações conhecidas.
+- Evoluir reconciliação de resets, Passes e outras movimentações conhecidas.
 - Resultado operacional separando faturamento, bônus, passes e custos, sem
   alterar ticket médio das viagens.
 - Eficiência diária, relatórios e timeline por projeção de tabelas especializadas.
+- Quilômetros operacionais versus não operacionais e proporção de utilização
+  profissional do veículo.
+- Meta mensal de quilômetros e rateio planejado de custos fixos por essa meta.
+- Referência econômica pessoal por quilômetro e hora, margem desejada e valor
+  mínimo econômico por Plataforma.
+
+## Produto
+
+- Avaliar estratégia gratuito/premium; inteligência econômica é candidata
+  natural à camada paga, sem decisão comercial fechada nesta fase.
 
 ## Infraestrutura futura
 

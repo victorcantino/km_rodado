@@ -62,8 +62,11 @@ deverão exigir justificativa e rastreabilidade.
 - Valor e viagens iguais a zero são dados válidos.
 - Leituras seguintes sugerem o último snapshot da mesma Jornada.
 - Diferenças são derivadas; não se persiste ganho do período.
-- Regressão de valor ou viagens, item ausente ou Passe no intervalo inicial–final
-  torna a receita da plataforma dependente de conferência.
+- A reconciliação percorre intervalos consecutivos de snapshots. Bônus e
+  promoções observados são subtraídos da variação para obter somente receita de
+  viagens. Cada intervalo é aberto no snapshot anterior e fechado no posterior.
+- Regressão de valor ou viagens, item ausente, Passe no intervalo ou bônus maior
+  que a variação torna a receita dependente de conferência.
 - Não se infere reset nem efeito financeiro automaticamente.
 
 ### Ganhos individuais
@@ -83,6 +86,8 @@ deverão exigir justificativa e rastreabilidade.
 - Pausa histórica sem odômetros deixa indicadores dependentes de distância
   incompletos, sem assumir deslocamento zero.
 - Ticket médio usa somente faturamento atribuível às viagens.
+- Resultado operacional calculável é receita de viagens + bônus/promoções -
+  Passes. Fatos conhecidos continuam visíveis quando a receita exige revisão.
 - Zero viagens produz ticket médio indisponível (`—`).
 - Se qualquer receita necessária não for calculável, totais gerais, ticket
   médio geral, R$/h e R$/km não são apresentados como exatos.
@@ -121,9 +126,27 @@ válidos de tanque cheio e abastecimentos parciais.
 - Foi observado que a 99 pode reduzir o visível e a Uber pode gerar débito
   interno, mas essas observações não viram hardcode por nome.
 
+## Bônus e promoções
+
+- Representam créditos positivos efetivamente observados na Plataforma, não
+  promessas, metas futuras ou faturamento de viagens.
+- Plataforma é obrigatória; Jornada é opcional e associada automaticamente se
+  estiver aberta no cadastro. `dataHora` é operacional e pode ser retroativa;
+  `dataCriacao` é técnica.
+- São fatos separados para plataformas acumuladas e individuais. Não se cria
+  snapshot artificial para plataforma individual e não aumentam ticket médio.
+- Snapshots brutos nunca são alterados.
+
+## Escopo operacional do produto
+
+- O KM Rodado não rastreia passageiro, deslocamento para buscar passageiro ou o
+  estado individual de cada corrida.
+- Jornada aberta representa o período operacional e Pausa representa sua
+  interrupção. A utilização profissional futura será derivada desses períodos
+  e das diferenças entre Jornadas, sem rastreamento por corrida.
+
 ## Decisões futuras já estabelecidas
 
-- Bônus/promoções serão fatos separados e não aumentarão ticket médio.
 - Regressões ou saltos de snapshot podem decorrer de reset, passe, bônus ou
   outra movimentação; reconciliação exigirá fatos e regras explícitas.
 - Manutenção e outros eventos poderão ter Jornada opcional quando fizer sentido.

@@ -4,6 +4,8 @@ import '../../../core/constants/enums/tipo_leitura_ganhos.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/database/daos/leitura_ganhos_dao.dart';
 import '../../../core/database/daos/passe_plataforma_dao.dart';
+import '../../../core/database/daos/bonus_promocao_dao.dart';
+import '../../bonus_promocao/data/bonus_promocao_repository.dart';
 import '../../leitura_ganhos/data/leitura_ganhos_repository.dart';
 import '../../ganho_individual/data/ganho_individual_repository.dart';
 import '../../pausa/data/pausa_repository.dart';
@@ -18,6 +20,7 @@ class JornadaService {
   final LeituraGanhosRepository? _leituraGanhosRepository;
   final GanhoIndividualRepository? _ganhoIndividualRepository;
   final PassePlataformaRepository? _passePlataformaRepository;
+  final BonusPromocaoRepository? _bonusPromocaoRepository;
 
   JornadaService(
     this._repository,
@@ -25,6 +28,7 @@ class JornadaService {
     this._leituraGanhosRepository,
     this._ganhoIndividualRepository,
     this._passePlataformaRepository,
+    this._bonusPromocaoRepository,
   ]);
 
   Future<Jornada?> jornadaAberta() {
@@ -54,6 +58,9 @@ class JornadaService {
         const [];
     final passes =
         await _passePlataformaRepository?.listarPorJornada(jornada.id) ??
+        const [];
+    final bonusPromocoes =
+        await _bonusPromocaoRepository?.listarPorJornada(jornada.id) ??
         const [];
     final duracaoTotal = _duracaoNaoNegativa(
       jornada.dataHoraFim!.difference(jornada.dataHoraInicio),
@@ -90,22 +97,29 @@ class JornadaService {
       quilometrosEmPausa: quilometrosEmPausa,
       quilometrosAtivos: quilometrosAtivos,
       resultadosPlataformas: [
-        ..._calcularResultadosPlataformas(snapshots, passes),
+        ..._calcularResultadosPlataformas(snapshots, passes, bonusPromocoes),
         for (final total in totaisIndividuais)
           ResultadoPlataformaJornada(
             plataformaId: total.plataforma.id,
             nome: total.plataforma.nome,
             receitaCentavos: total.valorTotalCentavos,
             quantidadeViagens: total.quantidadeViagens,
+            bonusPromocoesCentavos: _somarBonus(
+              bonusPromocoes,
+              total.plataforma.id,
+            ),
+            custoPassesCentavos: _somarPasses(passes, total.plataforma.id),
           ),
       ]..sort((a, b) => a.nome.compareTo(b.nome)),
       passes: passes,
+      bonusPromocoes: bonusPromocoes,
     );
   }
 
   List<ResultadoPlataformaJornada> _calcularResultadosPlataformas(
     List<SnapshotPlataforma> snapshots,
     List<PasseComPlataforma> passes,
+    List<BonusPromocaoComPlataforma> bonusPromocoes,
   ) {
     final leituras = <int, LeiturasGanho>{};
     for (final snapshot in snapshots) {
@@ -125,16 +139,6 @@ class JornadaService {
     if (indiceInicial < 0 || indiceFinal < indiceInicial) return const [];
 
     final sequencia = ordenadas.sublist(indiceInicial, indiceFinal + 1);
-    final inicio = sequencia.first.dataHora;
-    final fim = sequencia.last.dataHora;
-    final plataformasComPasse = passes
-        .where(
-          (item) =>
-              !item.passe.dataHora.isBefore(inicio) &&
-              !item.passe.dataHora.isAfter(fim),
-        )
-        .map<int>((item) => item.passe.plataformaId)
-        .toSet();
     final idsSequencia = sequencia.map((leitura) => leitura.id).toSet();
     final itensPorLeitura = <int, Map<int, SnapshotPlataforma>>{};
     for (final snapshot in snapshots) {
@@ -152,7 +156,8 @@ class JornadaService {
           inicial,
           sequencia,
           itensPorLeitura,
-          possuiPasse: plataformasComPasse.contains(inicial.plataforma.id),
+          passes,
+          bonusPromocoes,
         ),
     ]..sort((a, b) => a.nome.compareTo(b.nome));
   }
@@ -160,44 +165,97 @@ class JornadaService {
   ResultadoPlataformaJornada _calcularResultadoPlataforma(
     SnapshotPlataforma inicial,
     List<LeiturasGanho> sequencia,
-    Map<int, Map<int, SnapshotPlataforma>> itensPorLeitura, {
-    required bool possuiPasse,
-  }) {
-    var valorAnterior = inicial.item.valorAcumuladoCentavos;
-    var viagensAnteriores = inicial.item.quantidadeViagensAcumulada;
-    var calculavel = !possuiPasse;
-    SnapshotPlataforma? finalSnapshot;
+    Map<int, Map<int, SnapshotPlataforma>> itensPorLeitura,
+    List<PasseComPlataforma> passes,
+    List<BonusPromocaoComPlataforma> bonusPromocoes,
+  ) {
+    var receitaViagens = 0;
+    var quantidadeViagens = 0;
+    var calculavel = true;
 
-    for (final leitura in sequencia) {
-      final atual = itensPorLeitura[leitura.id]?[inicial.plataforma.id];
-      if (atual == null) {
+    for (var indice = 1; indice < sequencia.length; indice++) {
+      final leituraAnterior = sequencia[indice - 1];
+      final leituraAtual = sequencia[indice];
+      final anterior =
+          itensPorLeitura[leituraAnterior.id]?[inicial.plataforma.id];
+      final atual = itensPorLeitura[leituraAtual.id]?[inicial.plataforma.id];
+      if (anterior == null || atual == null) {
         calculavel = false;
         continue;
       }
-      if (atual.item.valorAcumuladoCentavos < valorAnterior ||
-          atual.item.quantidadeViagensAcumulada < viagensAnteriores) {
+      final variacaoValor =
+          atual.item.valorAcumuladoCentavos -
+          anterior.item.valorAcumuladoCentavos;
+      final variacaoViagens =
+          atual.item.quantidadeViagensAcumulada -
+          anterior.item.quantidadeViagensAcumulada;
+      final possuiPasse = passes.any(
+        (item) =>
+            item.passe.plataformaId == inicial.plataforma.id &&
+            _pertenceAoIntervalo(
+              item.passe.dataHora,
+              leituraAnterior.dataHora,
+              leituraAtual.dataHora,
+            ),
+      );
+      final bonusDoIntervalo = bonusPromocoes
+          .where(
+            (item) =>
+                item.bonusPromocao.plataformaId == inicial.plataforma.id &&
+                _pertenceAoIntervalo(
+                  item.bonusPromocao.dataHora,
+                  leituraAnterior.dataHora,
+                  leituraAtual.dataHora,
+                ),
+          )
+          .fold<int>(
+            0,
+            (total, item) => total + item.bonusPromocao.valorCentavos,
+          );
+      final receitaIntervalo = variacaoValor - bonusDoIntervalo;
+      if (possuiPasse ||
+          variacaoValor < 0 ||
+          variacaoViagens < 0 ||
+          receitaIntervalo < 0) {
         calculavel = false;
+        continue;
       }
-      valorAnterior = atual.item.valorAcumuladoCentavos;
-      viagensAnteriores = atual.item.quantidadeViagensAcumulada;
-      if (leitura.tipo == TipoLeituraGanhos.finalDaJornada) {
-        finalSnapshot = atual;
-      }
+      receitaViagens += receitaIntervalo;
+      quantidadeViagens += variacaoViagens;
     }
 
     return ResultadoPlataformaJornada(
       plataformaId: inicial.plataforma.id,
       nome: inicial.plataforma.nome,
-      receitaCentavos: calculavel && finalSnapshot != null
-          ? finalSnapshot.item.valorAcumuladoCentavos -
-                inicial.item.valorAcumuladoCentavos
-          : null,
-      quantidadeViagens: calculavel && finalSnapshot != null
-          ? finalSnapshot.item.quantidadeViagensAcumulada -
-                inicial.item.quantidadeViagensAcumulada
-          : null,
+      receitaCentavos: calculavel ? receitaViagens : null,
+      quantidadeViagens: calculavel ? quantidadeViagens : null,
+      bonusPromocoesCentavos: _somarBonus(
+        bonusPromocoes.where(
+          (item) => _pertenceAoIntervalo(
+            item.bonusPromocao.dataHora,
+            sequencia.first.dataHora,
+            sequencia.last.dataHora,
+          ),
+        ),
+        inicial.plataforma.id,
+      ),
+      custoPassesCentavos: _somarPasses(passes, inicial.plataforma.id),
     );
   }
+
+  bool _pertenceAoIntervalo(DateTime instante, DateTime inicio, DateTime fim) =>
+      instante.isAfter(inicio) && !instante.isAfter(fim);
+
+  int _somarBonus(
+    Iterable<BonusPromocaoComPlataforma> bonusPromocoes,
+    int plataformaId,
+  ) => bonusPromocoes
+      .where((item) => item.bonusPromocao.plataformaId == plataformaId)
+      .fold<int>(0, (total, item) => total + item.bonusPromocao.valorCentavos);
+
+  int _somarPasses(List<PasseComPlataforma> passes, int plataformaId) => passes
+      .where((item) => item.passe.plataformaId == plataformaId)
+      .fold<int>(0, (total, item) => total + item.passe.valorPagoCentavos);
 
   Duration _duracaoNaoNegativa(Duration duracao) =>
       duracao.isNegative ? Duration.zero : duracao;

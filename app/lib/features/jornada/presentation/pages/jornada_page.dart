@@ -10,6 +10,7 @@ import '../../../../core/database/daos/ganho_individual_dao.dart';
 import '../../../../core/database/daos/leitura_ganhos_dao.dart';
 import '../../../../core/database/daos/pausa_dao.dart';
 import '../../../../core/database/daos/passe_plataforma_dao.dart';
+import '../../../../core/database/daos/bonus_promocao_dao.dart';
 import '../../../../core/database/seeds/seed.dart';
 import '../../../../core/database/seeds/plataformas_seed.dart';
 import '../../../leitura_ganhos/data/leitura_ganhos_repository.dart';
@@ -34,6 +35,10 @@ import '../../../passe_plataforma/data/passe_plataforma_repository.dart';
 import '../../../passe_plataforma/data/passe_plataforma_service.dart';
 import '../../../passe_plataforma/presentation/controllers/passe_plataforma_controller.dart';
 import '../../../passe_plataforma/presentation/widgets/registrar_passe_dialog.dart';
+import '../../../bonus_promocao/data/bonus_promocao_repository.dart';
+import '../../../bonus_promocao/data/bonus_promocao_service.dart';
+import '../../../bonus_promocao/presentation/controllers/bonus_promocao_controller.dart';
+import '../../../bonus_promocao/presentation/widgets/registrar_bonus_promocao_dialog.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
 import '../../data/resumo_jornada.dart';
@@ -55,6 +60,7 @@ class _JornadaPageState extends State<JornadaPage> {
   GanhoIndividualController? ganhoIndividualController;
   AbastecimentoController? abastecimentoController;
   PassePlataformaController? passePlataformaController;
+  BonusPromocaoController? bonusPromocaoController;
   late final AppDatabase database;
   Timer? atualizadorDuracao;
 
@@ -92,6 +98,9 @@ class _JornadaPageState extends State<JornadaPage> {
     final passeRepository = PassePlataformaRepository(
       PassePlataformaDao(database),
     );
+    final bonusPromocaoRepository = BonusPromocaoRepository(
+      BonusPromocaoDao(database),
+    );
     final abastecimentoRepository = AbastecimentoRepository(
       AbastecimentoDao(database),
     );
@@ -101,6 +110,7 @@ class _JornadaPageState extends State<JornadaPage> {
       leituraGanhosRepository,
       ganhoIndividualRepository,
       passeRepository,
+      bonusPromocaoRepository,
     );
     final pausaService = PausaService(
       pausaRepository,
@@ -126,6 +136,9 @@ class _JornadaPageState extends State<JornadaPage> {
     final novoPasseController = PassePlataformaController(
       PassePlataformaService(passeRepository, repository),
     );
+    final novoBonusPromocaoController = BonusPromocaoController(
+      BonusPromocaoService(bonusPromocaoRepository, repository),
+    );
 
     setState(() {
       controller = novoController;
@@ -134,6 +147,7 @@ class _JornadaPageState extends State<JornadaPage> {
       ganhoIndividualController = novoGanhoIndividualController;
       abastecimentoController = novoAbastecimentoController;
       passePlataformaController = novoPasseController;
+      bonusPromocaoController = novoBonusPromocaoController;
     });
 
     await novoController.carregarJornadaAberta();
@@ -148,6 +162,40 @@ class _JornadaPageState extends State<JornadaPage> {
       novoController.jornadaAtual?.veiculoId ?? 1,
     );
     await novoPasseController.carregar();
+    await novoBonusPromocaoController.carregar();
+  }
+
+  Future<void> _registrarBonusPromocao() async {
+    final bonusController = bonusPromocaoController;
+    if (bonusController == null || bonusController.plataformas.isEmpty) return;
+    final resultado = await showDialog<RegistrarBonusPromocaoResultado>(
+      context: context,
+      builder: (_) => RegistrarBonusPromocaoDialog(
+        plataformas: bonusController.plataformas,
+      ),
+    );
+    if (!mounted || resultado == null) return;
+    try {
+      await bonusController.registrar(
+        plataformaId: resultado.plataformaId,
+        dataHora: resultado.dataHora,
+        valorCentavos: resultado.valorCentavos,
+        tipo: resultado.tipo,
+        observacao: resultado.observacao,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bônus/promoção registrado.')),
+      );
+    } catch (error, stackTrace) {
+      if (!mounted) return;
+      _apresentarErro(
+        operacao: 'registrar o bônus/promoção',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível registrar o bônus/promoção.',
+      );
+    }
   }
 
   Future<void> _registrarPasse() async {
@@ -676,13 +724,15 @@ class _JornadaPageState extends State<JornadaPage> {
     final ganhoIndividualController = this.ganhoIndividualController;
     final abastecimentoController = this.abastecimentoController;
     final passePlataformaController = this.passePlataformaController;
+    final bonusPromocaoController = this.bonusPromocaoController;
 
     if (controller == null ||
         leituraGanhosController == null ||
         pausaController == null ||
         ganhoIndividualController == null ||
         abastecimentoController == null ||
-        passePlataformaController == null) {
+        passePlataformaController == null ||
+        bonusPromocaoController == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
@@ -703,6 +753,7 @@ class _JornadaPageState extends State<JornadaPage> {
           ganhoIndividualController,
           abastecimentoController,
           passePlataformaController,
+          bonusPromocaoController,
         ]),
         builder: (context, _) {
           if (controller.carregando ||
@@ -710,7 +761,8 @@ class _JornadaPageState extends State<JornadaPage> {
               leituraGanhosController.carregando ||
               ganhoIndividualController.carregando ||
               abastecimentoController.carregando ||
-              passePlataformaController.carregando) {
+              passePlataformaController.carregando ||
+              bonusPromocaoController.carregando) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -766,6 +818,14 @@ class _JornadaPageState extends State<JornadaPage> {
                     onPressed: _registrarPasse,
                     icon: const Icon(Icons.confirmation_number_outlined),
                     label: const Text('Passe'),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                if (bonusPromocaoController.plataformas.isNotEmpty) ...[
+                  OutlinedButton.icon(
+                    onPressed: _registrarBonusPromocao,
+                    icon: const Icon(Icons.redeem_outlined),
+                    label: const Text('Bônus/promoção'),
                   ),
                   const SizedBox(height: 8),
                 ],
@@ -916,6 +976,7 @@ class _JornadaPageState extends State<JornadaPage> {
     ganhoIndividualController?.dispose();
     abastecimentoController?.dispose();
     passePlataformaController?.dispose();
+    bonusPromocaoController?.dispose();
     controller?.dispose();
     database.close();
     super.dispose();
@@ -979,17 +1040,40 @@ class _ResumoJornadaConcluida extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: resultado.calculavel
-                ? Text(
-                    '${resultado.nome}: '
-                    '${moeda.format(resultado.receitaCentavos! / 100)} · '
-                    '${resultado.quantidadeViagens} '
-                    '${resultado.quantidadeViagens == 1 ? 'viagem' : 'viagens'} · '
-                    'Ticket médio: '
-                    '${resultado.ticketMedio == null ? '—' : moeda.format(resultado.ticketMedio)}',
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${resultado.nome}: '
+                        '${moeda.format(resultado.receitaCentavos! / 100)} em viagens · '
+                        '${resultado.quantidadeViagens} '
+                        '${resultado.quantidadeViagens == 1 ? 'viagem' : 'viagens'} · '
+                        'Ticket médio: '
+                        '${resultado.ticketMedio == null ? '—' : moeda.format(resultado.ticketMedio)}',
+                      ),
+                      Text(
+                        'Bônus/promoções: '
+                        '${moeda.format(resultado.bonusPromocoesCentavos / 100)} · '
+                        'Passes: ${moeda.format(resultado.custoPassesCentavos / 100)} · '
+                        'Resultado operacional: '
+                        '${moeda.format(resultado.resultadoOperacionalCentavos! / 100)}',
+                      ),
+                    ],
                   )
-                : Text(
-                    '${resultado.nome}: Revisão necessária · '
-                    'Ticket médio: —',
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${resultado.nome}: Revisão necessária · '
+                        'Ticket médio: —',
+                      ),
+                      Text(
+                        'Bônus/promoções: '
+                        '${moeda.format(resultado.bonusPromocoesCentavos / 100)} · '
+                        'Passes: ${moeda.format(resultado.custoPassesCentavos / 100)} · '
+                        'Resultado operacional: —',
+                      ),
+                    ],
                   ),
           ),
         const SizedBox(height: 12),
@@ -1009,6 +1093,27 @@ class _ResumoJornadaConcluida extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
+        if (resumo.bonusPromocoes.isNotEmpty) ...[
+          Text(
+            'Bônus/promoções registrados',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          for (final item in resumo.bonusPromocoes)
+            Text(
+              '${item.plataforma.nome}: '
+              '${moeda.format(item.bonusPromocao.valorCentavos / 100)}',
+            ),
+          Text(
+            'Total de bônus/promoções: '
+            '${moeda.format(resumo.bonusPromocoesCentavos / 100)}',
+          ),
+          const SizedBox(height: 12),
+        ],
+        Text(
+          'Resultado operacional da Jornada: '
+          '${resumo.resultadoOperacionalCentavos == null ? '—' : moeda.format(resumo.resultadoOperacionalCentavos! / 100)}',
+        ),
+        const SizedBox(height: 12),
         _SecaoResumo(
           titulo: 'Tempo',
           linhas: [
