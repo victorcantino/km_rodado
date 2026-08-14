@@ -2,15 +2,14 @@
 
 ## Candidatas à próxima prioridade
 
-- Correção histórica segura de Pausas.
 - Bônus/promoções e reconciliação explícita de snapshots.
 - Formalização das modalidades de Passe e correção histórica de Passes.
 
 ## Operação e dados históricos
 
-- Fluxo auditável de edição/exclusão e correção histórica de Jornadas, Pausas,
-  ganhos, Abastecimentos e Passes.
-- Correção histórica de Pausas e odômetros com justificativa.
+- Evoluir edição/exclusão histórica para um fluxo auditável, com usuário,
+  justificativa e rastreabilidade de versões quando o uso definitivo/frota
+  exigir; a correção simples de Pausas já existe sem essa trilha.
 - Categorias e sugestões editáveis de Pausa, sem substituir o título livre.
 - Importar mais de um ano de dados do AppSheet, preservando originais e
   rastreabilidade.
@@ -20,6 +19,8 @@
 
 - Evolução visual móvel/operacional após estabilizar os fluxos.
 - Revisar autofocus e redução de toques nos demais inputs após uso em campo.
+- Corrigir globalmente SafeArea/insets no Android para que o conteúdo não fique
+  sob a barra inferior do sistema; evitar correção pontual de um único botão.
 
 ## Abastecimento
 

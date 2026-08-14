@@ -11,7 +11,8 @@
 
 - Jornada: abertura, fechamento, persistência, restauração, localização textual
   e progressão de odômetro, inclusive encerramento com zero km;
-- Pausas: início/fim, odômetros, duração derivada, título opcional e histórico;
+- Pausas: início/fim, odômetros, duração derivada, título opcional, histórico e
+  correção completa pelo lápis com coerência temporal e de odômetro;
 - Leituras de ganhos inicial, parcial e final, com fechamento atômico;
 - plataformas padrão configuráveis, ativas/inativas e classificadas como
   acumuladas ou individuais;
@@ -31,7 +32,7 @@ entregas mais recentes; a interface segue funcional e provisória.
 ## Limitações conhecidas
 
 - usuário e veículo operacionais ainda usam registros temporários com ID 1;
-- não há edição/exclusão histórica completa;
+- não há exclusão histórica nem auditoria/versionamento das correções;
 - efeitos de reset, passe, bônus ou promoção sobre snapshots não são inferidos;
 - não há consumo/autonomia, manutenção, custos gerais, alertas, GPS, nuvem ou
   importação do AppSheet;

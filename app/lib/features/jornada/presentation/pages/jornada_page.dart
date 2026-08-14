@@ -29,7 +29,7 @@ import '../../../pausa/data/pausa_service.dart';
 import '../../../pausa/presentation/controllers/pausa_controller.dart';
 import '../../../pausa/presentation/pausa_formatters.dart';
 import '../../../pausa/presentation/widgets/odometro_pausa_dialog.dart';
-import '../../../pausa/presentation/widgets/editar_titulo_pausa_dialog.dart';
+import '../../../pausa/presentation/widgets/editar_pausa_dialog.dart';
 import '../../../passe_plataforma/data/passe_plataforma_repository.dart';
 import '../../../passe_plataforma/data/passe_plataforma_service.dart';
 import '../../../passe_plataforma/presentation/controllers/passe_plataforma_controller.dart';
@@ -92,6 +92,9 @@ class _JornadaPageState extends State<JornadaPage> {
     final passeRepository = PassePlataformaRepository(
       PassePlataformaDao(database),
     );
+    final abastecimentoRepository = AbastecimentoRepository(
+      AbastecimentoDao(database),
+    );
     final service = JornadaService(
       repository,
       pausaRepository,
@@ -99,7 +102,11 @@ class _JornadaPageState extends State<JornadaPage> {
       ganhoIndividualRepository,
       passeRepository,
     );
-    final pausaService = PausaService(pausaRepository, repository);
+    final pausaService = PausaService(
+      pausaRepository,
+      repository,
+      abastecimentoRepository,
+    );
     final leituraGanhosService = LeituraGanhosService(
       leituraGanhosRepository,
       repository,
@@ -112,9 +119,6 @@ class _JornadaPageState extends State<JornadaPage> {
     final novoPausaController = PausaController(pausaService);
     final novoGanhoIndividualController = GanhoIndividualController(
       GanhoIndividualService(ganhoIndividualRepository, repository),
-    );
-    final abastecimentoRepository = AbastecimentoRepository(
-      AbastecimentoDao(database),
     );
     final novoAbastecimentoController = AbastecimentoController(
       AbastecimentoService(abastecimentoRepository, repository),
@@ -516,30 +520,30 @@ class _JornadaPageState extends State<JornadaPage> {
     return jornada.odometroInicio;
   }
 
-  Future<void> _editarTituloPausa(Pausa pausa) async {
-    final titulo = await showDialog<String>(
+  Future<void> _editarPausa(Pausa pausa) async {
+    await showDialog<bool>(
       context: context,
-      builder: (_) => EditarTituloPausaDialog(tituloInicial: pausa.titulo),
+      builder: (_) => EditarPausaDialog(
+        pausa: pausa,
+        onSalvar: (resultado) async {
+          try {
+            await pausaController?.editarPausa(
+              pausa: pausa,
+              inicio: resultado.inicio,
+              odometroInicio: resultado.odometroInicio,
+              fim: resultado.fim,
+              odometroFim: resultado.odometroFim,
+              titulo: resultado.titulo,
+              observacao: resultado.observacao,
+            );
+          } catch (error, stackTrace) {
+            debugPrint('Erro ao editar a Pausa: $error');
+            debugPrintStack(stackTrace: stackTrace);
+            rethrow;
+          }
+        },
+      ),
     );
-
-    if (!mounted || titulo == null) {
-      return;
-    }
-
-    try {
-      await pausaController?.editarTitulo(pausa, titulo);
-    } catch (error, stackTrace) {
-      if (!mounted) {
-        return;
-      }
-
-      _apresentarErro(
-        operacao: 'editar a Pausa',
-        error: error,
-        stackTrace: stackTrace,
-        mensagemPadrao: 'Não foi possível editar a Pausa.',
-      );
-    }
   }
 
   Future<void> _fecharJornada() async {
@@ -794,8 +798,8 @@ class _JornadaPageState extends State<JornadaPage> {
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Editar título',
-                          onPressed: () => _editarTituloPausa(pausaAberta),
+                          tooltip: 'Editar Pausa',
+                          onPressed: () => _editarPausa(pausaAberta),
                           icon: const Icon(Icons.edit),
                         ),
                       ],
@@ -838,7 +842,7 @@ class _JornadaPageState extends State<JornadaPage> {
                         pausa: pausaController.pausas[indice],
                         numero: indice + 1,
                         formatoHora: formatoHora,
-                        onEditar: _editarTituloPausa,
+                        onEditar: _editarPausa,
                       ),
                 ],
 
@@ -1088,7 +1092,7 @@ class _PausaItem extends StatelessWidget {
       title: Text(tituloExibido),
       subtitle: Text(intervalo),
       trailing: IconButton(
-        tooltip: 'Editar título',
+        tooltip: 'Editar Pausa',
         onPressed: () => onEditar(pausa),
         icon: const Icon(Icons.edit),
       ),

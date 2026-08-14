@@ -49,9 +49,25 @@ class PausaController extends ChangeNotifier {
     });
   }
 
-  Future<void> editarTitulo(Pausa pausa, String titulo) async {
+  Future<void> editarPausa({
+    required Pausa pausa,
+    required DateTime inicio,
+    required int? odometroInicio,
+    required DateTime? fim,
+    required int? odometroFim,
+    String? titulo,
+    String? observacao,
+  }) async {
     await _executar(() async {
-      await _service.editarTitulo(pausa, titulo);
+      await _service.editarPausa(
+        pausa: pausa,
+        inicio: inicio,
+        odometroInicio: odometroInicio,
+        fim: fim,
+        odometroFim: odometroFim,
+        titulo: titulo,
+        observacao: observacao,
+      );
       pausas = await _service.listarPorJornada(pausa.jornadaId);
     });
   }
