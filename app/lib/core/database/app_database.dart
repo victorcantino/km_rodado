@@ -22,6 +22,8 @@ import 'tables/lancamento_ganho_individual.dart';
 import 'tables/abastecimento.dart';
 import 'tables/passe_plataforma.dart';
 import 'tables/bonus_promocao.dart';
+import 'tables/manutencao.dart';
+import 'tables/item_manutencao.dart';
 
 import 'daos/jornada_dao.dart';
 import 'daos/leitura_ganhos_dao.dart';
@@ -30,6 +32,7 @@ import 'daos/ganho_individual_dao.dart';
 import 'daos/abastecimento_dao.dart';
 import 'daos/passe_plataforma_dao.dart';
 import 'daos/bonus_promocao_dao.dart';
+import 'daos/manutencao_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -47,6 +50,8 @@ part 'app_database.g.dart';
     Abastecimentos,
     PassesPlataforma,
     BonusPromocoes,
+    Manutencoes,
+    ItensManutencao,
   ],
   daos: [
     JornadaDao,
@@ -56,6 +61,7 @@ part 'app_database.g.dart';
     AbastecimentoDao,
     PassePlataformaDao,
     BonusPromocaoDao,
+    ManutencaoDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -64,7 +70,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -91,6 +97,10 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 8) {
         await migrator.createTable(bonusPromocoes);
+      }
+      if (from < 9) {
+        await migrator.createTable(manutencoes);
+        await migrator.createTable(itensManutencao);
       }
     },
     beforeOpen: (details) async {

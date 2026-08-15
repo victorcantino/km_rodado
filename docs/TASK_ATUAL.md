@@ -1,18 +1,15 @@
-# Tarefa atual — Inteligência de Abastecimento
+# Tarefa atual — Manutenções
 
 ## Estado
 
-O aplicativo deriva consumo físico de ciclos válidos entre tanques cheios,
-incluindo volumes parciais intermediários. A apresentação separa consumo
-recente, média, referência conservadora de consumo, autonomia teórica de tanque
-cheio e referência comportamental para abastecer.
+Primeira versão operacional com Manutenção como cabeçalho de visita e itens 1:N.
+Permite criação e edição atômicas, múltiplos itens, descrição livre com
+sugestões, valores opcionais em centavos, recorrência opcional por km/data e
+histórico próprio.
 
-A referência exige histórico mínimo, nunca é derivada da autonomia nominal e é
-omitida após parcial que torne o nível atual desconhecido. Se já foi alcançada,
-a interface informa o estado sem sugerir tanque vazio. Data de calendário não
-é prevista enquanto não houver histórico contínuo confiável.
-
-Todos os indicadores são derivados; o schema permanece 8.
+Manutenção é fato do veículo sem associação automática à Jornada. Seu odômetro
+passa a integrar a cronologia física usada pelos demais fluxos. O schema evolui
+de 8 para 9 com migração preservadora; o XLS histórico não é importado.
 
 ## Validação
 

@@ -90,7 +90,9 @@ class JornadaService {
       final porData = a.dataHora.compareTo(b.dataHora);
       return porData != 0 ? porData : a.ordem.compareTo(b.ordem);
     });
-    return fatos.last.odometro;
+    final ultimoFato = await _abastecimentoRepository
+        ?.buscarUltimoOdometroCronologico(jornada.veiculoId);
+    return ultimoFato ?? fatos.last.odometro;
   }
 
   Future<ResumoJornada?> resumoUltimaJornada() async {
@@ -355,7 +357,11 @@ class JornadaService {
     if (anterior?.dataHoraFim?.isAfter(inicio) == true) {
       throw Exception('A jornada não pode sobrepor outra jornada.');
     }
-    final ultimoOdometro = anterior?.odometroFim;
+    final limites = await _abastecimentoRepository?.buscarLimitesOdometro(
+      veiculoId,
+      inicio,
+    );
+    final ultimoOdometro = limites?.anterior ?? anterior?.odometroFim;
 
     if (ultimoOdometro != null && odometro < ultimoOdometro) {
       throw Exception(
@@ -410,6 +416,15 @@ class JornadaService {
     }
 
     final fim = dataHoraFim ?? _agora();
+    final limite = await _abastecimentoRepository?.buscarLimitesOdometro(
+      jornada.veiculoId,
+      fim,
+    );
+    if (limite?.anterior != null && odometroFim < limite!.anterior!) {
+      throw Exception(
+        'O odômetro final não pode ser menor que o último registrado.',
+      );
+    }
     final jornadaAtualizada = jornada.copyWith(
       dataHoraFim: Value(fim),
       odometroFim: Value(odometroFim),
@@ -431,6 +446,15 @@ class JornadaService {
   }) async {
     final jornada = await _repository.buscarJornadaAberta();
     if (jornada == null) throw Exception('Não existe jornada aberta.');
+    final limite = await _abastecimentoRepository?.buscarLimitesOdometro(
+      jornada.veiculoId,
+      dataHoraFim,
+    );
+    if (limite?.anterior != null && odometroFim < limite!.anterior!) {
+      throw Exception(
+        'O odômetro final não pode ser menor que o último registrado.',
+      );
+    }
     await _validarJornada(
       jornada.copyWith(
         dataHoraFim: Value(dataHoraFim),

@@ -37,7 +37,12 @@ class PausaService {
       throw Exception('O odômetro não pode ser negativo.');
     }
     final pausas = await _repository.listarPorJornada(jornada.id);
-    final ultimoOdometro = _ultimoOdometroConhecido(jornada, pausas);
+    final ultimoFato = await _abastecimentoRepository
+        .buscarUltimoOdometroCronologico(jornada.veiculoId);
+    final ultimoOdometro = [
+      _ultimoOdometroConhecido(jornada, pausas),
+      ...?ultimoFato == null ? null : [ultimoFato],
+    ].reduce((a, b) => a > b ? a : b);
     if (odometroInicio < ultimoOdometro) {
       throw Exception('O odômetro não pode ser menor que o último registrado.');
     }
@@ -84,6 +89,15 @@ class PausaService {
         jornada,
         pausas.where((registro) => registro.id != pausa.id).toList(),
       );
+    }
+    final jornada = await _jornadaRepository.buscarPorId(jornadaId);
+    final ultimoFato = jornada == null
+        ? null
+        : await _abastecimentoRepository.buscarUltimoOdometroCronologico(
+            jornada.veiculoId,
+          );
+    if (ultimoFato != null && ultimoFato > odometroMinimo) {
+      odometroMinimo = ultimoFato;
     }
     if (odometroFim < odometroMinimo) {
       throw Exception(

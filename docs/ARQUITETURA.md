@@ -20,6 +20,7 @@ app/lib/
 │   ├── ganho_individual/
 │   ├── jornada/
 │   ├── leitura_ganhos/
+│   ├── manutencao/
 │   ├── passe_plataforma/
 │   └── pausa/
 └── main.dart
@@ -47,7 +48,7 @@ concreta, sem criar abstrações antecipadas.
 
 ## Banco e funcionamento offline
 
-O schema atual é 7. O banco é criado localmente e suas migrações preservam
+O schema atual é 9. O banco é criado localmente e suas migrações preservam
 instalações anteriores. Seeds idempotentes garantem os dados temporários de
 usuário/veículo e as plataformas padrão sem sobrescrever registros existentes.
 
@@ -56,6 +57,6 @@ arquitetura atual.
 
 ## Features planejadas
 
-Manutenção, eventos financeiros adicionais, relatórios, alertas, localização e
+Eventos financeiros adicionais, relatórios, notificações, localização e
 sincronização permanecem no backlog. Diretórios futuros não são documentados
 como estrutura existente.

@@ -4,12 +4,13 @@ import '../app_database.dart';
 import '../tables/abastecimento.dart';
 import '../tables/jornada.dart';
 import '../tables/pausa.dart';
+import '../tables/manutencao.dart';
 
 part 'abastecimento_dao.g.dart';
 
 typedef LimitesOdometro = ({int? anterior, int? posterior});
 
-@DriftAccessor(tables: [Abastecimentos, Jornadas, Pausas])
+@DriftAccessor(tables: [Abastecimentos, Jornadas, Pausas, Manutencoes])
 class AbastecimentoDao extends DatabaseAccessor<AppDatabase>
     with _$AbastecimentoDaoMixin {
   AbastecimentoDao(super.db);
@@ -67,10 +68,12 @@ class AbastecimentoDao extends DatabaseAccessor<AppDatabase>
             AND pausas.odometro_fim IS NOT NULL
         UNION ALL
         SELECT data_hora, odometro, 4 FROM abastecimentos WHERE veiculo_id = ?
+        UNION ALL
+        SELECT data_hora, odometro, 5 FROM manutencoes WHERE veiculo_id = ?
       ) ORDER BY data_hora DESC, ordem DESC LIMIT 1
       ''',
-      variables: List.generate(5, (_) => Variable<int>(veiculoId)),
-      readsFrom: {abastecimentos},
+      variables: List.generate(6, (_) => Variable<int>(veiculoId)),
+      readsFrom: {jornadas, pausas, abastecimentos, manutencoes},
     ).getSingleOrNull();
     return linha?.readNullable<int>('odometro');
   }
@@ -111,8 +114,9 @@ class AbastecimentoDao extends DatabaseAccessor<AppDatabase>
 
   Future<LimitesOdometro> buscarLimitesOdometro(
     int veiculoId,
-    DateTime dataHora,
-  ) async {
+    DateTime dataHora, {
+    int? ignorarManutencaoId,
+  }) async {
     final instante = dataHora.millisecondsSinceEpoch ~/ 1000;
     final linha = await customSelect(
       '''
@@ -134,17 +138,22 @@ class AbastecimentoDao extends DatabaseAccessor<AppDatabase>
             AND pausas.odometro_fim IS NOT NULL
         UNION ALL
         SELECT data_hora, odometro FROM abastecimentos WHERE veiculo_id = ?
+        UNION ALL
+        SELECT data_hora, odometro FROM manutencoes
+          WHERE veiculo_id = ? AND (? IS NULL OR id != ?)
       )
       SELECT
         (SELECT MAX(odometro) FROM fatos WHERE data_hora <= ?) AS anterior,
         (SELECT MIN(odometro) FROM fatos WHERE data_hora >= ?) AS posterior
       ''',
       variables: [
-        ...List.generate(5, (_) => Variable<int>(veiculoId)),
+        ...List.generate(6, (_) => Variable<int>(veiculoId)),
+        Variable<int>(ignorarManutencaoId),
+        Variable<int>(ignorarManutencaoId),
         Variable<int>(instante),
         Variable<int>(instante),
       ],
-      readsFrom: {jornadas, pausas, abastecimentos},
+      readsFrom: {jornadas, pausas, abastecimentos, manutencoes},
     ).getSingle();
     return (
       anterior: linha.readNullable<int>('anterior'),
@@ -171,10 +180,12 @@ class AbastecimentoDao extends DatabaseAccessor<AppDatabase>
           WHERE jornadas.veiculo_id = ? AND pausas.odometro_fim IS NOT NULL
         UNION ALL
         SELECT odometro FROM abastecimentos WHERE veiculo_id = ?
+        UNION ALL
+        SELECT odometro FROM manutencoes WHERE veiculo_id = ?
       )
       ''',
-      variables: List.generate(5, (_) => Variable<int>(veiculoId)),
-      readsFrom: {jornadas, pausas, abastecimentos},
+      variables: List.generate(6, (_) => Variable<int>(veiculoId)),
+      readsFrom: {jornadas, pausas, abastecimentos, manutencoes},
     ).getSingle();
     return linha.readNullable<int>('odometro');
   }

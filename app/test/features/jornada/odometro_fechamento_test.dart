@@ -41,6 +41,7 @@ void main() {
       null,
       null,
       AbastecimentoRepository(AbastecimentoDao(database)),
+      () => DateTime(2026, 8, 16),
     );
   });
 
@@ -120,6 +121,30 @@ void main() {
 
     expect(await service.sugerirOdometroFechamento(), 52142);
   });
+
+  test(
+    'Manutenção posterior sugere e limita o fechamento da Jornada',
+    () async {
+      await database
+          .into(database.manutencoes)
+          .insert(
+            ManutencoesCompanion.insert(
+              veiculoId: 1,
+              dataHora: DateTime(2026, 8, 15, 16),
+              odometro: 52150,
+            ),
+          );
+
+      expect(await service.sugerirOdometroFechamento(), 52150);
+      await expectLater(
+        service.validarFechamento(
+          dataHoraFim: DateTime(2026, 8, 15, 18),
+          odometroFim: 52149,
+        ),
+        throwsA(isA<Exception>()),
+      );
+    },
+  );
 
   test('ordena fatos por horário e não pelo ID nem pelo maior valor', () async {
     await inserirAbastecimento(

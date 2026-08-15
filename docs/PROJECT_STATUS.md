@@ -4,8 +4,8 @@
 
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
-- schema atual: **8**;
-- suíte automatizada: **155 testes aprovados** em 15/08/2026.
+- schema atual: **9**;
+- suíte automatizada: **168 testes aprovados** em 15/08/2026.
 
 ## Implementado
 
@@ -27,6 +27,8 @@
 - inteligência derivada de Abastecimentos com ciclos cheio a cheio, parciais
   acumulados, consumo recente, autonomia teórica de tanque cheio e referência
   comportamental conservadora para abastecer;
+- Manutenções por veículo com cabeçalho e múltiplos itens, valores opcionais,
+  edição atômica, histórico, sugestões e recorrências derivadas por km/data;
 - Passes por faturamento ou tempo, validade derivada, repetição segura por
   Plataforma, cadastro retroativo, custos separados e Jornada opcional;
 - crédito promocional retroativo sem escolha de subtipo pelo motorista; valores
@@ -37,7 +39,7 @@
 - JornadaPage protegida pelos insets seguros inferiores do Android;
 - formulários operacionais navegam pelo teclado entre campos editáveis,
   ignorando botões, seletores e calendários, e encerram a sequência com Done;
-- migrações preservadoras até schema 8 e seeds idempotentes.
+- migrações preservadoras até schema 9 e seeds idempotentes.
 
 ## Em teste operacional
 
@@ -50,7 +52,7 @@ entregas mais recentes; a interface segue funcional e provisória.
 - não há exclusão histórica nem auditoria/versionamento das correções;
 - resets e efeitos de Passes sobre snapshots não são inferidos; bônus conhecidos
   são reconciliados somente quando a matemática é segura;
-- não há custo/km, análise por posto, manutenção, custos gerais, alertas, GPS,
+- não há custo/km, análise por posto, custos gerais, notificações, GPS,
   nuvem ou importação do AppSheet; previsão por data é omitida sem histórico
   calendário confiável;
 - tratamento visual e navegação ainda estão concentrados na `JornadaPage`;

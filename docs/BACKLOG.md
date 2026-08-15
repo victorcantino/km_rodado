@@ -43,9 +43,13 @@
 
 ## Manutenção e veículo
 
-- Manutenção associável ou não a Jornada.
 - Componentes por posição/lado e mapa visual do veículo (pneus, faróis etc.).
-- Alertas por data e/ou odômetro.
+- Alertas/notificações configuráveis por data e/ou odômetro, sem limiares
+  arbitrários.
+- Importação histórica das 38 linhas do AppSheet, agrupando visitas e revisando
+  a semântica mista de `Km Duração` e `Validade`.
+- Análises por oficina/fornecedor e custo econômico por km quando houver base
+  suficiente, sem atribuir automaticamente o custo a uma Jornada.
 
 ## Custos e obrigações
 
