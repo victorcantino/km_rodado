@@ -161,6 +161,33 @@ justificativa e inserção histórica arbitrária permanecem futuras.
   distinguir com segurança dias sem Jornada de ausência de dados.
 - Custo/km e análises por posto/bandeira permanecem futuros.
 
+## Manutenções
+
+- Manutenção representa a visita/evento do veículo e possui um ou mais itens.
+  Cabeçalho e itens são criados ou editados em uma única transação.
+- Veículo, instante operacional e odômetro são obrigatórios. Oficina e
+  observação são textos opcionais. Manutenção não é custo automático de uma
+  Jornada e não possui `jornadaId` nesta versão.
+- Item exige descrição livre normalizada com `trim`; sugestões históricas não
+  limitam textos novos nem formam enum de categorias.
+- Valor é opcional por item e usa centavos inteiros. Ausente é desconhecido,
+  não zero. Total só é apresentado quando todos os itens têm valor; caso
+  contrário, exibe-se custo conhecido e quantidade sem valor.
+- `dataHora` é quando ocorreu e não pode estar no futuro; `dataCriacao` é o
+  cadastro técnico. Registro retroativo é permitido quando a progressão do
+  odômetro é coerente com fatos anteriores e posteriores.
+- Manutenção integra a cronologia física usada por Jornada, Pausa e
+  Abastecimento. Igualdade de odômetro é válida.
+- Recorrência por km guarda somente `intervaloKm > 0`; próximo odômetro é
+  derivado. Recorrência por data é opcional, explícita e posterior à
+  Manutenção; nunca recebe como default a data do evento.
+- A ocorrência mais recente de uma descrição normalizada por `trim` e caixa
+  substitui a recorrência ativa anterior. Não há fuzzy matching: “Litro de
+  óleo” e “Troca de Óleo e Filtros” continuam diferentes.
+- Status mostram fatos — km restantes, referência atingida, dias restantes ou
+  vencimento atingido — sem limiares arbitrários e sem notificações nesta fase.
+- O XLS do AppSheet não é importado nem usado como seed nesta entrega.
+
 ## Passes de plataforma
 
 - Passe é custo operacional factual de uma Plataforma, não faturamento

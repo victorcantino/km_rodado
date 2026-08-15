@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('migra schema 1 vazio para schema 8', () async {
+  test('migra schema 1 vazio para schema 9', () async {
     _criarBancoSchema1(arquivoBanco);
 
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
@@ -34,7 +34,7 @@ void main() {
     expect(await _contar(database, 'pausas'), 0);
     expect(await _contar(database, 'leituras_ganhos'), 0);
     expect(await _contar(database, 'leituras_ganho_plataforma'), 0);
-    expect(await _userVersion(database), 8);
+    expect(await _userVersion(database), 9);
     expect(
       await _tabelaExiste(database, 'lancamentos_ganho_individual'),
       isTrue,
@@ -94,7 +94,7 @@ void main() {
       plataformas.map((plataforma) => plataforma.tipoRegistroGanhos).toSet(),
       {TipoRegistroGanhos.acumulado},
     );
-    expect(await _userVersion(database), 8);
+    expect(await _userVersion(database), 9);
     expect(await _contar(database, 'lancamentos_ganho_individual'), 0);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -202,7 +202,7 @@ void main() {
     addTearDown(database.close);
     final pausa = (await database.select(database.pausas).get()).single;
 
-    expect(await _userVersion(database), 8);
+    expect(await _userVersion(database), 9);
     expect(pausa.odometroInicio, isNull);
     expect(pausa.odometroFim, isNull);
   });
@@ -242,7 +242,7 @@ void main() {
     final abastecimento =
         (await database.select(database.abastecimentos).get()).single;
 
-    expect(await _userVersion(database), 8);
+    expect(await _userVersion(database), 9);
     expect(abastecimento.odometro, 123456);
     expect(abastecimento.dataHora, abastecimento.dataCriacao);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -283,7 +283,7 @@ void main() {
     final abastecimento =
         (await database.select(database.abastecimentos).get()).single;
 
-    expect(await _userVersion(database), 8);
+    expect(await _userVersion(database), 9);
     expect(abastecimento.id, 7);
     expect(abastecimento.odometro, 123456);
     expect(abastecimento.dataHora, isNot(abastecimento.dataCriacao));
@@ -321,10 +321,63 @@ void main() {
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 8);
+    expect(await _userVersion(database), 9);
     expect(await _contar(database, 'passes_plataforma'), 1);
     expect(await _tabelaExiste(database, 'bonus_promocoes'), isTrue);
     expect(await _contar(database, 'bonus_promocoes'), 0);
+    expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
+  });
+
+  test('migra schema 8 populado para 9 preservando dados e FKs', () async {
+    final banco = sqlite.sqlite3.open(arquivoBanco.path);
+    banco.execute('''
+      PRAGMA foreign_keys = ON;
+      CREATE TABLE veiculos (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE plataformas (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE jornadas (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE bonus_promocoes (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        plataforma_id INTEGER NOT NULL REFERENCES plataformas (id),
+        jornada_id INTEGER NULL REFERENCES jornadas (id),
+        data_hora INTEGER NOT NULL,
+        valor_centavos INTEGER NOT NULL,
+        tipo TEXT NOT NULL,
+        observacao TEXT NULL,
+        data_criacao INTEGER NOT NULL
+      );
+      INSERT INTO veiculos VALUES (1);
+      INSERT INTO plataformas VALUES (2);
+      INSERT INTO bonus_promocoes VALUES (
+        3, 2, NULL, 1786600000, 800, 'bonus', 'preservar', 1786608000
+      );
+      PRAGMA user_version = 8;
+    ''');
+    banco.close();
+
+    final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
+    addTearDown(database.close);
+
+    expect(await _userVersion(database), 9);
+    expect(await _contar(database, 'bonus_promocoes'), 1);
+    expect(await _tabelaExiste(database, 'manutencoes'), isTrue);
+    expect(await _tabelaExiste(database, 'itens_manutencao'), isTrue);
+    final manutencaoId = await database
+        .into(database.manutencoes)
+        .insert(
+          ManutencoesCompanion.insert(
+            veiculoId: 1,
+            dataHora: DateTime(2026, 8, 15),
+            odometro: 130000,
+          ),
+        );
+    await database
+        .into(database.itensManutencao)
+        .insert(
+          ItensManutencaoCompanion.insert(
+            manutencaoId: manutencaoId,
+            descricao: 'Óleo',
+          ),
+        );
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
 }

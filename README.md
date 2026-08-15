@@ -22,9 +22,11 @@ a margem desejada.
 - ganhos individuais, incluindo Particular e lançamentos em lote;
 - resumo analítico derivado, com conferência de snapshots inconsistentes;
 - Abastecimentos atuais ou retroativos;
-- Passes de plataforma como custos separados do faturamento.
+- Passes de plataforma como custos separados do faturamento;
 - Bônus/promoções como créditos separados e reconciliação conservadora da
-  receita de viagens.
+  receita de viagens;
+- Manutenções por veículo com múltiplos itens, histórico e recorrências por
+  odômetro ou data.
 
 ## Arquitetura
 

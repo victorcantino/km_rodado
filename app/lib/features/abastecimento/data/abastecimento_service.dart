@@ -53,7 +53,7 @@ class AbastecimentoService {
       (numerador + denominador ~/ 2) ~/ denominador;
 
   Future<int?> ultimoOdometro(int veiculoId) =>
-      _repository.buscarUltimoOdometroOperacional(veiculoId);
+      _repository.buscarUltimoOdometroCronologico(veiculoId);
 
   Future<Abastecimento?> ultimoAbastecimento(int veiculoId) =>
       _repository.buscarUltimoPorVeiculo(veiculoId);

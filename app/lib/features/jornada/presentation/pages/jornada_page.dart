@@ -11,6 +11,7 @@ import '../../../../core/database/daos/leitura_ganhos_dao.dart';
 import '../../../../core/database/daos/pausa_dao.dart';
 import '../../../../core/database/daos/passe_plataforma_dao.dart';
 import '../../../../core/database/daos/bonus_promocao_dao.dart';
+import '../../../../core/database/daos/manutencao_dao.dart';
 import '../../../../core/database/seeds/seed.dart';
 import '../../../../core/database/seeds/plataformas_seed.dart';
 import '../../../leitura_ganhos/data/leitura_ganhos_repository.dart';
@@ -40,6 +41,10 @@ import '../../../bonus_promocao/data/bonus_promocao_repository.dart';
 import '../../../bonus_promocao/data/bonus_promocao_service.dart';
 import '../../../bonus_promocao/presentation/controllers/bonus_promocao_controller.dart';
 import '../../../bonus_promocao/presentation/widgets/registrar_bonus_promocao_dialog.dart';
+import '../../../manutencao/data/manutencao_repository.dart';
+import '../../../manutencao/data/manutencao_service.dart';
+import '../../../manutencao/presentation/controllers/manutencao_controller.dart';
+import '../../../manutencao/presentation/pages/manutencoes_page.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
 import '../../data/resumo_jornada.dart';
@@ -289,6 +294,26 @@ class _JornadaPageState extends State<JornadaPage> {
     }
   }
 
+  Future<void> _abrirManutencoes() async {
+    final repository = ManutencaoRepository(ManutencaoDao(database));
+    final odometros = AbastecimentoRepository(AbastecimentoDao(database));
+    final manutencaoController = ManutencaoController(
+      ManutencaoService(repository, odometros),
+    );
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => ManutencoesPage(
+          veiculoId: controller?.jornadaAtual?.veiculoId ?? 1,
+          controller: manutencaoController,
+        ),
+      ),
+    );
+    manutencaoController.dispose();
+    await abastecimentoController?.carregar(
+      controller?.jornadaAtual?.veiculoId ?? 1,
+    );
+  }
+
   Future<void> _registrarGanhoIndividual([Plataforma? plataforma]) async {
     final jornadaId = controller?.jornadaAtual?.id;
     final ganhoController = ganhoIndividualController;
@@ -328,11 +353,22 @@ class _JornadaPageState extends State<JornadaPage> {
       return;
     }
 
+    final ultimoFato = await abastecimentoController?.ultimoOdometro(1);
+    if (!mounted) return;
+    final ultimoFim = controller.ultimaJornadaFinalizada?.odometroFim;
+    final odometroSugerido =
+        [
+          ...?ultimoFim == null ? null : [ultimoFim],
+          ...?ultimoFato == null ? null : [ultimoFato],
+        ].fold<int?>(
+          null,
+          (maior, valor) => maior == null || valor > maior ? valor : maior,
+        );
     final resultado = await showDialog<AbrirJornadaResultado>(
       context: context,
       builder: (context) => AbrirJornadaDialog(
-        odometroInicial: controller.ultimaJornadaFinalizada?.odometroFim,
-        odometroMinimo: controller.ultimaJornadaFinalizada?.odometroFim,
+        odometroInicial: odometroSugerido,
+        odometroMinimo: odometroSugerido,
         cidadeOrigemInicial: controller.ultimaJornadaFinalizada?.cidadeDestino,
       ),
     );
@@ -376,12 +412,18 @@ class _JornadaPageState extends State<JornadaPage> {
       return;
     }
 
+    final ultimoFato = await abastecimentoController?.ultimoOdometro(
+      controller?.jornadaAtual?.veiculoId ?? 1,
+    );
+    if (!mounted) return;
+    final minimoLocal = _ultimoOdometroConhecido();
+    final minimo = ultimoFato != null && ultimoFato > minimoLocal
+        ? ultimoFato
+        : minimoLocal;
     final odometro = await showDialog<int>(
       context: context,
-      builder: (_) => OdometroPausaDialog(
-        titulo: 'Iniciar Pausa',
-        odometroMinimo: _ultimoOdometroConhecido(),
-      ),
+      builder: (_) =>
+          OdometroPausaDialog(titulo: 'Iniciar Pausa', odometroMinimo: minimo),
     );
     if (!mounted || odometro == null) return;
 
@@ -541,11 +583,19 @@ class _JornadaPageState extends State<JornadaPage> {
 
     final pausa = pausaController.pausaAberta;
     if (pausa == null) return;
+    final ultimoFato = await abastecimentoController?.ultimoOdometro(
+      controller?.jornadaAtual?.veiculoId ?? 1,
+    );
+    if (!mounted) return;
+    final minimoLocal = pausa.odometroInicio ?? _ultimoOdometroConhecido();
+    final minimo = ultimoFato != null && ultimoFato > minimoLocal
+        ? ultimoFato
+        : minimoLocal;
     final odometro = await showDialog<int>(
       context: context,
       builder: (_) => OdometroPausaDialog(
         titulo: 'Retomar Jornada',
-        odometroMinimo: pausa.odometroInicio ?? _ultimoOdometroConhecido(),
+        odometroMinimo: minimo,
       ),
     );
     if (!mounted || odometro == null) return;
@@ -801,12 +851,39 @@ class _JornadaPageState extends State<JornadaPage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Jornada')),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: abastecimentoController.carregando
-            ? null
-            : _registrarAbastecimento,
-        icon: const Icon(Icons.local_gas_station),
-        label: const Text('Abastecimento'),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Tooltip(
+            message: 'Manutenções',
+            excludeFromSemantics: true,
+            child: Semantics(
+              label: 'Manutenções',
+              button: true,
+              child: FloatingActionButton(
+                heroTag: 'manutencoes',
+                onPressed: _abrirManutencoes,
+                child: const Icon(Icons.build_outlined),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Tooltip(
+            message: 'Abastecimento',
+            excludeFromSemantics: true,
+            child: Semantics(
+              label: 'Abastecimento',
+              button: true,
+              child: FloatingActionButton(
+                heroTag: 'abastecimento',
+                onPressed: abastecimentoController.carregando
+                    ? null
+                    : _registrarAbastecimento,
+                child: const Icon(Icons.local_gas_station),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         key: const ValueKey('jornada_safe_area'),

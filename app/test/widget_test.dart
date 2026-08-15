@@ -70,6 +70,73 @@ void main() {
     expect(tester.getBottomRight(find.text('Abrir Jornada')).dy, lessThan(352));
   });
 
+  testWidgets('ações do veículo usam ícones empilhados, tooltip e semântica', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 480);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+    await garantirDadosTemporarios(database);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MediaQuery(
+          data: const MediaQueryData(
+            size: Size(320, 480),
+            viewPadding: EdgeInsets.only(bottom: 48),
+          ),
+          child: JornadaPage(databaseFactory: () => database),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final manutencao = find.byIcon(Icons.build_outlined);
+    final abastecimento = find.byIcon(Icons.local_gas_station);
+    expect(manutencao, findsOneWidget);
+    expect(abastecimento, findsOneWidget);
+    expect(
+      find.descendant(of: find.byType(AppBar), matching: manutencao),
+      findsNothing,
+    );
+    expect(find.byTooltip('Manutenções'), findsOneWidget);
+    expect(find.byTooltip('Abastecimento'), findsOneWidget);
+    expect(find.text('Manutenções'), findsNothing);
+    expect(find.text('Abastecimento'), findsNothing);
+    expect(
+      tester.getCenter(manutencao).dy,
+      lessThan(tester.getCenter(abastecimento).dy),
+    );
+    expect(
+      tester.getSize(find.byType(FloatingActionButton).first).width,
+      greaterThanOrEqualTo(48),
+    );
+    expect(tester.getBottomRight(abastecimento).dy, lessThanOrEqualTo(432));
+
+    final semantics = tester.ensureSemantics();
+    expect(find.bySemanticsLabel('Manutenções'), findsOneWidget);
+    expect(find.bySemanticsLabel('Abastecimento'), findsOneWidget);
+
+    await tester.longPress(manutencao);
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('Manutenções'), findsOneWidget);
+    await tester.tapAt(const Offset(10, 100));
+    await tester.pumpAndSettle();
+
+    await tester.tap(manutencao);
+    await tester.pumpAndSettle();
+    expect(find.text('Manutenções'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await tester.tap(abastecimento);
+    await tester.pumpAndSettle();
+    expect(find.text('Registrar abastecimento'), findsOneWidget);
+    semantics.dispose();
+  });
+
   testWidgets('exibe os campos e ações para abrir jornada', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(home: Scaffold(body: AbrirJornadaDialog())),

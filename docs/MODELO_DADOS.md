@@ -1,6 +1,6 @@
 # Modelo de dados — KM Rodado
 
-O schema Drift atual é **8**. Esta seção separa o que existe no SQLite do que é
+O schema Drift atual é **9**. Esta seção separa o que existe no SQLite do que é
 derivado ou apenas planejado.
 
 ## Tabelas persistidas
@@ -101,6 +101,22 @@ registros operacionais usam `bonus` canônico, sem escolha do usuário. Ambos s�
 lidos e reconciliados uniformemente como crédito observado. A receita de
 viagens reconciliada permanece derivada.
 
+### Manutencoes
+
+`id`, `veiculoId` → Veiculos, `dataHora`, `odometro`, `oficina?`,
+`observacao?`, `dataCriacao`, `dataAtualizacao?`.
+
+Representa uma visita ou evento físico do veículo. Não pertence automaticamente
+a uma Jornada e integra a cronologia confiável do odômetro.
+
+### ItensManutencao
+
+`id`, `manutencaoId` → Manutencoes, `descricao`, `valorCentavos?`,
+`intervaloKm?`, `vencimentoEm?`, `dataCriacao`, `dataAtualizacao?`.
+
+Descrição é livre. Valor ausente significa desconhecido, não zero. Próximo
+odômetro é derivado de `Manutencao.odometro + intervaloKm`; não é persistido.
+
 ## Relações principais
 
 ```text
@@ -111,6 +127,7 @@ Jornada? ──< LancamentoGanhoIndividual >── Plataforma
 Jornada? ──< Abastecimento >── Veiculo
 Jornada? ──< PassePlataforma >── Plataforma
 Jornada? ──< BonusPromocao >── Plataforma
+Veiculo ──< Manutencao ──< ItemManutencao
 ```
 
 ## Dados derivados, não persistidos
@@ -123,9 +140,11 @@ Jornada? ──< BonusPromocao >── Plataforma
 - custo total de passes;
 - receita de viagens reconciliada e resultado operacional com bônus e Passes;
 - preço efetivo do combustível.
+- custo conhecido/completo da Manutenção, próximo hodômetro e estados de
+  recorrência por km/data.
 
 ## Planejado, sem tabela atual
 
-Manutenção, evento financeiro genérico, carteira de
+Evento financeiro genérico, carteira de
 plataforma, alertas, clima, localização e sincronização não fazem parte do
-schema 8. Suas decisões e ideias permanecem no backlog e nas regras futuras.
+schema 9. Suas decisões e ideias permanecem no backlog e nas regras futuras.

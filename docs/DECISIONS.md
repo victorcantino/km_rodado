@@ -183,3 +183,30 @@ nível físico atual. Referência atingida não significa tanque vazio.
 Todos esses valores são derivados. Não há previsão por data de calendário sem
 histórico contínuo confiável, nem atribuição exclusiva de ciclo com parcial a
 um posto/bandeira.
+
+## ADR-017 — Manutenção como visita com itens livres
+
+Decisão: representar Manutenção como cabeçalho do evento físico do veículo e
+seus itens em relação 1:N. Descrição é livre, valor é opcional por item e o
+custo total/completo é derivado. Manutenção não recebe `jornadaId` nesta versão.
+
+Recorrência por km persiste somente o intervalo; o próximo odômetro é derivado.
+Vencimento por data é explícito e opcional. Apenas o item mais recente de uma
+descrição normalizada por espaços externos e caixa mantém a recorrência ativa.
+
+Motivo: o histórico real agrupa várias peças e serviços na mesma visita e usa
+descrições concretas, incompatíveis com enum rígido ou uma linha por visita.
+Separar fatos comuns dos itens evita repetição e preserva valor desconhecido sem
+tratá-lo como zero. O XLS permanece fonte para futura importação revisada, não
+seed desta entrega.
+
+## ADR-018 — Ações compactas quando o ícone é inequívoco
+
+Decisão: o KM Rodado prefere ações compactas somente com ícone quando o
+significado visual for suficientemente reconhecível. O nome permanece
+disponível por tooltip/toque longo e pela semântica de acessibilidade.
+
+Ícones claros e universais reduzem poluição visual. Ações ambíguas, destrutivas
+ou dependentes de contexto podem manter texto; ações como Salvar e Confirmar
+também preservam texto quando isso evita dúvida. A preferência orienta novos
+botões e revisões oportunas, sem conversão indiscriminada da interface atual.

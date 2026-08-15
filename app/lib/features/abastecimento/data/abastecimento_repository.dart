@@ -27,6 +27,11 @@ class AbastecimentoRepository {
       _dao.buscarUltimoOdometroOperacional(veiculoId);
   Future<LimitesOdometro> buscarLimitesOdometro(
     int veiculoId,
-    DateTime dataHora,
-  ) => _dao.buscarLimitesOdometro(veiculoId, dataHora);
+    DateTime dataHora, {
+    int? ignorarManutencaoId,
+  }) => _dao.buscarLimitesOdometro(
+    veiculoId,
+    dataHora,
+    ignorarManutencaoId: ignorarManutencaoId,
+  );
 }

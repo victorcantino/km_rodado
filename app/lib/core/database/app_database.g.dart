@@ -7007,6 +7007,1069 @@ class BonusPromocoesCompanion extends UpdateCompanion<BonusPromocao> {
   }
 }
 
+class $ManutencoesTable extends Manutencoes
+    with TableInfo<$ManutencoesTable, Manutencao> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ManutencoesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _veiculoIdMeta = const VerificationMeta(
+    'veiculoId',
+  );
+  @override
+  late final GeneratedColumn<int> veiculoId = GeneratedColumn<int>(
+    'veiculo_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES veiculos (id)',
+    ),
+  );
+  static const VerificationMeta _dataHoraMeta = const VerificationMeta(
+    'dataHora',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataHora = GeneratedColumn<DateTime>(
+    'data_hora',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _odometroMeta = const VerificationMeta(
+    'odometro',
+  );
+  @override
+  late final GeneratedColumn<int> odometro = GeneratedColumn<int>(
+    'odometro',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _oficinaMeta = const VerificationMeta(
+    'oficina',
+  );
+  @override
+  late final GeneratedColumn<String> oficina = GeneratedColumn<String>(
+    'oficina',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _observacaoMeta = const VerificationMeta(
+    'observacao',
+  );
+  @override
+  late final GeneratedColumn<String> observacao = GeneratedColumn<String>(
+    'observacao',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dataCriacaoMeta = const VerificationMeta(
+    'dataCriacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataCriacao = GeneratedColumn<DateTime>(
+    'data_criacao',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _dataAtualizacaoMeta = const VerificationMeta(
+    'dataAtualizacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataAtualizacao =
+      GeneratedColumn<DateTime>(
+        'data_atualizacao',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    veiculoId,
+    dataHora,
+    odometro,
+    oficina,
+    observacao,
+    dataCriacao,
+    dataAtualizacao,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'manutencoes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Manutencao> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('veiculo_id')) {
+      context.handle(
+        _veiculoIdMeta,
+        veiculoId.isAcceptableOrUnknown(data['veiculo_id']!, _veiculoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_veiculoIdMeta);
+    }
+    if (data.containsKey('data_hora')) {
+      context.handle(
+        _dataHoraMeta,
+        dataHora.isAcceptableOrUnknown(data['data_hora']!, _dataHoraMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dataHoraMeta);
+    }
+    if (data.containsKey('odometro')) {
+      context.handle(
+        _odometroMeta,
+        odometro.isAcceptableOrUnknown(data['odometro']!, _odometroMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_odometroMeta);
+    }
+    if (data.containsKey('oficina')) {
+      context.handle(
+        _oficinaMeta,
+        oficina.isAcceptableOrUnknown(data['oficina']!, _oficinaMeta),
+      );
+    }
+    if (data.containsKey('observacao')) {
+      context.handle(
+        _observacaoMeta,
+        observacao.isAcceptableOrUnknown(data['observacao']!, _observacaoMeta),
+      );
+    }
+    if (data.containsKey('data_criacao')) {
+      context.handle(
+        _dataCriacaoMeta,
+        dataCriacao.isAcceptableOrUnknown(
+          data['data_criacao']!,
+          _dataCriacaoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('data_atualizacao')) {
+      context.handle(
+        _dataAtualizacaoMeta,
+        dataAtualizacao.isAcceptableOrUnknown(
+          data['data_atualizacao']!,
+          _dataAtualizacaoMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Manutencao map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Manutencao(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      veiculoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}veiculo_id'],
+      )!,
+      dataHora: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_hora'],
+      )!,
+      odometro: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}odometro'],
+      )!,
+      oficina: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}oficina'],
+      ),
+      observacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}observacao'],
+      ),
+      dataCriacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_criacao'],
+      )!,
+      dataAtualizacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_atualizacao'],
+      ),
+    );
+  }
+
+  @override
+  $ManutencoesTable createAlias(String alias) {
+    return $ManutencoesTable(attachedDatabase, alias);
+  }
+}
+
+class Manutencao extends DataClass implements Insertable<Manutencao> {
+  final int id;
+  final int veiculoId;
+  final DateTime dataHora;
+  final int odometro;
+  final String? oficina;
+  final String? observacao;
+  final DateTime dataCriacao;
+  final DateTime? dataAtualizacao;
+  const Manutencao({
+    required this.id,
+    required this.veiculoId,
+    required this.dataHora,
+    required this.odometro,
+    this.oficina,
+    this.observacao,
+    required this.dataCriacao,
+    this.dataAtualizacao,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['veiculo_id'] = Variable<int>(veiculoId);
+    map['data_hora'] = Variable<DateTime>(dataHora);
+    map['odometro'] = Variable<int>(odometro);
+    if (!nullToAbsent || oficina != null) {
+      map['oficina'] = Variable<String>(oficina);
+    }
+    if (!nullToAbsent || observacao != null) {
+      map['observacao'] = Variable<String>(observacao);
+    }
+    map['data_criacao'] = Variable<DateTime>(dataCriacao);
+    if (!nullToAbsent || dataAtualizacao != null) {
+      map['data_atualizacao'] = Variable<DateTime>(dataAtualizacao);
+    }
+    return map;
+  }
+
+  ManutencoesCompanion toCompanion(bool nullToAbsent) {
+    return ManutencoesCompanion(
+      id: Value(id),
+      veiculoId: Value(veiculoId),
+      dataHora: Value(dataHora),
+      odometro: Value(odometro),
+      oficina: oficina == null && nullToAbsent
+          ? const Value.absent()
+          : Value(oficina),
+      observacao: observacao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(observacao),
+      dataCriacao: Value(dataCriacao),
+      dataAtualizacao: dataAtualizacao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dataAtualizacao),
+    );
+  }
+
+  factory Manutencao.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Manutencao(
+      id: serializer.fromJson<int>(json['id']),
+      veiculoId: serializer.fromJson<int>(json['veiculoId']),
+      dataHora: serializer.fromJson<DateTime>(json['dataHora']),
+      odometro: serializer.fromJson<int>(json['odometro']),
+      oficina: serializer.fromJson<String?>(json['oficina']),
+      observacao: serializer.fromJson<String?>(json['observacao']),
+      dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
+      dataAtualizacao: serializer.fromJson<DateTime?>(json['dataAtualizacao']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'veiculoId': serializer.toJson<int>(veiculoId),
+      'dataHora': serializer.toJson<DateTime>(dataHora),
+      'odometro': serializer.toJson<int>(odometro),
+      'oficina': serializer.toJson<String?>(oficina),
+      'observacao': serializer.toJson<String?>(observacao),
+      'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
+      'dataAtualizacao': serializer.toJson<DateTime?>(dataAtualizacao),
+    };
+  }
+
+  Manutencao copyWith({
+    int? id,
+    int? veiculoId,
+    DateTime? dataHora,
+    int? odometro,
+    Value<String?> oficina = const Value.absent(),
+    Value<String?> observacao = const Value.absent(),
+    DateTime? dataCriacao,
+    Value<DateTime?> dataAtualizacao = const Value.absent(),
+  }) => Manutencao(
+    id: id ?? this.id,
+    veiculoId: veiculoId ?? this.veiculoId,
+    dataHora: dataHora ?? this.dataHora,
+    odometro: odometro ?? this.odometro,
+    oficina: oficina.present ? oficina.value : this.oficina,
+    observacao: observacao.present ? observacao.value : this.observacao,
+    dataCriacao: dataCriacao ?? this.dataCriacao,
+    dataAtualizacao: dataAtualizacao.present
+        ? dataAtualizacao.value
+        : this.dataAtualizacao,
+  );
+  Manutencao copyWithCompanion(ManutencoesCompanion data) {
+    return Manutencao(
+      id: data.id.present ? data.id.value : this.id,
+      veiculoId: data.veiculoId.present ? data.veiculoId.value : this.veiculoId,
+      dataHora: data.dataHora.present ? data.dataHora.value : this.dataHora,
+      odometro: data.odometro.present ? data.odometro.value : this.odometro,
+      oficina: data.oficina.present ? data.oficina.value : this.oficina,
+      observacao: data.observacao.present
+          ? data.observacao.value
+          : this.observacao,
+      dataCriacao: data.dataCriacao.present
+          ? data.dataCriacao.value
+          : this.dataCriacao,
+      dataAtualizacao: data.dataAtualizacao.present
+          ? data.dataAtualizacao.value
+          : this.dataAtualizacao,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Manutencao(')
+          ..write('id: $id, ')
+          ..write('veiculoId: $veiculoId, ')
+          ..write('dataHora: $dataHora, ')
+          ..write('odometro: $odometro, ')
+          ..write('oficina: $oficina, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao, ')
+          ..write('dataAtualizacao: $dataAtualizacao')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    veiculoId,
+    dataHora,
+    odometro,
+    oficina,
+    observacao,
+    dataCriacao,
+    dataAtualizacao,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Manutencao &&
+          other.id == this.id &&
+          other.veiculoId == this.veiculoId &&
+          other.dataHora == this.dataHora &&
+          other.odometro == this.odometro &&
+          other.oficina == this.oficina &&
+          other.observacao == this.observacao &&
+          other.dataCriacao == this.dataCriacao &&
+          other.dataAtualizacao == this.dataAtualizacao);
+}
+
+class ManutencoesCompanion extends UpdateCompanion<Manutencao> {
+  final Value<int> id;
+  final Value<int> veiculoId;
+  final Value<DateTime> dataHora;
+  final Value<int> odometro;
+  final Value<String?> oficina;
+  final Value<String?> observacao;
+  final Value<DateTime> dataCriacao;
+  final Value<DateTime?> dataAtualizacao;
+  const ManutencoesCompanion({
+    this.id = const Value.absent(),
+    this.veiculoId = const Value.absent(),
+    this.dataHora = const Value.absent(),
+    this.odometro = const Value.absent(),
+    this.oficina = const Value.absent(),
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+    this.dataAtualizacao = const Value.absent(),
+  });
+  ManutencoesCompanion.insert({
+    this.id = const Value.absent(),
+    required int veiculoId,
+    required DateTime dataHora,
+    required int odometro,
+    this.oficina = const Value.absent(),
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+    this.dataAtualizacao = const Value.absent(),
+  }) : veiculoId = Value(veiculoId),
+       dataHora = Value(dataHora),
+       odometro = Value(odometro);
+  static Insertable<Manutencao> custom({
+    Expression<int>? id,
+    Expression<int>? veiculoId,
+    Expression<DateTime>? dataHora,
+    Expression<int>? odometro,
+    Expression<String>? oficina,
+    Expression<String>? observacao,
+    Expression<DateTime>? dataCriacao,
+    Expression<DateTime>? dataAtualizacao,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (veiculoId != null) 'veiculo_id': veiculoId,
+      if (dataHora != null) 'data_hora': dataHora,
+      if (odometro != null) 'odometro': odometro,
+      if (oficina != null) 'oficina': oficina,
+      if (observacao != null) 'observacao': observacao,
+      if (dataCriacao != null) 'data_criacao': dataCriacao,
+      if (dataAtualizacao != null) 'data_atualizacao': dataAtualizacao,
+    });
+  }
+
+  ManutencoesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? veiculoId,
+    Value<DateTime>? dataHora,
+    Value<int>? odometro,
+    Value<String?>? oficina,
+    Value<String?>? observacao,
+    Value<DateTime>? dataCriacao,
+    Value<DateTime?>? dataAtualizacao,
+  }) {
+    return ManutencoesCompanion(
+      id: id ?? this.id,
+      veiculoId: veiculoId ?? this.veiculoId,
+      dataHora: dataHora ?? this.dataHora,
+      odometro: odometro ?? this.odometro,
+      oficina: oficina ?? this.oficina,
+      observacao: observacao ?? this.observacao,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+      dataAtualizacao: dataAtualizacao ?? this.dataAtualizacao,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (veiculoId.present) {
+      map['veiculo_id'] = Variable<int>(veiculoId.value);
+    }
+    if (dataHora.present) {
+      map['data_hora'] = Variable<DateTime>(dataHora.value);
+    }
+    if (odometro.present) {
+      map['odometro'] = Variable<int>(odometro.value);
+    }
+    if (oficina.present) {
+      map['oficina'] = Variable<String>(oficina.value);
+    }
+    if (observacao.present) {
+      map['observacao'] = Variable<String>(observacao.value);
+    }
+    if (dataCriacao.present) {
+      map['data_criacao'] = Variable<DateTime>(dataCriacao.value);
+    }
+    if (dataAtualizacao.present) {
+      map['data_atualizacao'] = Variable<DateTime>(dataAtualizacao.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ManutencoesCompanion(')
+          ..write('id: $id, ')
+          ..write('veiculoId: $veiculoId, ')
+          ..write('dataHora: $dataHora, ')
+          ..write('odometro: $odometro, ')
+          ..write('oficina: $oficina, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao, ')
+          ..write('dataAtualizacao: $dataAtualizacao')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ItensManutencaoTable extends ItensManutencao
+    with TableInfo<$ItensManutencaoTable, ItemManutencao> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ItensManutencaoTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _manutencaoIdMeta = const VerificationMeta(
+    'manutencaoId',
+  );
+  @override
+  late final GeneratedColumn<int> manutencaoId = GeneratedColumn<int>(
+    'manutencao_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES manutencoes (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _descricaoMeta = const VerificationMeta(
+    'descricao',
+  );
+  @override
+  late final GeneratedColumn<String> descricao = GeneratedColumn<String>(
+    'descricao',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valorCentavosMeta = const VerificationMeta(
+    'valorCentavos',
+  );
+  @override
+  late final GeneratedColumn<int> valorCentavos = GeneratedColumn<int>(
+    'valor_centavos',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _intervaloKmMeta = const VerificationMeta(
+    'intervaloKm',
+  );
+  @override
+  late final GeneratedColumn<int> intervaloKm = GeneratedColumn<int>(
+    'intervalo_km',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _vencimentoEmMeta = const VerificationMeta(
+    'vencimentoEm',
+  );
+  @override
+  late final GeneratedColumn<DateTime> vencimentoEm = GeneratedColumn<DateTime>(
+    'vencimento_em',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dataCriacaoMeta = const VerificationMeta(
+    'dataCriacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataCriacao = GeneratedColumn<DateTime>(
+    'data_criacao',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _dataAtualizacaoMeta = const VerificationMeta(
+    'dataAtualizacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataAtualizacao =
+      GeneratedColumn<DateTime>(
+        'data_atualizacao',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    manutencaoId,
+    descricao,
+    valorCentavos,
+    intervaloKm,
+    vencimentoEm,
+    dataCriacao,
+    dataAtualizacao,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'itens_manutencao';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ItemManutencao> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('manutencao_id')) {
+      context.handle(
+        _manutencaoIdMeta,
+        manutencaoId.isAcceptableOrUnknown(
+          data['manutencao_id']!,
+          _manutencaoIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_manutencaoIdMeta);
+    }
+    if (data.containsKey('descricao')) {
+      context.handle(
+        _descricaoMeta,
+        descricao.isAcceptableOrUnknown(data['descricao']!, _descricaoMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_descricaoMeta);
+    }
+    if (data.containsKey('valor_centavos')) {
+      context.handle(
+        _valorCentavosMeta,
+        valorCentavos.isAcceptableOrUnknown(
+          data['valor_centavos']!,
+          _valorCentavosMeta,
+        ),
+      );
+    }
+    if (data.containsKey('intervalo_km')) {
+      context.handle(
+        _intervaloKmMeta,
+        intervaloKm.isAcceptableOrUnknown(
+          data['intervalo_km']!,
+          _intervaloKmMeta,
+        ),
+      );
+    }
+    if (data.containsKey('vencimento_em')) {
+      context.handle(
+        _vencimentoEmMeta,
+        vencimentoEm.isAcceptableOrUnknown(
+          data['vencimento_em']!,
+          _vencimentoEmMeta,
+        ),
+      );
+    }
+    if (data.containsKey('data_criacao')) {
+      context.handle(
+        _dataCriacaoMeta,
+        dataCriacao.isAcceptableOrUnknown(
+          data['data_criacao']!,
+          _dataCriacaoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('data_atualizacao')) {
+      context.handle(
+        _dataAtualizacaoMeta,
+        dataAtualizacao.isAcceptableOrUnknown(
+          data['data_atualizacao']!,
+          _dataAtualizacaoMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ItemManutencao map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ItemManutencao(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      manutencaoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}manutencao_id'],
+      )!,
+      descricao: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}descricao'],
+      )!,
+      valorCentavos: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_centavos'],
+      ),
+      intervaloKm: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}intervalo_km'],
+      ),
+      vencimentoEm: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}vencimento_em'],
+      ),
+      dataCriacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_criacao'],
+      )!,
+      dataAtualizacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_atualizacao'],
+      ),
+    );
+  }
+
+  @override
+  $ItensManutencaoTable createAlias(String alias) {
+    return $ItensManutencaoTable(attachedDatabase, alias);
+  }
+}
+
+class ItemManutencao extends DataClass implements Insertable<ItemManutencao> {
+  final int id;
+  final int manutencaoId;
+  final String descricao;
+  final int? valorCentavos;
+  final int? intervaloKm;
+  final DateTime? vencimentoEm;
+  final DateTime dataCriacao;
+  final DateTime? dataAtualizacao;
+  const ItemManutencao({
+    required this.id,
+    required this.manutencaoId,
+    required this.descricao,
+    this.valorCentavos,
+    this.intervaloKm,
+    this.vencimentoEm,
+    required this.dataCriacao,
+    this.dataAtualizacao,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['manutencao_id'] = Variable<int>(manutencaoId);
+    map['descricao'] = Variable<String>(descricao);
+    if (!nullToAbsent || valorCentavos != null) {
+      map['valor_centavos'] = Variable<int>(valorCentavos);
+    }
+    if (!nullToAbsent || intervaloKm != null) {
+      map['intervalo_km'] = Variable<int>(intervaloKm);
+    }
+    if (!nullToAbsent || vencimentoEm != null) {
+      map['vencimento_em'] = Variable<DateTime>(vencimentoEm);
+    }
+    map['data_criacao'] = Variable<DateTime>(dataCriacao);
+    if (!nullToAbsent || dataAtualizacao != null) {
+      map['data_atualizacao'] = Variable<DateTime>(dataAtualizacao);
+    }
+    return map;
+  }
+
+  ItensManutencaoCompanion toCompanion(bool nullToAbsent) {
+    return ItensManutencaoCompanion(
+      id: Value(id),
+      manutencaoId: Value(manutencaoId),
+      descricao: Value(descricao),
+      valorCentavos: valorCentavos == null && nullToAbsent
+          ? const Value.absent()
+          : Value(valorCentavos),
+      intervaloKm: intervaloKm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(intervaloKm),
+      vencimentoEm: vencimentoEm == null && nullToAbsent
+          ? const Value.absent()
+          : Value(vencimentoEm),
+      dataCriacao: Value(dataCriacao),
+      dataAtualizacao: dataAtualizacao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dataAtualizacao),
+    );
+  }
+
+  factory ItemManutencao.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ItemManutencao(
+      id: serializer.fromJson<int>(json['id']),
+      manutencaoId: serializer.fromJson<int>(json['manutencaoId']),
+      descricao: serializer.fromJson<String>(json['descricao']),
+      valorCentavos: serializer.fromJson<int?>(json['valorCentavos']),
+      intervaloKm: serializer.fromJson<int?>(json['intervaloKm']),
+      vencimentoEm: serializer.fromJson<DateTime?>(json['vencimentoEm']),
+      dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
+      dataAtualizacao: serializer.fromJson<DateTime?>(json['dataAtualizacao']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'manutencaoId': serializer.toJson<int>(manutencaoId),
+      'descricao': serializer.toJson<String>(descricao),
+      'valorCentavos': serializer.toJson<int?>(valorCentavos),
+      'intervaloKm': serializer.toJson<int?>(intervaloKm),
+      'vencimentoEm': serializer.toJson<DateTime?>(vencimentoEm),
+      'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
+      'dataAtualizacao': serializer.toJson<DateTime?>(dataAtualizacao),
+    };
+  }
+
+  ItemManutencao copyWith({
+    int? id,
+    int? manutencaoId,
+    String? descricao,
+    Value<int?> valorCentavos = const Value.absent(),
+    Value<int?> intervaloKm = const Value.absent(),
+    Value<DateTime?> vencimentoEm = const Value.absent(),
+    DateTime? dataCriacao,
+    Value<DateTime?> dataAtualizacao = const Value.absent(),
+  }) => ItemManutencao(
+    id: id ?? this.id,
+    manutencaoId: manutencaoId ?? this.manutencaoId,
+    descricao: descricao ?? this.descricao,
+    valorCentavos: valorCentavos.present
+        ? valorCentavos.value
+        : this.valorCentavos,
+    intervaloKm: intervaloKm.present ? intervaloKm.value : this.intervaloKm,
+    vencimentoEm: vencimentoEm.present ? vencimentoEm.value : this.vencimentoEm,
+    dataCriacao: dataCriacao ?? this.dataCriacao,
+    dataAtualizacao: dataAtualizacao.present
+        ? dataAtualizacao.value
+        : this.dataAtualizacao,
+  );
+  ItemManutencao copyWithCompanion(ItensManutencaoCompanion data) {
+    return ItemManutencao(
+      id: data.id.present ? data.id.value : this.id,
+      manutencaoId: data.manutencaoId.present
+          ? data.manutencaoId.value
+          : this.manutencaoId,
+      descricao: data.descricao.present ? data.descricao.value : this.descricao,
+      valorCentavos: data.valorCentavos.present
+          ? data.valorCentavos.value
+          : this.valorCentavos,
+      intervaloKm: data.intervaloKm.present
+          ? data.intervaloKm.value
+          : this.intervaloKm,
+      vencimentoEm: data.vencimentoEm.present
+          ? data.vencimentoEm.value
+          : this.vencimentoEm,
+      dataCriacao: data.dataCriacao.present
+          ? data.dataCriacao.value
+          : this.dataCriacao,
+      dataAtualizacao: data.dataAtualizacao.present
+          ? data.dataAtualizacao.value
+          : this.dataAtualizacao,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ItemManutencao(')
+          ..write('id: $id, ')
+          ..write('manutencaoId: $manutencaoId, ')
+          ..write('descricao: $descricao, ')
+          ..write('valorCentavos: $valorCentavos, ')
+          ..write('intervaloKm: $intervaloKm, ')
+          ..write('vencimentoEm: $vencimentoEm, ')
+          ..write('dataCriacao: $dataCriacao, ')
+          ..write('dataAtualizacao: $dataAtualizacao')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    manutencaoId,
+    descricao,
+    valorCentavos,
+    intervaloKm,
+    vencimentoEm,
+    dataCriacao,
+    dataAtualizacao,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ItemManutencao &&
+          other.id == this.id &&
+          other.manutencaoId == this.manutencaoId &&
+          other.descricao == this.descricao &&
+          other.valorCentavos == this.valorCentavos &&
+          other.intervaloKm == this.intervaloKm &&
+          other.vencimentoEm == this.vencimentoEm &&
+          other.dataCriacao == this.dataCriacao &&
+          other.dataAtualizacao == this.dataAtualizacao);
+}
+
+class ItensManutencaoCompanion extends UpdateCompanion<ItemManutencao> {
+  final Value<int> id;
+  final Value<int> manutencaoId;
+  final Value<String> descricao;
+  final Value<int?> valorCentavos;
+  final Value<int?> intervaloKm;
+  final Value<DateTime?> vencimentoEm;
+  final Value<DateTime> dataCriacao;
+  final Value<DateTime?> dataAtualizacao;
+  const ItensManutencaoCompanion({
+    this.id = const Value.absent(),
+    this.manutencaoId = const Value.absent(),
+    this.descricao = const Value.absent(),
+    this.valorCentavos = const Value.absent(),
+    this.intervaloKm = const Value.absent(),
+    this.vencimentoEm = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+    this.dataAtualizacao = const Value.absent(),
+  });
+  ItensManutencaoCompanion.insert({
+    this.id = const Value.absent(),
+    required int manutencaoId,
+    required String descricao,
+    this.valorCentavos = const Value.absent(),
+    this.intervaloKm = const Value.absent(),
+    this.vencimentoEm = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+    this.dataAtualizacao = const Value.absent(),
+  }) : manutencaoId = Value(manutencaoId),
+       descricao = Value(descricao);
+  static Insertable<ItemManutencao> custom({
+    Expression<int>? id,
+    Expression<int>? manutencaoId,
+    Expression<String>? descricao,
+    Expression<int>? valorCentavos,
+    Expression<int>? intervaloKm,
+    Expression<DateTime>? vencimentoEm,
+    Expression<DateTime>? dataCriacao,
+    Expression<DateTime>? dataAtualizacao,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (manutencaoId != null) 'manutencao_id': manutencaoId,
+      if (descricao != null) 'descricao': descricao,
+      if (valorCentavos != null) 'valor_centavos': valorCentavos,
+      if (intervaloKm != null) 'intervalo_km': intervaloKm,
+      if (vencimentoEm != null) 'vencimento_em': vencimentoEm,
+      if (dataCriacao != null) 'data_criacao': dataCriacao,
+      if (dataAtualizacao != null) 'data_atualizacao': dataAtualizacao,
+    });
+  }
+
+  ItensManutencaoCompanion copyWith({
+    Value<int>? id,
+    Value<int>? manutencaoId,
+    Value<String>? descricao,
+    Value<int?>? valorCentavos,
+    Value<int?>? intervaloKm,
+    Value<DateTime?>? vencimentoEm,
+    Value<DateTime>? dataCriacao,
+    Value<DateTime?>? dataAtualizacao,
+  }) {
+    return ItensManutencaoCompanion(
+      id: id ?? this.id,
+      manutencaoId: manutencaoId ?? this.manutencaoId,
+      descricao: descricao ?? this.descricao,
+      valorCentavos: valorCentavos ?? this.valorCentavos,
+      intervaloKm: intervaloKm ?? this.intervaloKm,
+      vencimentoEm: vencimentoEm ?? this.vencimentoEm,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+      dataAtualizacao: dataAtualizacao ?? this.dataAtualizacao,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (manutencaoId.present) {
+      map['manutencao_id'] = Variable<int>(manutencaoId.value);
+    }
+    if (descricao.present) {
+      map['descricao'] = Variable<String>(descricao.value);
+    }
+    if (valorCentavos.present) {
+      map['valor_centavos'] = Variable<int>(valorCentavos.value);
+    }
+    if (intervaloKm.present) {
+      map['intervalo_km'] = Variable<int>(intervaloKm.value);
+    }
+    if (vencimentoEm.present) {
+      map['vencimento_em'] = Variable<DateTime>(vencimentoEm.value);
+    }
+    if (dataCriacao.present) {
+      map['data_criacao'] = Variable<DateTime>(dataCriacao.value);
+    }
+    if (dataAtualizacao.present) {
+      map['data_atualizacao'] = Variable<DateTime>(dataAtualizacao.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ItensManutencaoCompanion(')
+          ..write('id: $id, ')
+          ..write('manutencaoId: $manutencaoId, ')
+          ..write('descricao: $descricao, ')
+          ..write('valorCentavos: $valorCentavos, ')
+          ..write('intervaloKm: $intervaloKm, ')
+          ..write('vencimentoEm: $vencimentoEm, ')
+          ..write('dataCriacao: $dataCriacao, ')
+          ..write('dataAtualizacao: $dataAtualizacao')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7026,6 +8089,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $BonusPromocoesTable bonusPromocoes = $BonusPromocoesTable(this);
+  late final $ManutencoesTable manutencoes = $ManutencoesTable(this);
+  late final $ItensManutencaoTable itensManutencao = $ItensManutencaoTable(
+    this,
+  );
   late final JornadaDao jornadaDao = JornadaDao(this as AppDatabase);
   late final PausaDao pausaDao = PausaDao(this as AppDatabase);
   late final LeituraGanhosDao leituraGanhosDao = LeituraGanhosDao(
@@ -7043,6 +8110,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final BonusPromocaoDao bonusPromocaoDao = BonusPromocaoDao(
     this as AppDatabase,
   );
+  late final ManutencaoDao manutencaoDao = ManutencaoDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7060,7 +8128,19 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     abastecimentos,
     passesPlataforma,
     bonusPromocoes,
+    manutencoes,
+    itensManutencao,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'manutencoes',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('itens_manutencao', kind: UpdateKind.delete)],
+    ),
+  ]);
 }
 
 typedef $$UsuariosTableCreateCompanionBuilder =
@@ -7445,6 +8525,24 @@ final class $$VeiculosTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$ManutencoesTable, List<Manutencao>>
+  _manutencoesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.manutencoes,
+    aliasName: 'veiculos__id__manutencoes__veiculo_id',
+  );
+
+  $$ManutencoesTableProcessedTableManager get manutencoesRefs {
+    final manager = $$ManutencoesTableTableManager(
+      $_db,
+      $_db.manutencoes,
+    ).filter((f) => f.veiculoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_manutencoesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$VeiculosTableFilterComposer
@@ -7562,6 +8660,31 @@ class $$VeiculosTableFilterComposer
           }) => $$AbastecimentosTableFilterComposer(
             $db: $db,
             $table: $db.abastecimentos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> manutencoesRefs(
+    Expression<bool> Function($$ManutencoesTableFilterComposer f) f,
+  ) {
+    final $$ManutencoesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.manutencoes,
+      getReferencedColumn: (t) => t.veiculoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ManutencoesTableFilterComposer(
+            $db: $db,
+            $table: $db.manutencoes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -7756,6 +8879,31 @@ class $$VeiculosTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> manutencoesRefs<T extends Object>(
+    Expression<T> Function($$ManutencoesTableAnnotationComposer a) f,
+  ) {
+    final $$ManutencoesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.manutencoes,
+      getReferencedColumn: (t) => t.veiculoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ManutencoesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.manutencoes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$VeiculosTableTableManager
@@ -7771,7 +8919,11 @@ class $$VeiculosTableTableManager
           $$VeiculosTableUpdateCompanionBuilder,
           (Veiculo, $$VeiculosTableReferences),
           Veiculo,
-          PrefetchHooks Function({bool jornadasRefs, bool abastecimentosRefs})
+          PrefetchHooks Function({
+            bool jornadasRefs,
+            bool abastecimentosRefs,
+            bool manutencoesRefs,
+          })
         > {
   $$VeiculosTableTableManager(_$AppDatabase db, $VeiculosTable table)
     : super(
@@ -7853,12 +9005,17 @@ class $$VeiculosTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({jornadasRefs = false, abastecimentosRefs = false}) {
+              ({
+                jornadasRefs = false,
+                abastecimentosRefs = false,
+                manutencoesRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (jornadasRefs) db.jornadas,
                     if (abastecimentosRefs) db.abastecimentos,
+                    if (manutencoesRefs) db.manutencoes,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -7905,6 +9062,27 @@ class $$VeiculosTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (manutencoesRefs)
+                        await $_getPrefetchedData<
+                          Veiculo,
+                          $VeiculosTable,
+                          Manutencao
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VeiculosTableReferences
+                              ._manutencoesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VeiculosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).manutencoesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.veiculoId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -7925,7 +9103,11 @@ typedef $$VeiculosTableProcessedTableManager =
       $$VeiculosTableUpdateCompanionBuilder,
       (Veiculo, $$VeiculosTableReferences),
       Veiculo,
-      PrefetchHooks Function({bool jornadasRefs, bool abastecimentosRefs})
+      PrefetchHooks Function({
+        bool jornadasRefs,
+        bool abastecimentosRefs,
+        bool manutencoesRefs,
+      })
     >;
 typedef $$ConfiguracoesTableCreateCompanionBuilder =
     ConfiguracoesCompanion Function({
@@ -13566,6 +14748,865 @@ typedef $$BonusPromocoesTableProcessedTableManager =
       BonusPromocao,
       PrefetchHooks Function({bool plataformaId, bool jornadaId})
     >;
+typedef $$ManutencoesTableCreateCompanionBuilder =
+    ManutencoesCompanion Function({
+      Value<int> id,
+      required int veiculoId,
+      required DateTime dataHora,
+      required int odometro,
+      Value<String?> oficina,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+      Value<DateTime?> dataAtualizacao,
+    });
+typedef $$ManutencoesTableUpdateCompanionBuilder =
+    ManutencoesCompanion Function({
+      Value<int> id,
+      Value<int> veiculoId,
+      Value<DateTime> dataHora,
+      Value<int> odometro,
+      Value<String?> oficina,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+      Value<DateTime?> dataAtualizacao,
+    });
+
+final class $$ManutencoesTableReferences
+    extends BaseReferences<_$AppDatabase, $ManutencoesTable, Manutencao> {
+  $$ManutencoesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $VeiculosTable _veiculoIdTable(_$AppDatabase db) =>
+      db.veiculos.createAlias('manutencoes__veiculo_id__veiculos__id');
+
+  $$VeiculosTableProcessedTableManager get veiculoId {
+    final $_column = $_itemColumn<int>('veiculo_id')!;
+
+    final manager = $$VeiculosTableTableManager(
+      $_db,
+      $_db.veiculos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_veiculoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$ItensManutencaoTable, List<ItemManutencao>>
+  _itensManutencaoRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.itensManutencao,
+    aliasName: 'manutencoes__id__itens_manutencao__manutencao_id',
+  );
+
+  $$ItensManutencaoTableProcessedTableManager get itensManutencaoRefs {
+    final manager = $$ItensManutencaoTableTableManager(
+      $_db,
+      $_db.itensManutencao,
+    ).filter((f) => f.manutencaoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _itensManutencaoRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ManutencoesTableFilterComposer
+    extends Composer<_$AppDatabase, $ManutencoesTable> {
+  $$ManutencoesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get odometro => $composableBuilder(
+    column: $table.odometro,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get oficina => $composableBuilder(
+    column: $table.oficina,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VeiculosTableFilterComposer get veiculoId {
+    final $$VeiculosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableFilterComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> itensManutencaoRefs(
+    Expression<bool> Function($$ItensManutencaoTableFilterComposer f) f,
+  ) {
+    final $$ItensManutencaoTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.itensManutencao,
+      getReferencedColumn: (t) => t.manutencaoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItensManutencaoTableFilterComposer(
+            $db: $db,
+            $table: $db.itensManutencao,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ManutencoesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ManutencoesTable> {
+  $$ManutencoesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get odometro => $composableBuilder(
+    column: $table.odometro,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get oficina => $composableBuilder(
+    column: $table.oficina,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VeiculosTableOrderingComposer get veiculoId {
+    final $$VeiculosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableOrderingComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ManutencoesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ManutencoesTable> {
+  $$ManutencoesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dataHora =>
+      $composableBuilder(column: $table.dataHora, builder: (column) => column);
+
+  GeneratedColumn<int> get odometro =>
+      $composableBuilder(column: $table.odometro, builder: (column) => column);
+
+  GeneratedColumn<String> get oficina =>
+      $composableBuilder(column: $table.oficina, builder: (column) => column);
+
+  GeneratedColumn<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => column,
+  );
+
+  $$VeiculosTableAnnotationComposer get veiculoId {
+    final $$VeiculosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> itensManutencaoRefs<T extends Object>(
+    Expression<T> Function($$ItensManutencaoTableAnnotationComposer a) f,
+  ) {
+    final $$ItensManutencaoTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.itensManutencao,
+      getReferencedColumn: (t) => t.manutencaoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ItensManutencaoTableAnnotationComposer(
+            $db: $db,
+            $table: $db.itensManutencao,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ManutencoesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ManutencoesTable,
+          Manutencao,
+          $$ManutencoesTableFilterComposer,
+          $$ManutencoesTableOrderingComposer,
+          $$ManutencoesTableAnnotationComposer,
+          $$ManutencoesTableCreateCompanionBuilder,
+          $$ManutencoesTableUpdateCompanionBuilder,
+          (Manutencao, $$ManutencoesTableReferences),
+          Manutencao,
+          PrefetchHooks Function({bool veiculoId, bool itensManutencaoRefs})
+        > {
+  $$ManutencoesTableTableManager(_$AppDatabase db, $ManutencoesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ManutencoesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ManutencoesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ManutencoesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> veiculoId = const Value.absent(),
+                Value<DateTime> dataHora = const Value.absent(),
+                Value<int> odometro = const Value.absent(),
+                Value<String?> oficina = const Value.absent(),
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+                Value<DateTime?> dataAtualizacao = const Value.absent(),
+              }) => ManutencoesCompanion(
+                id: id,
+                veiculoId: veiculoId,
+                dataHora: dataHora,
+                odometro: odometro,
+                oficina: oficina,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+                dataAtualizacao: dataAtualizacao,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int veiculoId,
+                required DateTime dataHora,
+                required int odometro,
+                Value<String?> oficina = const Value.absent(),
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+                Value<DateTime?> dataAtualizacao = const Value.absent(),
+              }) => ManutencoesCompanion.insert(
+                id: id,
+                veiculoId: veiculoId,
+                dataHora: dataHora,
+                odometro: odometro,
+                oficina: oficina,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+                dataAtualizacao: dataAtualizacao,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ManutencoesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({veiculoId = false, itensManutencaoRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (itensManutencaoRefs) db.itensManutencao,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (veiculoId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.veiculoId,
+                                    referencedTable:
+                                        $$ManutencoesTableReferences
+                                            ._veiculoIdTable(db),
+                                    referencedColumn:
+                                        $$ManutencoesTableReferences
+                                            ._veiculoIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (itensManutencaoRefs)
+                        await $_getPrefetchedData<
+                          Manutencao,
+                          $ManutencoesTable,
+                          ItemManutencao
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ManutencoesTableReferences
+                              ._itensManutencaoRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ManutencoesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).itensManutencaoRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.manutencaoId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ManutencoesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ManutencoesTable,
+      Manutencao,
+      $$ManutencoesTableFilterComposer,
+      $$ManutencoesTableOrderingComposer,
+      $$ManutencoesTableAnnotationComposer,
+      $$ManutencoesTableCreateCompanionBuilder,
+      $$ManutencoesTableUpdateCompanionBuilder,
+      (Manutencao, $$ManutencoesTableReferences),
+      Manutencao,
+      PrefetchHooks Function({bool veiculoId, bool itensManutencaoRefs})
+    >;
+typedef $$ItensManutencaoTableCreateCompanionBuilder =
+    ItensManutencaoCompanion Function({
+      Value<int> id,
+      required int manutencaoId,
+      required String descricao,
+      Value<int?> valorCentavos,
+      Value<int?> intervaloKm,
+      Value<DateTime?> vencimentoEm,
+      Value<DateTime> dataCriacao,
+      Value<DateTime?> dataAtualizacao,
+    });
+typedef $$ItensManutencaoTableUpdateCompanionBuilder =
+    ItensManutencaoCompanion Function({
+      Value<int> id,
+      Value<int> manutencaoId,
+      Value<String> descricao,
+      Value<int?> valorCentavos,
+      Value<int?> intervaloKm,
+      Value<DateTime?> vencimentoEm,
+      Value<DateTime> dataCriacao,
+      Value<DateTime?> dataAtualizacao,
+    });
+
+final class $$ItensManutencaoTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $ItensManutencaoTable, ItemManutencao> {
+  $$ItensManutencaoTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ManutencoesTable _manutencaoIdTable(_$AppDatabase db) => db
+      .manutencoes
+      .createAlias('itens_manutencao__manutencao_id__manutencoes__id');
+
+  $$ManutencoesTableProcessedTableManager get manutencaoId {
+    final $_column = $_itemColumn<int>('manutencao_id')!;
+
+    final manager = $$ManutencoesTableTableManager(
+      $_db,
+      $_db.manutencoes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_manutencaoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ItensManutencaoTableFilterComposer
+    extends Composer<_$AppDatabase, $ItensManutencaoTable> {
+  $$ItensManutencaoTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get descricao => $composableBuilder(
+    column: $table.descricao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get valorCentavos => $composableBuilder(
+    column: $table.valorCentavos,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get intervaloKm => $composableBuilder(
+    column: $table.intervaloKm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get vencimentoEm => $composableBuilder(
+    column: $table.vencimentoEm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ManutencoesTableFilterComposer get manutencaoId {
+    final $$ManutencoesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.manutencaoId,
+      referencedTable: $db.manutencoes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ManutencoesTableFilterComposer(
+            $db: $db,
+            $table: $db.manutencoes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ItensManutencaoTableOrderingComposer
+    extends Composer<_$AppDatabase, $ItensManutencaoTable> {
+  $$ItensManutencaoTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get descricao => $composableBuilder(
+    column: $table.descricao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get valorCentavos => $composableBuilder(
+    column: $table.valorCentavos,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get intervaloKm => $composableBuilder(
+    column: $table.intervaloKm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get vencimentoEm => $composableBuilder(
+    column: $table.vencimentoEm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ManutencoesTableOrderingComposer get manutencaoId {
+    final $$ManutencoesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.manutencaoId,
+      referencedTable: $db.manutencoes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ManutencoesTableOrderingComposer(
+            $db: $db,
+            $table: $db.manutencoes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ItensManutencaoTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ItensManutencaoTable> {
+  $$ItensManutencaoTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get descricao =>
+      $composableBuilder(column: $table.descricao, builder: (column) => column);
+
+  GeneratedColumn<int> get valorCentavos => $composableBuilder(
+    column: $table.valorCentavos,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get intervaloKm => $composableBuilder(
+    column: $table.intervaloKm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get vencimentoEm => $composableBuilder(
+    column: $table.vencimentoEm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => column,
+  );
+
+  $$ManutencoesTableAnnotationComposer get manutencaoId {
+    final $$ManutencoesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.manutencaoId,
+      referencedTable: $db.manutencoes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ManutencoesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.manutencoes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ItensManutencaoTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ItensManutencaoTable,
+          ItemManutencao,
+          $$ItensManutencaoTableFilterComposer,
+          $$ItensManutencaoTableOrderingComposer,
+          $$ItensManutencaoTableAnnotationComposer,
+          $$ItensManutencaoTableCreateCompanionBuilder,
+          $$ItensManutencaoTableUpdateCompanionBuilder,
+          (ItemManutencao, $$ItensManutencaoTableReferences),
+          ItemManutencao,
+          PrefetchHooks Function({bool manutencaoId})
+        > {
+  $$ItensManutencaoTableTableManager(
+    _$AppDatabase db,
+    $ItensManutencaoTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ItensManutencaoTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ItensManutencaoTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ItensManutencaoTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> manutencaoId = const Value.absent(),
+                Value<String> descricao = const Value.absent(),
+                Value<int?> valorCentavos = const Value.absent(),
+                Value<int?> intervaloKm = const Value.absent(),
+                Value<DateTime?> vencimentoEm = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+                Value<DateTime?> dataAtualizacao = const Value.absent(),
+              }) => ItensManutencaoCompanion(
+                id: id,
+                manutencaoId: manutencaoId,
+                descricao: descricao,
+                valorCentavos: valorCentavos,
+                intervaloKm: intervaloKm,
+                vencimentoEm: vencimentoEm,
+                dataCriacao: dataCriacao,
+                dataAtualizacao: dataAtualizacao,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int manutencaoId,
+                required String descricao,
+                Value<int?> valorCentavos = const Value.absent(),
+                Value<int?> intervaloKm = const Value.absent(),
+                Value<DateTime?> vencimentoEm = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+                Value<DateTime?> dataAtualizacao = const Value.absent(),
+              }) => ItensManutencaoCompanion.insert(
+                id: id,
+                manutencaoId: manutencaoId,
+                descricao: descricao,
+                valorCentavos: valorCentavos,
+                intervaloKm: intervaloKm,
+                vencimentoEm: vencimentoEm,
+                dataCriacao: dataCriacao,
+                dataAtualizacao: dataAtualizacao,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ItensManutencaoTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({manutencaoId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (manutencaoId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.manutencaoId,
+                                referencedTable:
+                                    $$ItensManutencaoTableReferences
+                                        ._manutencaoIdTable(db),
+                                referencedColumn:
+                                    $$ItensManutencaoTableReferences
+                                        ._manutencaoIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ItensManutencaoTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ItensManutencaoTable,
+      ItemManutencao,
+      $$ItensManutencaoTableFilterComposer,
+      $$ItensManutencaoTableOrderingComposer,
+      $$ItensManutencaoTableAnnotationComposer,
+      $$ItensManutencaoTableCreateCompanionBuilder,
+      $$ItensManutencaoTableUpdateCompanionBuilder,
+      (ItemManutencao, $$ItensManutencaoTableReferences),
+      ItemManutencao,
+      PrefetchHooks Function({bool manutencaoId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -13601,4 +15642,8 @@ class $AppDatabaseManager {
       $$PassesPlataformaTableTableManager(_db, _db.passesPlataforma);
   $$BonusPromocoesTableTableManager get bonusPromocoes =>
       $$BonusPromocoesTableTableManager(_db, _db.bonusPromocoes);
+  $$ManutencoesTableTableManager get manutencoes =>
+      $$ManutencoesTableTableManager(_db, _db.manutencoes);
+  $$ItensManutencaoTableTableManager get itensManutencao =>
+      $$ItensManutencaoTableTableManager(_db, _db.itensManutencao);
 }

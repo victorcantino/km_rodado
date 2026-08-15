@@ -9,6 +9,7 @@ mixin _$AbastecimentoDaoMixin on DatabaseAccessor<AppDatabase> {
   $JornadasTable get jornadas => attachedDatabase.jornadas;
   $AbastecimentosTable get abastecimentos => attachedDatabase.abastecimentos;
   $PausasTable get pausas => attachedDatabase.pausas;
+  $ManutencoesTable get manutencoes => attachedDatabase.manutencoes;
   AbastecimentoDaoManager get managers => AbastecimentoDaoManager(this);
 }
 
@@ -28,4 +29,6 @@ class AbastecimentoDaoManager {
       );
   $$PausasTableTableManager get pausas =>
       $$PausasTableTableManager(_db.attachedDatabase, _db.pausas);
+  $$ManutencoesTableTableManager get manutencoes =>
+      $$ManutencoesTableTableManager(_db.attachedDatabase, _db.manutencoes);
 }
