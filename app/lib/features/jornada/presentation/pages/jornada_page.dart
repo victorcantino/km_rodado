@@ -16,6 +16,7 @@ import '../../../../core/database/seeds/plataformas_seed.dart';
 import '../../../leitura_ganhos/data/leitura_ganhos_repository.dart';
 import '../../../abastecimento/data/abastecimento_repository.dart';
 import '../../../abastecimento/data/abastecimento_service.dart';
+import '../../../abastecimento/data/resumo_inteligencia_abastecimento.dart';
 import '../../../abastecimento/presentation/controllers/abastecimento_controller.dart';
 import '../../../abastecimento/presentation/widgets/registrar_abastecimento_dialog.dart';
 import '../../../ganho_individual/data/ganho_individual_repository.dart';
@@ -880,6 +881,15 @@ class _JornadaPageState extends State<JornadaPage> {
 
                   Text('Cidade de origem: ${jornada.cidadeOrigem}'),
 
+                  if (abastecimentoController.inteligencia?.possuiDados ==
+                      true) ...[
+                    const SizedBox(height: 24),
+                    ResumoInteligenciaAbastecimentoCard(
+                      resumo: abastecimentoController.inteligencia!,
+                      locale: locale,
+                    ),
+                  ],
+
                   const SizedBox(height: 24),
 
                   if (ganhoIndividualController.plataformas.isNotEmpty) ...[
@@ -1050,6 +1060,14 @@ class _JornadaPageState extends State<JornadaPage> {
                     ultimaJornada.cidadeDestino,
                   ),
                 ),
+                if (abastecimentoController.inteligencia?.possuiDados ==
+                    true) ...[
+                  const SizedBox(height: 16),
+                  ResumoInteligenciaAbastecimentoCard(
+                    resumo: abastecimentoController.inteligencia!,
+                    locale: locale,
+                  ),
+                ],
                 if (resumo != null) ...[
                   const SizedBox(height: 16),
                   _ResumoJornadaConcluida(
@@ -1083,6 +1101,89 @@ class _JornadaPageState extends State<JornadaPage> {
     controller?.dispose();
     database.close();
     super.dispose();
+  }
+}
+
+class ResumoInteligenciaAbastecimentoCard extends StatelessWidget {
+  final ResumoInteligenciaAbastecimento resumo;
+  final String locale;
+
+  const ResumoInteligenciaAbastecimentoCard({
+    super.key,
+    required this.resumo,
+    required this.locale,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final decimal = NumberFormat.decimalPattern(locale)
+      ..minimumFractionDigits = 1
+      ..maximumFractionDigits = 2;
+    final inteiros = NumberFormat.decimalPattern(locale);
+    final cicloRecente = resumo.ciclosRecentes.isEmpty
+        ? null
+        : resumo.ciclosRecentes.first;
+    final referencia = resumo.odometroReferenciaAbastecimento;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Consumo recente',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Text(
+              cicloRecente == null
+                  ? '—'
+                  : '${decimal.format(cicloRecente.kmPorLitro)} km/L',
+            ),
+            Text(
+              'Média recente: ${resumo.mediaKmPorLitro == null ? '—' : '${decimal.format(resumo.mediaKmPorLitro)} km/L'} '
+              '(${resumo.ciclosRecentes.length} ${resumo.ciclosRecentes.length == 1 ? 'ciclo' : 'ciclos'})',
+            ),
+            Text(
+              'Referência conservadora de consumo: '
+              '${resumo.kmPorLitroConservador == null ? '—' : '${decimal.format(resumo.kmPorLitroConservador)} km/L'}',
+            ),
+            Text(
+              'Autonomia estimada de tanque cheio: '
+              '${resumo.autonomiaConservadoraTanqueCheioKm == null ? '—' : '~${inteiros.format(resumo.autonomiaConservadoraTanqueCheioKm!.round())} km'}',
+            ),
+            if (referencia != null)
+              if (resumo.referenciaAtingida) ...[
+                const Text('Referência para abastecer atingida'),
+                Text('Referência: ~${inteiros.format(referencia)} km'),
+              ] else ...[
+                Text(
+                  'Referência para abastecer: '
+                  '~${inteiros.format(referencia)} km',
+                ),
+                if (resumo.distanciaAteReferenciaKm != null)
+                  Text(
+                    'Faltam aproximadamente '
+                    '${inteiros.format(resumo.distanciaAteReferenciaKm)} km '
+                    'até a referência comportamental.',
+                  ),
+                if (resumo.diasOperacaoAteReferencia != null)
+                  Text(
+                    'Aproximadamente '
+                    '${decimal.format(resumo.diasOperacaoAteReferencia)} '
+                    'dias de operação.',
+                  ),
+              ]
+            else
+              const Text('Referência para abastecer: —'),
+            if (resumo.ciclosRecentes.any((ciclo) => ciclo.potencialmenteMisto))
+              const Text(
+                'Há ciclo com abastecimento parcial; o consumo físico é '
+                'válido, mas não pertence exclusivamente a um único posto.',
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

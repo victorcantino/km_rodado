@@ -31,16 +31,15 @@
 ## Abastecimento
 
 - Histórico completo por posto, bandeira e cidade; preço médio e promoções.
-- Capacidade real/configurável do tanque por veículo.
-- Consumo por pelo menos três ciclos válidos de tanque cheio, tratando parciais.
-- No ciclo entre tanques cheios A e B, calcular `km desde A / litros colocados
-  em B` e atribuir o rendimento ao ciclo iniciado em A, inclusive ao analisar o
-  posto/bandeira de A. Acumular parciais até o próximo ciclo válido.
+- Evoluir a capacidade do tanque por veículo para configuração operacional.
+- Ao analisar posto/bandeira, tratar ciclos com parciais intermediários como
+  potencialmente mistos; não atribuir todo o rendimento a um único posto.
 - Com consentimento e infraestrutura apropriada, usar localização/serviço de
   lugares para sugerir cidade e posto, pedir confirmação, recuperar preços e
   ciclos anteriores e apoiar a escolha. GPS sozinho não identifica um
   estabelecimento com garantia; não criar cadastro automático sem confirmação.
-- Autonomia, custo/km e previsão do próximo abastecimento como derivados.
+- Custo/km e previsão por data de calendário somente com atribuição econômica e
+  histórico contínuo confiáveis.
 
 ## Manutenção e veículo
 

@@ -5,7 +5,7 @@
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
 - schema atual: **8**;
-- suíte automatizada: **152 testes aprovados** em 15/08/2026.
+- suíte automatizada: **155 testes aprovados** em 15/08/2026.
 
 ## Implementado
 
@@ -24,6 +24,9 @@
   totais financeiros gerais exatos;
 - Abastecimentos atuais/retroativos, preço efetivo derivado, tanque cheio ou
   parcial e associação opcional à Jornada;
+- inteligência derivada de Abastecimentos com ciclos cheio a cheio, parciais
+  acumulados, consumo recente, autonomia teórica de tanque cheio e referência
+  comportamental conservadora para abastecer;
 - Passes por faturamento ou tempo, validade derivada, repetição segura por
   Plataforma, cadastro retroativo, custos separados e Jornada opcional;
 - crédito promocional retroativo sem escolha de subtipo pelo motorista; valores
@@ -47,8 +50,9 @@ entregas mais recentes; a interface segue funcional e provisória.
 - não há exclusão histórica nem auditoria/versionamento das correções;
 - resets e efeitos de Passes sobre snapshots não são inferidos; bônus conhecidos
   são reconciliados somente quando a matemática é segura;
-- não há consumo/autonomia, manutenção, custos gerais, alertas, GPS, nuvem ou
-  importação do AppSheet;
+- não há custo/km, análise por posto, manutenção, custos gerais, alertas, GPS,
+  nuvem ou importação do AppSheet; previsão por data é omitida sem histórico
+  calendário confiável;
 - tratamento visual e navegação ainda estão concentrados na `JornadaPage`;
 - campos legados de Veículo/Configuração ainda usam `REAL` e aguardam evolução
   orientada pelas respectivas features.
