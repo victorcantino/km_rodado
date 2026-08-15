@@ -1,23 +1,18 @@
-# Tarefa atual — Jornada retroativa
+# Tarefa atual — Inteligência de Abastecimento
 
 ## Estado
 
-O fluxo normal de Jornada continua usando agora, odômetro e cidade sugeridos,
-sem etapa obrigatória adicional. Data/hora pode ser alterada discretamente para
-abertura ou fechamento tardio.
+O aplicativo deriva consumo físico de ciclos válidos entre tanques cheios,
+incluindo volumes parciais intermediários. A apresentação separa consumo
+recente, média, referência conservadora de consumo, autonomia teórica de tanque
+cheio e referência comportamental para abastecer.
 
-A Jornada aberta e a última Jornada finalizada podem ser corrigidas no local em
-que são apresentadas. A alteração é validada integralmente antes de persistir,
-considerando Jornadas vizinhas e fatos com instante operacional confiável.
-Ganhos individuais são preservados, mas seu `dataCriacao` técnico não limita a
-Jornada.
+A referência exige histórico mínimo, nunca é derivada da autonomia nominal e é
+omitida após parcial que torne o nível atual desconhecido. Se já foi alcançada,
+a interface informa o estado sem sugerir tanque vazio. Data de calendário não
+é prevista enquanto não houver histórico contínuo confiável.
 
-Quando a Leitura Inicial é observada depois do início retroativo, o resumo
-indica cobertura financeira parcial e não apresenta indicadores gerais como se
-cobrissem toda a Jornada. No fechamento reconstruído, `dataHora` da Leitura
-Final é operacional e `dataCriacao` permanece técnica.
-
-O schema permanece 8.
+Todos os indicadores são derivados; o schema permanece 8.
 
 ## Validação
 

@@ -136,14 +136,30 @@ justificativa e inserção histórica arbitrária permanecem futuras.
   que pode divergir do preço opcional da bomba.
 - Cidade, posto, bandeira e observação são opcionais e normalizados com `trim`.
 
-Consumo, autonomia e custo/km permanecem futuros e devem considerar ciclos
-válidos de tanque cheio e abastecimentos parciais.
-
-Em um futuro ciclo válido entre tanques cheios A e B, o consumo usa a distância
-percorrida desde A dividida pelo volume abastecido em B. O rendimento pertence
-ao ciclo iniciado em A — inclusive para análise de posto/bandeira — e não é
-atribuído automaticamente ao posto do abastecimento final. Abastecimentos
-parciais devem ser acumulados até um ciclo válido.
+- Consumo é derivado de ciclos cronologicamente válidos entre abastecimentos
+  com tanque cheio: distância entre os cheios dividida por todo o volume
+  abastecido depois do cheio inicial, incluindo parciais intermediários.
+- A visão usa até os três ciclos válidos mais recentes. A média é aritmética e
+  a referência conservadora de consumo é o menor km/L dessa amostra.
+- Ciclo com parcial continua fisicamente válido, mas é potencialmente misto e
+  não deve ser atribuído integralmente ao posto/bandeira do cheio inicial.
+- A capacidade configurada no Veículo permite estimar a autonomia teórica de
+  um tanque cheio. Essa autonomia não representa combustível restante nem
+  define quando abastecer.
+- A referência comportamental para abastecer exige ao menos dois ciclos e usa
+  a menor distância recente efetivamente percorrida do tanque cheio até o
+  primeiro reabastecimento. Ela é aplicada a partir do último tanque cheio.
+- Se houve parcial após o último tanque cheio, a referência é omitida porque o
+  nível físico atual é desconhecido. Não se soma uma autonomia artificial.
+- Quando o último odômetro conhecido atinge ou ultrapassa a referência, a UI
+  informa apenas que a referência comportamental foi atingida. Isso não
+  significa tanque vazio ou risco imediato de pane seca.
+- A distância restante, quando exibida, é até a referência comportamental, não
+  autonomia restante. Uma estimativa em dias de operação exige ao menos três
+  dias operacionais válidos recentes.
+- Não há previsão por data de calendário enquanto o histórico não permitir
+  distinguir com segurança dias sem Jornada de ausência de dados.
+- Custo/km e análises por posto/bandeira permanecem futuros.
 
 ## Passes de plataforma
 

@@ -27,6 +27,54 @@ class AbastecimentoDao extends DatabaseAccessor<AppDatabase>
             ..limit(1))
           .getSingleOrNull();
 
+  Future<List<Abastecimento>> listarPorVeiculo(int veiculoId) =>
+      (select(abastecimentos)
+            ..where(
+              (abastecimento) => abastecimento.veiculoId.equals(veiculoId),
+            )
+            ..orderBy([
+              (abastecimento) => OrderingTerm.asc(abastecimento.dataHora),
+              (abastecimento) => OrderingTerm.asc(abastecimento.id),
+            ]))
+          .get();
+
+  Future<double?> buscarCapacidadeTanque(int veiculoId) async {
+    final linha = await customSelect(
+      'SELECT capacidade_tanque FROM veiculos WHERE id = ? LIMIT 1',
+      variables: [Variable<int>(veiculoId)],
+    ).getSingleOrNull();
+    return linha?.readNullable<double>('capacidade_tanque');
+  }
+
+  Future<int?> buscarUltimoOdometroCronologico(int veiculoId) async {
+    final linha = await customSelect(
+      '''
+      SELECT odometro FROM (
+        SELECT data_hora_inicio AS data_hora, odometro_inicio AS odometro, 0 AS ordem
+          FROM jornadas WHERE veiculo_id = ?
+        UNION ALL
+        SELECT data_hora_fim, odometro_fim, 1 FROM jornadas
+          WHERE veiculo_id = ? AND data_hora_fim IS NOT NULL
+            AND odometro_fim IS NOT NULL
+        UNION ALL
+        SELECT pausas.inicio, pausas.odometro_inicio, 2 FROM pausas
+          INNER JOIN jornadas ON jornadas.id = pausas.jornada_id
+          WHERE jornadas.veiculo_id = ? AND pausas.odometro_inicio IS NOT NULL
+        UNION ALL
+        SELECT pausas.fim, pausas.odometro_fim, 3 FROM pausas
+          INNER JOIN jornadas ON jornadas.id = pausas.jornada_id
+          WHERE jornadas.veiculo_id = ? AND pausas.fim IS NOT NULL
+            AND pausas.odometro_fim IS NOT NULL
+        UNION ALL
+        SELECT data_hora, odometro, 4 FROM abastecimentos WHERE veiculo_id = ?
+      ) ORDER BY data_hora DESC, ordem DESC LIMIT 1
+      ''',
+      variables: List.generate(5, (_) => Variable<int>(veiculoId)),
+      readsFrom: {abastecimentos},
+    ).getSingleOrNull();
+    return linha?.readNullable<int>('odometro');
+  }
+
   Future<List<Abastecimento>> listarPorJornada(int jornadaId) =>
       (select(abastecimentos)
             ..where(

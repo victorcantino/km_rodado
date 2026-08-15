@@ -167,3 +167,19 @@ reconstruídos de forma cronologicamente coerente.
 Somente instantes operacionais semanticamente confiáveis limitam a Jornada.
 `LancamentoGanhoIndividual.dataCriacao` registra o cadastro técnico, não o
 momento da viagem, e por isso nunca é usado como fronteira temporal.
+
+## ADR-016 — Inteligência de abastecimento conservadora e derivada
+
+Decisão: calcular consumo por ciclos válidos entre tanques cheios, somando os
+volumes parciais intermediários, e usar no máximo os três ciclos mais recentes.
+A média é aritmética; a referência conservadora de consumo é o menor km/L.
+
+A autonomia estimada usa a capacidade do tanque, mas é apenas uma estimativa de
+tanque cheio. A referência para abastecer é comportamental: exige ao menos dois
+ciclos e usa a menor distância recente entre um tanque cheio e o primeiro
+reabastecimento. Após um parcial, a recomendação é omitida por não conhecermos o
+nível físico atual. Referência atingida não significa tanque vazio.
+
+Todos esses valores são derivados. Não há previsão por data de calendário sem
+histórico contínuo confiável, nem atribuição exclusiva de ciclo com parcial a
+um posto/bandeira.

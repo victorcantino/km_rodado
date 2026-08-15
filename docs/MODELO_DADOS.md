@@ -73,6 +73,11 @@ valores unitários.
 Combustíveis atuais: gasolina, etanol e outro. `dataHora` é o instante
 operacional; `dataCriacao`, o instante técnico do cadastro.
 
+Consumo, médias, autonomia estimada de tanque cheio e referência comportamental
+para abastecer são projeções calculadas a partir de Abastecimentos e da
+capacidade do Veículo. Não são persistidos. Parciais integram o volume físico do
+ciclo, mas tornam o ciclo potencialmente misto para análises por posto.
+
 ### PassesPlataforma
 
 `id`, `plataformaId` → Plataformas, `jornadaId?` → Jornadas, `dataHora`,

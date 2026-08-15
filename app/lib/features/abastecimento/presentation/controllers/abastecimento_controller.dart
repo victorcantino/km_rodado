@@ -3,10 +3,12 @@ import 'package:flutter/foundation.dart';
 import '../../../../core/constants/enums/tipo_combustivel.dart';
 import '../../../../core/database/app_database.dart';
 import '../../data/abastecimento_service.dart';
+import '../../data/resumo_inteligencia_abastecimento.dart';
 
 class AbastecimentoController extends ChangeNotifier {
   final AbastecimentoService _service;
   Abastecimento? ultimo;
+  ResumoInteligenciaAbastecimento? inteligencia;
   bool carregando = false;
 
   AbastecimentoController(this._service);
@@ -16,6 +18,7 @@ class AbastecimentoController extends ChangeNotifier {
 
   Future<void> carregar(int veiculoId) async {
     ultimo = await _service.ultimoAbastecimento(veiculoId);
+    inteligencia = await _service.calcularInteligencia(veiculoId);
     notifyListeners();
   }
 
@@ -51,6 +54,7 @@ class AbastecimentoController extends ChangeNotifier {
         observacao: observacao,
       );
       ultimo = await _service.ultimoAbastecimento(veiculoId);
+      inteligencia = await _service.calcularInteligencia(veiculoId);
     } finally {
       carregando = false;
       notifyListeners();
