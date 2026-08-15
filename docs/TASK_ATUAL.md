@@ -1,19 +1,24 @@
-# Tarefa atual — Navegação dos formulários
+# Tarefa atual — Jornada retroativa
 
 ## Estado
 
-Os formulários operacionais atuais usam `Próximo` para avançar somente entre
-campos editáveis, sem parar em botões, ícones, seletores, calendários ou outros
-controles auxiliares. O último campo usa `Done` e apenas encerra o foco, sem
-salvar automaticamente.
+O fluxo normal de Jornada continua usando agora, odômetro e cidade sugeridos,
+sem etapa obrigatória adicional. Data/hora pode ser alterada discretamente para
+abertura ou fechamento tardio.
 
-Fluxos lineares usam a navegação nativa do Flutter. Formulários com controles
-intermediários ou campos condicionais possuem foco explícito local ao diálogo,
-com ciclo de vida ligado ao respectivo `State`.
+A Jornada aberta e a última Jornada finalizada podem ser corrigidas no local em
+que são apresentadas. A alteração é validada integralmente antes de persistir,
+considerando Jornadas vizinhas e fatos com instante operacional confiável.
+Ganhos individuais são preservados, mas seu `dataCriacao` técnico não limita a
+Jornada.
+
+Quando a Leitura Inicial é observada depois do início retroativo, o resumo
+indica cobertura financeira parcial e não apresenta indicadores gerais como se
+cobrissem toda a Jornada. No fechamento reconstruído, `dataHora` da Leitura
+Final é operacional e `dataCriacao` permanece técnica.
 
 O schema permanece 8.
 
 ## Validação
 
-Aguardando validação operacional do teclado no Android após a suíte
-automatizada.
+Aguardando validação operacional no Android.

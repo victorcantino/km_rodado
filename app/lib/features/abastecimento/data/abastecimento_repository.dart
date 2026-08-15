@@ -10,6 +10,8 @@ class AbastecimentoRepository {
       _dao.inserir(abastecimento);
   Future<Abastecimento?> buscarUltimoPorVeiculo(int veiculoId) =>
       _dao.buscarUltimoPorVeiculo(veiculoId);
+  Future<List<Abastecimento>> listarPorJornada(int jornadaId) =>
+      _dao.listarPorJornada(jornadaId);
   Future<List<Abastecimento>> listarPorVeiculoNoIntervalo(
     int veiculoId,
     DateTime inicio,

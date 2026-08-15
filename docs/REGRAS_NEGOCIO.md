@@ -16,11 +16,25 @@
 - Quilômetros percorridos são `odometroFim - odometroInicio`.
 - A leitura final e o fechamento são persistidos atomicamente.
 - Não se fecha Jornada com Pausa aberta ou leitura inicial pendente.
+- Abertura e fechamento aceitam registro tardio, usando por padrão o instante
+  atual e permitindo alterar data/hora sob demanda, nunca para o futuro.
+- Jornadas do mesmo veículo não podem se sobrepor. A validação usa vizinhos por
+  data/hora, não por ID; igualdade entre o fim de uma e o início de outra é
+  aceita.
+- A edição da Jornada aberta ou da última finalizada deve manter Pausas,
+  Leituras, Abastecimentos, Passes e Bônus vinculados dentro do intervalo.
+  Esses fatos não são movidos ou reescritos automaticamente.
+- `LancamentoGanhoIndividual.dataCriacao` é instante técnico e não limita o
+  intervalo da Jornada. O lançamento é apenas preservado pelo `jornadaId`.
+- Leituras já persistidas preservam horário, tipo, vínculo com Pausa e valores.
+  A Leitura Final criada no fechamento usa o fim operacional escolhido em
+  `dataHora`; `dataCriacao` registra quando foi lançada no aplicativo.
 - A superfície operacional respeita os insets seguros do aparelho; ações não
   podem terminar atrás da navegação inferior do sistema.
 
-Correções históricas de odômetro não pertencem ao fluxo operacional normal e
-deverão exigir justificativa e rastreabilidade.
+Correções tardias da Jornada aberta ou da última finalizada podem ajustar
+odômetros quando toda a progressão física permanecer coerente. Auditoria,
+justificativa e inserção histórica arbitrária permanecem futuras.
 
 ## Pausas
 
@@ -101,6 +115,11 @@ deverão exigir justificativa e rastreabilidade.
 - Zero viagens produz ticket médio indisponível (`—`).
 - Se qualquer receita necessária não for calculável, totais gerais, ticket
   médio geral, R$/h e R$/km não são apresentados como exatos.
+- Se a Leitura Inicial ocorrer depois do início operacional da Jornada, a
+  cobertura financeira inicial é parcial. Não se inventam ganhos do intervalo
+  ausente; receita, viagens, ticket médio, R$/h, R$/km e resultado operacional
+  gerais ficam indisponíveis como totais exatos, embora fatos conhecidos do
+  período observado possam continuar visíveis.
 
 ## Abastecimentos
 

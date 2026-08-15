@@ -130,6 +130,7 @@ class LeituraGanhosService {
     required List<ItemLeituraGanhosEntrada> itens,
     String? cidadeDestino,
     String? observacoes,
+    DateTime? dataHoraFim,
   }) async {
     final jornada = await _validarJornadaAberta(jornadaId);
 
@@ -162,19 +163,38 @@ class LeituraGanhosService {
     }
 
     await _validarItens(jornadaId, itens, usarLeituraInicial: true);
-    final agora = _agora();
+    final instanteTecnico = _agora();
+    final fimOperacional = dataHoraFim ?? instanteTecnico;
+    if (fimOperacional.isBefore(jornada.dataHoraInicio)) {
+      throw Exception('O fim da jornada não pode ser anterior ao início.');
+    }
+    if (fimOperacional.isAfter(instanteTecnico)) {
+      throw Exception('O fim da jornada não pode estar no futuro.');
+    }
+    if (pausas.any(
+      (pausa) =>
+          pausa.inicio.isAfter(fimOperacional) ||
+          pausa.fim?.isAfter(fimOperacional) == true,
+    )) {
+      throw Exception('Existe uma Pausa posterior a esse encerramento.');
+    }
     final jornadaFinalizada = jornada.copyWith(
-      dataHoraFim: Value(agora),
+      dataHoraFim: Value(fimOperacional),
       odometroFim: Value(odometroFim),
       cidadeDestino: Value(cidadeDestino),
       observacoes: Value(observacoes),
       status: StatusJornada.finalizada,
       quilometrosPercorridos: Value(odometroFim - jornada.odometroInicio),
-      dataAtualizacao: agora,
+      dataAtualizacao: instanteTecnico,
     );
 
     return _repository.salvarLeituraFinalEFecharJornada(
-      _criarLeitura(jornadaId, TipoLeituraGanhos.finalDaJornada, agora),
+      _criarLeitura(
+        jornadaId,
+        TipoLeituraGanhos.finalDaJornada,
+        fimOperacional,
+        dataCriacao: instanteTecnico,
+      ),
       (leituraId) => _criarItens(leituraId, itens),
       jornadaFinalizada,
     );
@@ -228,13 +248,14 @@ class LeituraGanhosService {
     TipoLeituraGanhos tipo,
     DateTime agora, {
     int? pausaId,
+    DateTime? dataCriacao,
   }) {
     return LeiturasGanhosCompanion.insert(
       jornadaId: jornadaId,
       pausaId: Value(pausaId),
       dataHora: agora,
       tipo: tipo,
-      dataCriacao: Value(agora),
+      dataCriacao: Value(dataCriacao ?? agora),
     );
   }
 

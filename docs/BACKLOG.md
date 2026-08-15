@@ -6,6 +6,8 @@
 
 ## Operação e dados históricos
 
+- Avaliar inserção histórica arbitrária de Jornadas após uso operacional da
+  correção tardia.
 - Evoluir edição/exclusão histórica para um fluxo auditável, com usuário,
   justificativa e rastreabilidade de versões quando o uso definitivo/frota
   exigir; a correção simples de Pausas já existe sem essa trilha.

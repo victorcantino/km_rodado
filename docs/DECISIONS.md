@@ -156,3 +156,14 @@ Ao acionar `Próximo`, o foco percorre somente campos editáveis e respeita o
 tipo de teclado do destino. Botões, seletores e calendários ficam fora dessa
 sequência; valores padrão confiáveis permanecem preenchidos e detalhes menos
 frequentes continuam disponíveis sob demanda.
+
+## ADR-015 — Correção tardia sem falsificar instantes técnicos
+
+Decisão: o fluxo normal usa valores padrão confiáveis e exige poucos toques;
+edição de data/hora e demais detalhes permanece disponível sob demanda. O uso
+operacional tolera lançamentos tardios somente quando os fatos podem ser
+reconstruídos de forma cronologicamente coerente.
+
+Somente instantes operacionais semanticamente confiáveis limitam a Jornada.
+`LancamentoGanhoIndividual.dataCriacao` registra o cadastro técnico, não o
+momento da viagem, e por isso nunca é usado como fronteira temporal.

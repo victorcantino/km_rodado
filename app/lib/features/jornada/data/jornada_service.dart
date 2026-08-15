@@ -23,6 +23,7 @@ class JornadaService {
   final PassePlataformaRepository? _passePlataformaRepository;
   final BonusPromocaoRepository? _bonusPromocaoRepository;
   final AbastecimentoRepository? _abastecimentoRepository;
+  final DateTime Function() _agora;
 
   JornadaService(
     this._repository,
@@ -32,7 +33,8 @@ class JornadaService {
     this._passePlataformaRepository,
     this._bonusPromocaoRepository,
     this._abastecimentoRepository,
-  ]);
+    DateTime Function()? agora,
+  ]) : _agora = agora ?? DateTime.now;
 
   Future<Jornada?> jornadaAberta() {
     return _repository.buscarJornadaAberta();
@@ -105,6 +107,15 @@ class JornadaService {
     final snapshots = await leituraRepository.listarSnapshotsDaJornada(
       jornada.id,
     );
+    final leiturasIniciais =
+        snapshots
+            .map((snapshot) => snapshot.leitura)
+            .where((leitura) => leitura.tipo == TipoLeituraGanhos.inicial)
+            .toList()
+          ..sort((a, b) => a.dataHora.compareTo(b.dataHora));
+    final coberturaFinanceiraInicialCompleta =
+        leiturasIniciais.isNotEmpty &&
+        !leiturasIniciais.first.dataHora.isAfter(jornada.dataHoraInicio);
     final totaisIndividuais =
         await _ganhoIndividualRepository?.totalizarPorJornada(jornada.id) ??
         const [];
@@ -165,6 +176,7 @@ class JornadaService {
       ]..sort((a, b) => a.nome.compareTo(b.nome)),
       passes: passes,
       bonusPromocoes: bonusPromocoes,
+      coberturaFinanceiraInicialCompleta: coberturaFinanceiraInicialCompleta,
     );
   }
 
@@ -317,6 +329,7 @@ class JornadaService {
     required int veiculoId,
     required int odometro,
     required String cidadeOrigem,
+    DateTime? dataHoraInicio,
   }) async {
     final aberta = await _repository.buscarJornadaAberta();
 
@@ -324,8 +337,25 @@ class JornadaService {
       throw Exception('Já existe uma jornada aberta.');
     }
 
-    final ultimaJornada = await _repository.buscarUltimaJornadaFinalizada();
-    final ultimoOdometro = ultimaJornada?.odometroFim;
+    final inicio = dataHoraInicio ?? _agora();
+    if (inicio.isAfter(_agora())) {
+      throw Exception('O início da jornada não pode estar no futuro.');
+    }
+
+    final jornadas = await _repository.listar();
+    final anteriores =
+        jornadas
+            .where(
+              (jornada) =>
+                  jornada.veiculoId == veiculoId && jornada.dataHoraFim != null,
+            )
+            .toList()
+          ..sort((a, b) => a.dataHoraFim!.compareTo(b.dataHoraFim!));
+    final anterior = anteriores.lastOrNull;
+    if (anterior?.dataHoraFim?.isAfter(inicio) == true) {
+      throw Exception('A jornada não pode sobrepor outra jornada.');
+    }
+    final ultimoOdometro = anterior?.odometroFim;
 
     if (ultimoOdometro != null && odometro < ultimoOdometro) {
       throw Exception(
@@ -336,7 +366,7 @@ class JornadaService {
     final jornada = JornadasCompanion.insert(
       usuarioId: usuarioId,
       veiculoId: veiculoId,
-      dataHoraInicio: DateTime.now(),
+      dataHoraInicio: inicio,
       odometroInicio: odometro,
       cidadeOrigem: cidadeOrigem,
       status: StatusJornada.aberta,
@@ -347,6 +377,7 @@ class JornadaService {
 
   Future<bool> fecharJornada({
     required int odometroFim,
+    DateTime? dataHoraFim,
     String? cidadeDestino,
     String? observacoes,
   }) async {
@@ -378,16 +409,242 @@ class JornadaService {
       );
     }
 
+    final fim = dataHoraFim ?? _agora();
     final jornadaAtualizada = jornada.copyWith(
-      dataHoraFim: Value(DateTime.now()),
+      dataHoraFim: Value(fim),
       odometroFim: Value(odometroFim),
       cidadeDestino: Value(cidadeDestino),
       observacoes: Value(observacoes),
       status: StatusJornada.finalizada,
       quilometrosPercorridos: Value(odometroFim - jornada.odometroInicio),
-      dataAtualizacao: DateTime.now(),
+      dataAtualizacao: _agora(),
     );
-
+    await _validarJornada(jornadaAtualizada);
     return _repository.atualizar(jornadaAtualizada);
+  }
+
+  Future<void> validarFechamento({
+    required DateTime dataHoraFim,
+    required int odometroFim,
+    String? cidadeDestino,
+    String? observacoes,
+  }) async {
+    final jornada = await _repository.buscarJornadaAberta();
+    if (jornada == null) throw Exception('Não existe jornada aberta.');
+    await _validarJornada(
+      jornada.copyWith(
+        dataHoraFim: Value(dataHoraFim),
+        odometroFim: Value(odometroFim),
+        cidadeDestino: Value(_textoOpcional(cidadeDestino)),
+        observacoes: Value(_textoOpcional(observacoes)),
+        status: StatusJornada.finalizada,
+        quilometrosPercorridos: Value(odometroFim - jornada.odometroInicio),
+      ),
+    );
+  }
+
+  Future<bool> editarJornada({
+    required int jornadaId,
+    required DateTime dataHoraInicio,
+    required int odometroInicio,
+    required String cidadeOrigem,
+    DateTime? dataHoraFim,
+    int? odometroFim,
+    String? cidadeDestino,
+    String? observacoes,
+  }) async {
+    final atual = await _repository.buscarPorId(jornadaId);
+    if (atual == null) throw Exception('A Jornada não foi encontrada.');
+    final finalizada = atual.status == StatusJornada.finalizada;
+    if (finalizada && (dataHoraFim == null || odometroFim == null)) {
+      throw Exception('Informe o fim e o odômetro final da Jornada.');
+    }
+    final proposta = atual.copyWith(
+      dataHoraInicio: dataHoraInicio,
+      odometroInicio: odometroInicio,
+      cidadeOrigem: cidadeOrigem.trim(),
+      dataHoraFim: finalizada ? Value(dataHoraFim) : const Value.absent(),
+      odometroFim: finalizada ? Value(odometroFim) : const Value.absent(),
+      cidadeDestino: finalizada
+          ? Value(_textoOpcional(cidadeDestino))
+          : const Value.absent(),
+      observacoes: Value(_textoOpcional(observacoes)),
+      quilometrosPercorridos: finalizada
+          ? Value(odometroFim! - odometroInicio)
+          : const Value.absent(),
+      dataAtualizacao: _agora(),
+    );
+    await _validarJornada(proposta);
+    return _repository.atualizar(proposta);
+  }
+
+  String? _textoOpcional(String? texto) {
+    final normalizado = texto?.trim() ?? '';
+    return normalizado.isEmpty ? null : normalizado;
+  }
+
+  Future<void> _validarJornada(Jornada proposta) async {
+    final agora = _agora();
+    final fim = proposta.dataHoraFim;
+    if (proposta.dataHoraInicio.isAfter(agora)) {
+      throw Exception('O início da jornada não pode estar no futuro.');
+    }
+    if (fim != null && fim.isAfter(agora)) {
+      throw Exception('O fim da jornada não pode estar no futuro.');
+    }
+    if (fim != null && fim.isBefore(proposta.dataHoraInicio)) {
+      throw Exception('O fim da jornada não pode ser anterior ao início.');
+    }
+    if (proposta.cidadeOrigem.trim().isEmpty) {
+      throw Exception('Informe a cidade de origem.');
+    }
+    if (proposta.odometroInicio < 0) {
+      throw Exception('O odômetro inicial não pode ser negativo.');
+    }
+    if (fim != null && proposta.odometroFim == null) {
+      throw Exception('Informe o odômetro final.');
+    }
+    if (proposta.odometroFim != null &&
+        proposta.odometroFim! < proposta.odometroInicio) {
+      throw Exception('O odômetro final não pode ser menor que o inicial.');
+    }
+
+    final outras = (await _repository.listar())
+        .where(
+          (jornada) =>
+              jornada.id != proposta.id &&
+              jornada.veiculoId == proposta.veiculoId,
+        )
+        .toList();
+    for (final outra in outras) {
+      final outroFim = outra.dataHoraFim;
+      final comecaAntesDoFim =
+          fim == null || outra.dataHoraInicio.isBefore(fim);
+      final terminaDepoisDoInicio =
+          outroFim == null || outroFim.isAfter(proposta.dataHoraInicio);
+      if (comecaAntesDoFim && terminaDepoisDoInicio) {
+        throw Exception('A jornada não pode sobrepor outra jornada.');
+      }
+    }
+    final anteriores =
+        outras
+            .where(
+              (jornada) =>
+                  jornada.dataHoraFim != null &&
+                  !jornada.dataHoraFim!.isAfter(proposta.dataHoraInicio),
+            )
+            .toList()
+          ..sort((a, b) => a.dataHoraFim!.compareTo(b.dataHoraFim!));
+    final anterior = anteriores.lastOrNull;
+    if (anterior?.odometroFim != null &&
+        proposta.odometroInicio < anterior!.odometroFim!) {
+      throw Exception(
+        'O odômetro inicial não pode ser menor que o fim da Jornada anterior.',
+      );
+    }
+    if (fim != null) {
+      final posteriores =
+          outras
+              .where((jornada) => !jornada.dataHoraInicio.isBefore(fim))
+              .toList()
+            ..sort((a, b) => a.dataHoraInicio.compareTo(b.dataHoraInicio));
+      final posterior = posteriores.firstOrNull;
+      if (posterior != null &&
+          proposta.odometroFim! > posterior.odometroInicio) {
+        throw Exception(
+          'O odômetro final não pode ultrapassar o início da Jornada posterior.',
+        );
+      }
+    }
+
+    final pausas = await _pausaRepository.listarPorJornada(proposta.id);
+    for (final pausa in pausas) {
+      if (pausa.inicio.isBefore(proposta.dataHoraInicio)) {
+        throw Exception('Existe uma Pausa anterior ao novo início da Jornada.');
+      }
+      if (fim != null &&
+          (pausa.inicio.isAfter(fim) || pausa.fim?.isAfter(fim) == true)) {
+        throw Exception('Existe uma Pausa posterior a esse encerramento.');
+      }
+      for (final odometro in [pausa.odometroInicio, pausa.odometroFim]) {
+        if (odometro != null && odometro < proposta.odometroInicio) {
+          throw Exception(
+            'O odômetro inicial não pode ultrapassar um registro posterior.',
+          );
+        }
+        if (odometro != null &&
+            proposta.odometroFim != null &&
+            odometro > proposta.odometroFim!) {
+          throw Exception(
+            'O odômetro final não pode ser menor que um registro anterior.',
+          );
+        }
+      }
+    }
+    final abastecimentos =
+        await _abastecimentoRepository?.listarPorJornada(proposta.id) ??
+        const [];
+    for (final abastecimento in abastecimentos) {
+      _validarInstanteInterno(
+        abastecimento.dataHora,
+        proposta,
+        'Existe um Abastecimento fora do novo intervalo da Jornada.',
+      );
+      if (abastecimento.odometro < proposta.odometroInicio) {
+        throw Exception(
+          'O odômetro inicial não pode ultrapassar um registro posterior.',
+        );
+      }
+      if (proposta.odometroFim != null &&
+          abastecimento.odometro > proposta.odometroFim!) {
+        throw Exception(
+          'O odômetro final não pode ser menor que um registro anterior.',
+        );
+      }
+    }
+    final leituras =
+        await _leituraGanhosRepository?.listarPorJornada(proposta.id) ??
+        const [];
+    for (final leitura in leituras) {
+      _validarInstanteInterno(
+        leitura.dataHora,
+        proposta,
+        'Existe uma Leitura de Ganhos fora do novo intervalo da Jornada.',
+      );
+    }
+    final passes =
+        await _passePlataformaRepository?.listarPorJornada(proposta.id) ??
+        const [];
+    for (final item in passes) {
+      _validarInstanteInterno(
+        item.passe.dataHora,
+        proposta,
+        'Existe um Passe fora do novo intervalo da Jornada.',
+      );
+    }
+    final bonus =
+        await _bonusPromocaoRepository?.listarPorJornada(proposta.id) ??
+        const [];
+    for (final item in bonus) {
+      _validarInstanteInterno(
+        item.bonusPromocao.dataHora,
+        proposta,
+        'Existe um Bônus/Promoção fora do novo intervalo da Jornada.',
+      );
+    }
+    // Ganhos individuais são preservados pelo jornadaId, mas dataCriacao é
+    // técnica e deliberadamente não limita o intervalo operacional.
+  }
+
+  void _validarInstanteInterno(
+    DateTime instante,
+    Jornada jornada,
+    String mensagem,
+  ) {
+    if (instante.isBefore(jornada.dataHoraInicio) ||
+        (jornada.dataHoraFim != null &&
+            instante.isAfter(jornada.dataHoraFim!))) {
+      throw Exception(mensagem);
+    }
   }
 }

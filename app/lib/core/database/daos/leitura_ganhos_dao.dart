@@ -142,6 +142,15 @@ class LeituraGanhosDao extends DatabaseAccessor<AppDatabase>
         .getSingleOrNull();
   }
 
+  Future<List<LeiturasGanho>> listarPorJornada(int jornadaId) =>
+      (select(leiturasGanhos)
+            ..where((leitura) => leitura.jornadaId.equals(jornadaId))
+            ..orderBy([
+              (leitura) => OrderingTerm.asc(leitura.dataHora),
+              (leitura) => OrderingTerm.asc(leitura.id),
+            ]))
+          .get();
+
   Future<int> salvarLeitura(
     LeiturasGanhosCompanion leitura,
     List<LeiturasGanhoPlataformaCompanion> Function(int leituraId) criarItens,

@@ -46,7 +46,16 @@ void main() {
     abastecimentoRepository = AbastecimentoRepository(
       AbastecimentoDao(database),
     );
-    jornadaService = JornadaService(jornadaRepository, pausaRepository);
+    jornadaService = JornadaService(
+      jornadaRepository,
+      pausaRepository,
+      null,
+      null,
+      null,
+      null,
+      null,
+      () => agora,
+    );
     pausaService = PausaService(
       pausaRepository,
       jornadaRepository,

@@ -45,6 +45,7 @@ import '../../data/resumo_jornada.dart';
 import '../controllers/jornada_controller.dart';
 import '../widgets/abrir_jornada_dialog.dart';
 import '../widgets/fechar_jornada_dialog.dart';
+import '../widgets/editar_jornada_dialog.dart';
 
 class JornadaPage extends StatefulWidget {
   final AppDatabase Function()? databaseFactory;
@@ -345,6 +346,7 @@ class _JornadaPageState extends State<JornadaPage> {
         veiculoId: 1,
         odometro: resultado.odometro,
         cidadeOrigem: resultado.cidadeOrigem,
+        dataHoraInicio: resultado.dataHoraInicio,
       );
       await pausaController?.carregar(controller.jornadaAtual?.id);
       final jornadaId = controller.jornadaAtual?.id;
@@ -614,11 +616,30 @@ class _JornadaPageState extends State<JornadaPage> {
       context: context,
       builder: (context) => FecharJornadaDialog(
         odometroInicio: odometroSugerido,
+        dataHoraInicio: jornada.dataHoraInicio,
         cidadeDestinoInicial: jornada.cidadeOrigem,
       ),
     );
 
     if (!mounted || resultado == null) {
+      return;
+    }
+
+    try {
+      await controller.validarFechamento(
+        dataHoraFim: resultado.dataHoraFim,
+        odometroFim: resultado.odometroFim,
+        cidadeDestino: resultado.cidadeDestino,
+        observacoes: resultado.observacoes,
+      );
+    } catch (error, stackTrace) {
+      if (!mounted) return;
+      _apresentarErro(
+        operacao: 'validar o fechamento da Jornada',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível validar o fechamento da jornada.',
+      );
       return;
     }
 
@@ -638,6 +659,7 @@ class _JornadaPageState extends State<JornadaPage> {
         odometroFim: resultado.odometroFim,
         cidadeDestino: resultado.cidadeDestino,
         observacoes: resultado.observacoes,
+        dataHoraFim: resultado.dataHoraFim,
         itens: leituraFinal,
       );
       await controller.carregarJornadaAberta();
@@ -652,6 +674,37 @@ class _JornadaPageState extends State<JornadaPage> {
         error: error,
         stackTrace: stackTrace,
         mensagemPadrao: 'Não foi possível fechar a jornada. Tente novamente.',
+      );
+    }
+  }
+
+  Future<void> _editarJornada(Jornada jornada) async {
+    final controller = this.controller;
+    if (controller == null) return;
+    final resultado = await showDialog<EditarJornadaResultado>(
+      context: context,
+      builder: (_) => EditarJornadaDialog(jornada: jornada),
+    );
+    if (!mounted || resultado == null) return;
+    try {
+      await controller.editarJornada(
+        jornada: jornada,
+        dataHoraInicio: resultado.dataHoraInicio,
+        odometroInicio: resultado.odometroInicio,
+        cidadeOrigem: resultado.cidadeOrigem,
+        dataHoraFim: resultado.dataHoraFim,
+        odometroFim: resultado.odometroFim,
+        cidadeDestino: resultado.cidadeDestino,
+        observacoes: resultado.observacoes,
+      );
+      await pausaController?.carregar(controller.jornadaAtual?.id);
+    } catch (error, stackTrace) {
+      if (!mounted) return;
+      _apresentarErro(
+        operacao: 'editar a Jornada',
+        error: error,
+        stackTrace: stackTrace,
+        mensagemPadrao: 'Não foi possível editar a Jornada.',
       );
     }
   }
@@ -685,6 +738,7 @@ class _JornadaPageState extends State<JornadaPage> {
       'Os ganhos',
       'Registre',
       'Informe',
+      'Existe',
       'Uma plataforma',
       'O valor',
       'A quantidade',
@@ -802,9 +856,20 @@ class _JornadaPageState extends State<JornadaPage> {
                   16 + MediaQuery.viewPaddingOf(context).bottom,
                 ),
                 children: [
-                  Text(
-                    'Status: ${jornada.status.name.toUpperCase()}',
-                    style: Theme.of(context).textTheme.titleLarge,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Status: ${jornada.status.name.toUpperCase()}',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Editar Jornada',
+                        onPressed: () => _editarJornada(jornada),
+                        icon: const Icon(Icons.edit),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 16),
@@ -963,9 +1028,20 @@ class _JornadaPageState extends State<JornadaPage> {
                 16 + MediaQuery.viewPaddingOf(context).bottom,
               ),
               children: [
-                Text(
-                  'Jornada concluída',
-                  style: Theme.of(context).textTheme.titleLarge,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Jornada concluída',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Editar Jornada',
+                      onPressed: () => _editarJornada(ultimaJornada),
+                      icon: const Icon(Icons.edit),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -1055,11 +1131,20 @@ class _ResumoJornadaConcluida extends StatelessWidget {
             '${resumo.ticketMedioGeral == null ? '—' : moeda.format(resumo.ticketMedioGeral)}',
           ),
         ] else
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Resultado financeiro incompleto'),
-              Text('Ticket médio geral: —'),
+              Text(
+                resumo.coberturaFinanceiraInicialCompleta
+                    ? 'Resultado financeiro incompleto'
+                    : 'Cobertura financeira parcial',
+              ),
+              if (!resumo.coberturaFinanceiraInicialCompleta)
+                const Text(
+                  'A leitura inicial ocorreu depois do início da Jornada. '
+                  'Os valores conhecidos cobrem somente o período observado.',
+                ),
+              const Text('Ticket médio geral: —'),
             ],
           ),
         const SizedBox(height: 12),

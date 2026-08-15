@@ -59,6 +59,7 @@ void main() {
       veiculoId: 1,
       odometro: 100,
       cidadeOrigem: 'Curitiba',
+      dataHoraInicio: instanteLeitura.subtract(const Duration(hours: 1)),
     );
     return (await jornadaService.jornadaAberta())!;
   }
@@ -105,6 +106,26 @@ void main() {
       ),
       throwsException,
     );
+  });
+
+  test('abertura tardia não falsifica horário da Leitura Inicial', () async {
+    final jornada = await abrirJornada();
+    final uberId = await inserirPlataforma(
+      'Uber',
+      TipoRegistroGanhos.acumulado,
+    );
+    final leituraId = await leituraService.salvarLeituraInicial(
+      jornadaId: jornada.id,
+      itens: [item(uberId)],
+    );
+    final leitura = await leituraService.buscarLeitura(leituraId);
+
+    expect(
+      jornada.dataHoraInicio,
+      instanteLeitura.subtract(const Duration(hours: 1)),
+    );
+    expect(leitura!.dataHora, instanteLeitura);
+    expect(leitura.dataHora.isAfter(jornada.dataHoraInicio), isTrue);
   });
 
   test('cria leitura inicial sem Pausa e impede duplicidade', () async {
@@ -302,10 +323,18 @@ void main() {
         itens: [snapshot],
       );
 
-      final leituraId = await leituraService.finalizarJornada(
+      final fimOperacional = DateTime(2026, 8, 10, 12, 30);
+      final serviceFechamentoTardio = LeituraGanhosService(
+        leituraRepository,
+        jornadaRepository,
+        pausaRepository,
+        agora: () => DateTime(2026, 8, 10, 13),
+      );
+      final leituraId = await serviceFechamentoTardio.finalizarJornada(
         jornadaId: jornada.id,
         odometroFim: 110,
         itens: [snapshot],
+        dataHoraFim: fimOperacional,
       );
       final leitura = await leituraService.buscarLeitura(leituraId);
       final jornadaPersistida = await (database.select(
@@ -313,8 +342,12 @@ void main() {
       )..where((registro) => registro.id.equals(jornada.id))).getSingle();
 
       expect(leitura!.tipo, TipoLeituraGanhos.finalDaJornada);
+      expect(leitura.dataHora, fimOperacional);
+      expect(leitura.dataCriacao, DateTime(2026, 8, 10, 13));
       expect(leitura.pausaId, isNull);
       expect(jornadaPersistida.status, StatusJornada.finalizada);
+      expect(jornadaPersistida.dataHoraFim, fimOperacional);
+      expect(jornadaPersistida.dataAtualizacao, DateTime(2026, 8, 10, 13));
       expect(await leituraService.buscarLeituraFinal(jornada.id), isNotNull);
 
       await expectLater(
