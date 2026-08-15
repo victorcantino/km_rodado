@@ -111,6 +111,7 @@ class _JornadaPageState extends State<JornadaPage> {
       ganhoIndividualRepository,
       passeRepository,
       bonusPromocaoRepository,
+      abastecimentoRepository,
     );
     final pausaService = PausaService(
       pausaRepository,
@@ -602,10 +603,14 @@ class _JornadaPageState extends State<JornadaPage> {
       return;
     }
 
+    final odometroSugerido =
+        await controller.sugerirOdometroFechamento() ?? jornada.odometroInicio;
+    if (!mounted) return;
+
     final resultado = await showDialog<FecharJornadaResultado>(
       context: context,
       builder: (context) => FecharJornadaDialog(
-        odometroInicio: _ultimoOdometroConhecido(),
+        odometroInicio: odometroSugerido,
         cidadeDestinoInicial: jornada.cidadeOrigem,
       ),
     );

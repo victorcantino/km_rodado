@@ -1,18 +1,16 @@
-# Tarefa atual — Bônus/Promoções e reconciliação
+# Tarefa atual — Odômetro no fechamento e consolidação documental
 
 ## Estado
 
-Implementada a primeira versão de créditos promocionais observados, com
-cadastro retroativo, Jornada opcional e apresentação separada no resumo.
-Plataformas acumuladas são reconciliadas por intervalos consecutivos; ticket
-médio usa somente receita atribuível às viagens.
+O fechamento da Jornada passa a sugerir o último odômetro conhecido por
+cronologia, considerando Jornada, Pausas e Abastecimentos no contexto atual. O
+valor permanece editável e a igualdade continua válida.
 
-Créditos anteriores ou exatamente no baseline permanecem fora da associação
-com a Jornada e não são subtraídos novamente da variação. A competência
-econômica de bônus permanece futura.
+Foi consolidada a decisão de manter Bônus/Promoções como registro factual
+simples, sem evolução para missões ou competência econômica. Passes continuam
+aguardando formalização futura entre tempo e limite de faturamento.
 
-O schema evolui de 7 para 8 com migração preservadora. Esta etapa não infere
-resets nem o efeito de Passes sobre snapshots.
+O schema permanece 8.
 
 ## Validação
 

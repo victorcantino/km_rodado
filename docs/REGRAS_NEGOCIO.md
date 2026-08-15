@@ -8,6 +8,10 @@
 - Havendo Jornada anterior finalizada, `novo odometroInicio >= odometroFim`.
 - O destino anterior e seu odômetro final são sugestões editáveis na abertura.
 - O fechamento exige `odometroFim >=` o maior odômetro conhecido da Jornada.
+- O formulário de fechamento sugere o último odômetro conhecido por cronologia
+  entre início da Jornada, Pausas e Abastecimentos do veículo no intervalo. A
+  sugestão é editável e não usa ID nem `MAX(odometro)` para definir o último
+  fato.
 - Igualdade é válida: uma Jornada pode terminar com zero km.
 - Quilômetros percorridos são `odometroFim - odometroInicio`.
 - A leitura final e o fechamento são persistidos atomicamente.
@@ -153,9 +157,12 @@ válidos de tanque cheio e abastecimentos parciais.
 - `dataHora` indica quando o crédito apareceu e afetou o contador. Uber foi
   observada creditando no mesmo dia após a promoção e 99 normalmente no dia
   seguinte, sem transformar essas observações em regras por Plataforma.
-- A competência ou origem econômica pode anteceder o crédito e permanece
-  futura. Para a reconciliação atual importa o instante em que o contador foi
-  afetado.
+- Não se modelam missão, meta, etapas, viagens necessárias, horário da missão,
+  origem/competência econômica, Jornada que teria gerado o bônus nem
+  lucratividade da promoção. O registro pede somente Plataforma, valor
+  creditado, `dataHora`, classificação simples e observação opcional.
+- Para a reconciliação importa somente quando o crédito apareceu e afetou o
+  contador.
 - Bônus anterior à Jornada permanece com `jornadaId` nulo. Se já estiver no
   baseline, não é associado artificialmente nem subtraído novamente.
 

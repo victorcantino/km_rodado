@@ -22,13 +22,16 @@ class FecharJornadaDialog extends StatefulWidget {
 
 class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
   final formKey = GlobalKey<FormState>();
-  final odometroController = TextEditingController();
+  late final TextEditingController odometroController;
   late final TextEditingController cidadeController;
   final observacoesController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    odometroController = TextEditingController(
+      text: widget.odometroInicio.toString(),
+    );
     cidadeController = TextEditingController(
       text: widget.cidadeDestinoInicial ?? '',
     );
