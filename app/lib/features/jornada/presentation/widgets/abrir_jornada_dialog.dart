@@ -58,6 +58,7 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
               controller: odometroController,
               autofocus: true,
               keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.next,
               selectAllOnFocus: true,
               decoration: const InputDecoration(labelText: 'Odômetro'),
               validator: (valor) {
@@ -91,6 +92,8 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
 
             TextFormField(
               controller: cidadeController,
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
               decoration: const InputDecoration(labelText: 'Cidade'),
               validator: (valor) {
                 if (valor == null || valor.trim().isEmpty) {

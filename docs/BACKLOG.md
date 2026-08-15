@@ -18,9 +18,6 @@
 
 - Evolução visual móvel/operacional após estabilizar os fluxos.
 - Revisar autofocus e redução de toques nos demais inputs após uso em campo.
-- Controlar explicitamente a navegação “Próximo” entre campos editáveis: pular
-  botões, ícones, checkboxes e controles auxiliares; trocar teclado conforme o
-  tipo do próximo input e usar Done/Concluir no último campo.
 - Reorganizar futuramente a JornadaPage em seções recolhíveis com resumo curto
   quando fechadas, como Faturamento, Custos, Pausas, Abastecimentos,
   Plataformas e Manutenção. Indicadores serão escolhidos com a maturidade das

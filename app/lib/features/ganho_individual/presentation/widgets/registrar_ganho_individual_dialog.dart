@@ -26,6 +26,9 @@ class _RegistrarGanhoIndividualDialogState
   final formKey = GlobalKey<FormState>();
   final valor = TextEditingController();
   final quantidade = TextEditingController(text: '1');
+  final focoValor = FocusNode();
+  final focoQuantidade = FocusNode();
+  final focoObservacao = FocusNode();
   String observacao = '';
   late int plataformaId = widget.plataformas.first.id;
 
@@ -55,6 +58,9 @@ class _RegistrarGanhoIndividualDialogState
   void dispose() {
     valor.dispose();
     quantidade.dispose();
+    focoValor.dispose();
+    focoQuantidade.dispose();
+    focoObservacao.dispose();
     super.dispose();
   }
 
@@ -91,8 +97,11 @@ class _RegistrarGanhoIndividualDialogState
             TextFormField(
               key: const ValueKey('valor_individual'),
               controller: valor,
+              focusNode: focoValor,
               autofocus: true,
               keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (_) => focoQuantidade.requestFocus(),
               inputFormatters: const [_CentavosFormatter()],
               decoration: const InputDecoration(
                 labelText: 'Valor total',
@@ -112,7 +121,10 @@ class _RegistrarGanhoIndividualDialogState
                   child: TextFormField(
                     key: const ValueKey('quantidade_individual'),
                     controller: quantidade,
+                    focusNode: focoQuantidade,
                     keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => focoObservacao.requestFocus(),
                     textAlign: TextAlign.center,
                     decoration: const InputDecoration(labelText: 'Viagens'),
                     validator: (texto) {
@@ -131,7 +143,11 @@ class _RegistrarGanhoIndividualDialogState
               ],
             ),
             TextFormField(
+              key: const ValueKey('observacao_individual'),
               initialValue: observacao,
+              focusNode: focoObservacao,
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (_) => focoObservacao.unfocus(),
               decoration: const InputDecoration(
                 labelText: 'Observação (opcional)',
               ),

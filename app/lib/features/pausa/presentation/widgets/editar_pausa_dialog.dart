@@ -32,6 +32,10 @@ class _EditarPausaDialogState extends State<EditarPausaDialog> {
   late final TextEditingController odometroInicio;
   late final TextEditingController odometroFim;
   late final TextEditingController observacao;
+  final focoTitulo = FocusNode();
+  final focoOdometroInicio = FocusNode();
+  final focoOdometroFim = FocusNode();
+  final focoObservacao = FocusNode();
   late DateTime inicio;
   late DateTime? fim;
   String? erro;
@@ -60,6 +64,10 @@ class _EditarPausaDialogState extends State<EditarPausaDialog> {
     odometroInicio.dispose();
     odometroFim.dispose();
     observacao.dispose();
+    focoTitulo.dispose();
+    focoOdometroInicio.dispose();
+    focoOdometroFim.dispose();
+    focoObservacao.dispose();
     super.dispose();
   }
 
@@ -156,6 +164,9 @@ class _EditarPausaDialogState extends State<EditarPausaDialog> {
               children: [
                 TextFormField(
                   controller: titulo,
+                  focusNode: focoTitulo,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => focoOdometroInicio.requestFocus(),
                   decoration: const InputDecoration(
                     labelText: 'Título opcional',
                   ),
@@ -172,7 +183,12 @@ class _EditarPausaDialogState extends State<EditarPausaDialog> {
                 TextFormField(
                   key: const ValueKey('odometro_inicio_edicao_pausa'),
                   controller: odometroInicio,
+                  focusNode: focoOdometroInicio,
                   keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => concluida
+                      ? focoOdometroFim.requestFocus()
+                      : focoObservacao.requestFocus(),
                   selectAllOnFocus: true,
                   decoration: const InputDecoration(
                     labelText: 'Odômetro inicial',
@@ -195,7 +211,10 @@ class _EditarPausaDialogState extends State<EditarPausaDialog> {
                   TextFormField(
                     key: const ValueKey('odometro_fim_edicao_pausa'),
                     controller: odometroFim,
+                    focusNode: focoOdometroFim,
                     keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => focoObservacao.requestFocus(),
                     selectAllOnFocus: true,
                     decoration: const InputDecoration(
                       labelText: 'Odômetro final',
@@ -208,6 +227,9 @@ class _EditarPausaDialogState extends State<EditarPausaDialog> {
                 ],
                 TextFormField(
                   controller: observacao,
+                  focusNode: focoObservacao,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => focoObservacao.unfocus(),
                   decoration: const InputDecoration(
                     labelText: 'Observação opcional',
                   ),

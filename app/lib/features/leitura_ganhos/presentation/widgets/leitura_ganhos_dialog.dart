@@ -41,6 +41,8 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
   final formKey = GlobalKey<FormState>();
   final valores = <int, TextEditingController>{};
   final quantidades = <int, TextEditingController>{};
+  final focosValores = <int, FocusNode>{};
+  final focosQuantidades = <int, FocusNode>{};
   late List<Plataforma> plataformas = widget.plataformas;
   late List<TotalGanhoIndividual> totaisIndividuais = widget.totaisIndividuais;
 
@@ -63,6 +65,8 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
       quantidades[plataforma.id] = TextEditingController(
         text: sugestao?.quantidadeViagensAcumulada.toString() ?? '0',
       );
+      focosValores[plataforma.id] = FocusNode();
+      focosQuantidades[plataforma.id] = FocusNode();
     }
   }
 
@@ -83,6 +87,8 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
         plataforma.id,
         () => TextEditingController(text: '0'),
       );
+      focosValores.putIfAbsent(plataforma.id, FocusNode.new);
+      focosQuantidades.putIfAbsent(plataforma.id, FocusNode.new);
     }
   }
 
@@ -90,6 +96,12 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
   void dispose() {
     for (final controller in [...valores.values, ...quantidades.values]) {
       controller.dispose();
+    }
+    for (final focusNode in [
+      ...focosValores.values,
+      ...focosQuantidades.values,
+    ]) {
+      focusNode.dispose();
     }
     super.dispose();
   }
@@ -143,6 +155,16 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
   void _fechar([LeituraGanhosResultado? resultado]) {
     FocusManager.instance.primaryFocus?.unfocus();
     Navigator.pop<LeituraGanhosResultado>(context, resultado);
+  }
+
+  void _avancarDepoisDaQuantidade(int plataformaId) {
+    final acumuladas = plataformasAcumuladas.toList();
+    final indice = acumuladas.indexWhere((item) => item.id == plataformaId);
+    if (indice >= 0 && indice + 1 < acumuladas.length) {
+      focosValores[acumuladas[indice + 1].id]!.requestFocus();
+    } else {
+      focosQuantidades[plataformaId]!.unfocus();
+    }
   }
 
   @override
@@ -231,7 +253,11 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
                     TextFormField(
                       key: ValueKey('valor_${plataforma.id}'),
                       controller: valores[plataforma.id],
+                      focusNode: focosValores[plataforma.id],
                       keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) =>
+                          focosQuantidades[plataforma.id]!.requestFocus(),
                       inputFormatters: const [_CentavosInputFormatter()],
                       selectAllOnFocus: true,
                       decoration: const InputDecoration(
@@ -271,7 +297,14 @@ class _LeituraGanhosDialogState extends State<LeituraGanhosDialog> {
                           child: TextFormField(
                             key: ValueKey('quantidade_${plataforma.id}'),
                             controller: quantidades[plataforma.id],
+                            focusNode: focosQuantidades[plataforma.id],
                             keyboardType: TextInputType.number,
+                            textInputAction:
+                                plataforma.id == plataformasAcumuladas.last.id
+                                ? TextInputAction.done
+                                : TextInputAction.next,
+                            onFieldSubmitted: (_) =>
+                                _avancarDepoisDaQuantidade(plataforma.id),
                             textAlign: TextAlign.center,
                             decoration: const InputDecoration(
                               labelText: 'Viagens',

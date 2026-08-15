@@ -85,6 +85,22 @@ void main() {
           .hasFocus,
       isTrue,
     );
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pump();
+    expect(
+      tester
+          .widget<EditableText>(find.byType(EditableText).at(1))
+          .focusNode
+          .hasFocus,
+      isTrue,
+    );
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
+    for (final campo in tester.widgetList<EditableText>(
+      find.byType(EditableText),
+    )) {
+      expect(campo.focusNode.hasFocus, isFalse);
+    }
   });
 
   testWidgets('odômetro da Pausa recebe foco e fecha sem exceções', (

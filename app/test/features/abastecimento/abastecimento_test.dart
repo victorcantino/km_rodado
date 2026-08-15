@@ -242,6 +242,20 @@ void main() {
           .hasFocus,
       isTrue,
     );
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pump();
+    expect(
+      tester
+          .widget<EditableText>(
+            find.descendant(
+              of: find.byKey(const ValueKey('volume_abastecimento')),
+              matching: find.byType(EditableText),
+            ),
+          )
+          .focusNode
+          .hasFocus,
+      isTrue,
+    );
     await tester.enterText(
       find.byKey(const ValueKey('volume_abastecimento')),
       '10000',
