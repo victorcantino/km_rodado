@@ -1,0 +1,1 @@
+enum TipoPasse { faturamento, tempo }

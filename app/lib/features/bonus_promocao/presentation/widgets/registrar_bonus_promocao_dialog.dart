@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../core/constants/enums/tipo_bonus_promocao.dart';
 import '../../../../core/database/app_database.dart';
 
 typedef RegistrarBonusPromocaoResultado = ({
   int plataformaId,
   DateTime dataHora,
   int valorCentavos,
-  TipoBonusPromocao tipo,
   String? observacao,
 });
 
@@ -29,7 +27,6 @@ class _RegistrarBonusPromocaoDialogState
   final valor = TextEditingController();
   final observacao = TextEditingController();
   late int plataformaId = widget.plataformas.first.id;
-  TipoBonusPromocao tipo = TipoBonusPromocao.bonus;
   DateTime dataHora = DateTime.now();
 
   int? get valorCentavos {
@@ -69,7 +66,6 @@ class _RegistrarBonusPromocaoDialogState
       plataformaId: plataformaId,
       dataHora: dataHora,
       valorCentavos: valorCentavos!,
-      tipo: tipo,
       observacao: texto.isEmpty ? null : texto,
     ));
   }
@@ -103,21 +99,6 @@ class _RegistrarBonusPromocaoDialogState
                     ),
                 ],
                 onChanged: (id) => plataformaId = id!,
-              ),
-              DropdownButtonFormField<TipoBonusPromocao>(
-                initialValue: tipo,
-                decoration: const InputDecoration(labelText: 'Tipo'),
-                items: const [
-                  DropdownMenuItem(
-                    value: TipoBonusPromocao.bonus,
-                    child: Text('Bônus'),
-                  ),
-                  DropdownMenuItem(
-                    value: TipoBonusPromocao.promocao,
-                    child: Text('Promoção'),
-                  ),
-                ],
-                onChanged: (valor) => tipo = valor!,
               ),
               TextFormField(
                 key: const ValueKey('valor_bonus_promocao'),

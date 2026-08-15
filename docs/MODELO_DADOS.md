@@ -80,15 +80,21 @@ operacional; `dataCriacao`, o instante técnico do cadastro.
 `limiteFaturamentoCentavos?`, `observacao?`, `dataCriacao`.
 
 O valor pago deve ser positivo. O efeito sobre snapshots não é persistido nem
-inferido.
+inferido. Novos registros usam `modalidade` canônica `faturamento` ou `tempo`.
+Faturamento exige `limiteFaturamentoCentavos` e validade derivada de 180 dias;
+tempo deriva duração de 24h/72h pela diferença entre `dataHora` e
+`validadeAte`. Não há coluna nova de duração, e valores legados livres são
+preservados.
 
 ### BonusPromocoes
 
 `id`, `plataformaId` → Plataformas, `jornadaId?` → Jornadas, `dataHora`,
 `valorCentavos`, `tipo`, `observacao?`, `dataCriacao`.
 
-O valor deve ser positivo. Tipos atuais: `bonus` e `promocao`. O registro é um
-crédito observado; receita de viagens reconciliada permanece derivada.
+O valor deve ser positivo. A coluna histórica aceita `bonus` e `promocao`; novos
+registros operacionais usam `bonus` canônico, sem escolha do usuário. Ambos são
+lidos e reconciliados uniformemente como crédito observado. A receita de
+viagens reconciliada permanece derivada.
 
 ## Relações principais
 

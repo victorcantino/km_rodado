@@ -5,7 +5,7 @@
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
 - schema atual: **8**;
-- suíte automatizada: **117 testes aprovados** em 15/08/2026.
+- suíte automatizada: **128 testes aprovados** em 15/08/2026.
 
 ## Implementado
 
@@ -22,10 +22,14 @@
   indicadores; regressões ou passes em acumuladas exigem conferência;
 - Abastecimentos atuais/retroativos, preço efetivo derivado, tanque cheio ou
   parcial e associação opcional à Jornada;
-- Passes de plataforma retroativos, custos separados e Jornada opcional;
-- Bônus/promoções retroativos e reconciliação conservadora por intervalos;
+- Passes por faturamento ou tempo, validade derivada, repetição segura por
+  Plataforma, cadastro retroativo, custos separados e Jornada opcional;
+- crédito promocional retroativo sem escolha de subtipo pelo motorista; valores
+  históricos `bonus`/`promocao` permanecem compatíveis e a reconciliação é
+  uniforme por intervalos;
 - baseline protege contra dupla subtração de bônus creditado antes da Jornada,
   sem criar associação cronologicamente falsa;
+- JornadaPage protegida pelos insets seguros inferiores do Android;
 - migrações preservadoras até schema 8 e seeds idempotentes.
 
 ## Em teste operacional
@@ -44,6 +48,9 @@ entregas mais recentes; a interface segue funcional e provisória.
 - tratamento visual e navegação ainda estão concentrados na `JornadaPage`;
 - campos legados de Veículo/Configuração ainda usam `REAL` e aguardam evolução
   orientada pelas respectivas features.
+- Passes suportam operacionalmente tempo e faturamento; carteira pré-paga e
+  condições compostas por tempo/uso permanecem documentadas, sem schema ou
+  fluxo de cadastro.
 
 ## Próxima frente
 
