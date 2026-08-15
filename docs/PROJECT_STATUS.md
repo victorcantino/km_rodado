@@ -5,12 +5,13 @@
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
 - schema atual: **8**;
-- suíte automatizada: **112 testes aprovados** em 14/08/2026.
+- suíte automatizada: **117 testes aprovados** em 15/08/2026.
 
 ## Implementado
 
 - Jornada: abertura, fechamento, persistência, restauração, localização textual
-  e progressão de odômetro, inclusive encerramento com zero km;
+  e progressão de odômetro, inclusive sugestão cronológica no fechamento e
+  encerramento com zero km;
 - Pausas: início/fim, odômetros, duração derivada, título opcional, histórico e
   correção completa pelo lápis com coerência temporal e de odômetro;
 - Leituras de ganhos inicial, parcial e final, com fechamento atômico;

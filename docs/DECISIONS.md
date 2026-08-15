@@ -123,5 +123,9 @@ genérico ou regras por nome de Plataforma.
 
 Crédito anterior ou exatamente no baseline não é subtraído da variação
 seguinte, pois já compõe o saldo inicial. Ele permanece um fato independente e
-não recebe `jornadaId` artificial. A competência econômica da promoção pode ser
-anterior a `dataHora`, mas não é modelada nesta etapa.
+não recebe `jornadaId` artificial.
+
+O módulo não evoluirá para cadastrar missão, meta, etapas, exigências, origem
+econômica, competência em outra Jornada ou lucratividade da promoção.
+`dataHora` é o instante factual em que o crédito apareceu; análises eventuais
+mais complexas não justificam aumentar a carga operacional do motorista.

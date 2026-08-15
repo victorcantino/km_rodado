@@ -255,6 +255,14 @@ void main() {
     final campoCidade = tester.widget<TextFormField>(
       find.byType(TextFormField).at(1),
     );
+    final campoOdometro = tester.widget<TextFormField>(
+      find.byType(TextFormField).first,
+    );
+    expect(campoOdometro.controller!.text, '100');
+    final campoEditavel = tester.widget<EditableText>(
+      find.byType(EditableText).first,
+    );
+    expect(campoEditavel.focusNode.hasFocus, isTrue);
     expect(campoCidade.controller!.text, 'São Paulo');
   });
 
@@ -267,6 +275,7 @@ void main() {
 
     final campoOdometro = find.byType(TextFormField).first;
 
+    await tester.enterText(campoOdometro, '');
     await tester.tap(find.text('Confirmar'));
     await tester.pump();
     expect(find.text('Informe o odômetro final.'), findsOneWidget);

@@ -53,8 +53,11 @@
 - Evoluir reconciliação de resets, Passes e outras movimentações conhecidas.
 - Formalizar Passe com mecanismo `tempo | faturamento` e campos coerentes de
   duração/validade ou limite, mantendo preços e ofertas como dados variáveis.
-- Avaliar competência/origem econômica de bônus creditados em dia diferente
-  daquele em que foram conquistados, sem modelar missão/meta antecipadamente.
+- Ao cadastrar Passe após escolher a Plataforma, oferecer “Repetir último
+  Passe” ou “Informar outro”. Copiar somente tipo, valor como sugestão e limite
+  ou duração; nunca copiar ID, `dataHora`, `jornadaId` ou validade absoluta.
+  Para Passe por tempo, reutilizar duração, não a data final. Tudo permanece
+  editável porque ofertas podem mudar.
 - Resultado operacional separando faturamento, bônus, passes e custos, sem
   alterar ticket médio das viagens.
 - Eficiência diária, relatórios e timeline por projeção de tabelas especializadas.

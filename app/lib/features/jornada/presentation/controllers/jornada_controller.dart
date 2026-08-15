@@ -17,6 +17,9 @@ class JornadaController extends ChangeNotifier {
 
   bool get possuiJornadaAberta => jornadaAtual != null;
 
+  Future<int?> sugerirOdometroFechamento() =>
+      _service.sugerirOdometroFechamento();
+
   Future<void> carregarJornadaAberta() async {
     carregando = true;
     notifyListeners();

@@ -6,6 +6,7 @@ import '../../../core/database/daos/leitura_ganhos_dao.dart';
 import '../../../core/database/daos/passe_plataforma_dao.dart';
 import '../../../core/database/daos/bonus_promocao_dao.dart';
 import '../../bonus_promocao/data/bonus_promocao_repository.dart';
+import '../../abastecimento/data/abastecimento_repository.dart';
 import '../../leitura_ganhos/data/leitura_ganhos_repository.dart';
 import '../../ganho_individual/data/ganho_individual_repository.dart';
 import '../../pausa/data/pausa_repository.dart';
@@ -21,6 +22,7 @@ class JornadaService {
   final GanhoIndividualRepository? _ganhoIndividualRepository;
   final PassePlataformaRepository? _passePlataformaRepository;
   final BonusPromocaoRepository? _bonusPromocaoRepository;
+  final AbastecimentoRepository? _abastecimentoRepository;
 
   JornadaService(
     this._repository,
@@ -29,6 +31,7 @@ class JornadaService {
     this._ganhoIndividualRepository,
     this._passePlataformaRepository,
     this._bonusPromocaoRepository,
+    this._abastecimentoRepository,
   ]);
 
   Future<Jornada?> jornadaAberta() {
@@ -37,6 +40,55 @@ class JornadaService {
 
   Future<Jornada?> ultimaJornadaFinalizada() {
     return _repository.buscarUltimaJornadaFinalizada();
+  }
+
+  Future<int?> sugerirOdometroFechamento() async {
+    final jornada = await _repository.buscarJornadaAberta();
+    if (jornada == null) return null;
+
+    final fatos = <({DateTime dataHora, int odometro, int ordem})>[
+      (
+        dataHora: jornada.dataHoraInicio,
+        odometro: jornada.odometroInicio,
+        ordem: 0,
+      ),
+    ];
+    final pausas = await _pausaRepository.listarPorJornada(jornada.id);
+    for (final pausa in pausas) {
+      if (pausa.odometroInicio != null) {
+        fatos.add((
+          dataHora: pausa.inicio,
+          odometro: pausa.odometroInicio!,
+          ordem: 1,
+        ));
+      }
+      if (pausa.fim != null && pausa.odometroFim != null) {
+        fatos.add((
+          dataHora: pausa.fim!,
+          odometro: pausa.odometroFim!,
+          ordem: 2,
+        ));
+      }
+    }
+    final abastecimentos =
+        await _abastecimentoRepository?.listarPorVeiculoNoIntervalo(
+          jornada.veiculoId,
+          jornada.dataHoraInicio,
+          null,
+        ) ??
+        const [];
+    for (final abastecimento in abastecimentos) {
+      fatos.add((
+        dataHora: abastecimento.dataHora,
+        odometro: abastecimento.odometro,
+        ordem: 3,
+      ));
+    }
+    fatos.sort((a, b) {
+      final porData = a.dataHora.compareTo(b.dataHora);
+      return porData != 0 ? porData : a.ordem.compareTo(b.ordem);
+    });
+    return fatos.last.odometro;
   }
 
   Future<ResumoJornada?> resumoUltimaJornada() async {
