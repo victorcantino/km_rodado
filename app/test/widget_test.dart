@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:drift/drift.dart' hide Column, isNull;
 import 'package:drift/native.dart';
 
@@ -9,6 +10,7 @@ import 'package:km_rodado/core/database/seeds/seed.dart';
 import 'package:km_rodado/features/jornada/presentation/pages/jornada_page.dart';
 import 'package:km_rodado/features/jornada/presentation/widgets/abrir_jornada_dialog.dart';
 import 'package:km_rodado/features/jornada/presentation/widgets/fechar_jornada_dialog.dart';
+import 'package:km_rodado/features/jornada/presentation/widgets/editar_jornada_dialog.dart';
 import 'package:km_rodado/features/pausa/presentation/widgets/odometro_pausa_dialog.dart';
 
 void main() {
@@ -205,14 +207,16 @@ void main() {
     await tester.enterText(campoOdometro, '152184');
     await tester.tap(find.text('Salvar'));
     await tester.pumpAndSettle();
-    expect(resultado, (odometro: 152184, cidadeOrigem: 'Curitiba'));
+    expect(resultado?.odometro, 152184);
+    expect(resultado?.cidadeOrigem, 'Curitiba');
 
     await tester.tap(find.text('Exibir progressão'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField).first, '152185');
     await tester.tap(find.text('Salvar'));
     await tester.pumpAndSettle();
-    expect(resultado, (odometro: 152185, cidadeOrigem: 'Curitiba'));
+    expect(resultado?.odometro, 152185);
+    expect(resultado?.cidadeOrigem, 'Curitiba');
   });
 
   testWidgets('valida os campos obrigatórios', (tester) async {
@@ -276,7 +280,8 @@ void main() {
     await tester.tap(find.text('Salvar'));
     await tester.pumpAndSettle();
 
-    expect(resultado, (odometro: 12345, cidadeOrigem: 'São Paulo'));
+    expect(resultado?.odometro, 12345);
+    expect(resultado?.cidadeOrigem, 'São Paulo');
   });
 
   testWidgets('retorna nulo ao cancelar', (tester) async {
@@ -410,11 +415,9 @@ void main() {
     await tester.tap(find.text('Confirmar'));
     await tester.pumpAndSettle();
 
-    expect(resultado, (
-      odometroFim: 150,
-      cidadeDestino: 'Campinas',
-      observacoes: 'Dia produtivo',
-    ));
+    expect(resultado?.odometroFim, 150);
+    expect(resultado?.cidadeDestino, 'Campinas');
+    expect(resultado?.observacoes, 'Dia produtivo');
   });
 
   testWidgets('retorna opcionais nulos e permite cancelar', (tester) async {
@@ -450,11 +453,9 @@ void main() {
     await tester.enterText(find.byType(TextFormField).first, '101');
     await tester.tap(find.text('Confirmar'));
     await tester.pumpAndSettle();
-    expect(resultado, (
-      odometroFim: 101,
-      cidadeDestino: null,
-      observacoes: null,
-    ));
+    expect(resultado?.odometroFim, 101);
+    expect(resultado?.cidadeDestino, null);
+    expect(resultado?.observacoes, null);
 
     dialogoConcluido = false;
     await tester.tap(find.text('Exibir fechamento'));
@@ -464,5 +465,59 @@ void main() {
 
     expect(dialogoConcluido, isTrue);
     expect(resultado, isNull);
+  });
+
+  testWidgets('edição abre preenchida, localizada e preserva Próximo', (
+    tester,
+  ) async {
+    final jornada = Jornada(
+      id: 1,
+      usuarioId: 1,
+      veiculoId: 1,
+      dataHoraInicio: DateTime(2026, 8, 14, 8),
+      dataHoraFim: DateTime(2026, 8, 14, 18),
+      odometroInicio: 1000,
+      odometroFim: 1100,
+      cidadeOrigem: 'Ponta Grossa',
+      cidadeDestino: 'Curitiba',
+      status: StatusJornada.finalizada,
+      odometroAlterado: false,
+      observacoes: 'Teste',
+      dataCriacao: DateTime(2026, 8, 14),
+      dataAtualizacao: DateTime(2026, 8, 14),
+      quilometrosPercorridos: 100,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('pt', 'BR'),
+        supportedLocales: const [Locale('pt', 'BR')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        home: EditarJornadaDialog(jornada: jornada),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.textContaining('14/08/2026'), findsNWidgets(2));
+    expect(find.text('Ponta Grossa'), findsOneWidget);
+    expect(find.text('Curitiba'), findsOneWidget);
+    final inicio = find.byKey(const ValueKey('editar_odometro_inicio_jornada'));
+    expect(
+      tester
+          .widget<EditableText>(
+            find.descendant(of: inicio, matching: find.byType(EditableText)),
+          )
+          .focusNode
+          .hasFocus,
+      isTrue,
+    );
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pump();
+    expect(
+      tester
+          .widgetList<EditableText>(find.byType(EditableText))
+          .elementAt(1)
+          .focusNode
+          .hasFocus,
+      isTrue,
+    );
   });
 }

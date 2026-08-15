@@ -93,6 +93,7 @@ class LeituraGanhosController extends ChangeNotifier {
     required List<ItemLeituraGanhosEntrada> itens,
     String? cidadeDestino,
     String? observacoes,
+    DateTime? dataHoraFim,
   }) async {
     await _executar(() async {
       final leituraId = await _service.finalizarJornada(
@@ -100,6 +101,7 @@ class LeituraGanhosController extends ChangeNotifier {
         odometroFim: odometroFim,
         cidadeDestino: cidadeDestino,
         observacoes: observacoes,
+        dataHoraFim: dataHoraFim,
         itens: itens,
       );
       ultimaLeituraSalva = await _service.buscarLeitura(leituraId);

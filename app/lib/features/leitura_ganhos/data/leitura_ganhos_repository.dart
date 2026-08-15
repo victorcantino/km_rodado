@@ -37,6 +37,9 @@ class LeituraGanhosRepository {
     return _dao.buscarUltimaLeitura(jornadaId);
   }
 
+  Future<List<LeiturasGanho>> listarPorJornada(int jornadaId) =>
+      _dao.listarPorJornada(jornadaId);
+
   Future<int> salvarLeitura(
     LeiturasGanhosCompanion leitura,
     List<LeiturasGanhoPlataformaCompanion> Function(int leituraId) criarItens,

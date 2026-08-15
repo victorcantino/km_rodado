@@ -5,13 +5,14 @@
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
 - schema atual: **8**;
-- suíte automatizada: **139 testes aprovados** em 15/08/2026.
+- suíte automatizada: **152 testes aprovados** em 15/08/2026.
 
 ## Implementado
 
 - Jornada: abertura, fechamento, persistência, restauração, localização textual
   e progressão de odômetro, inclusive sugestão cronológica no fechamento e
-  encerramento com zero km;
+  encerramento com zero km; abertura/fechamento tardios e correção segura da
+  Jornada aberta ou da última finalizada;
 - Pausas: início/fim, odômetros, duração derivada, título opcional, histórico e
   correção completa pelo lápis com coerência temporal e de odômetro;
 - Leituras de ganhos inicial, parcial e final, com fechamento atômico;
@@ -19,7 +20,8 @@
   acumuladas ou individuais;
 - ganhos acumulados por snapshots e ganhos individuais/Particular em lote;
 - resumo derivado com receita, viagens, ticket médio, tempos, distâncias e
-  indicadores; regressões ou passes em acumuladas exigem conferência;
+  indicadores; regressões, passes ou baseline posterior ao início impedem
+  totais financeiros gerais exatos;
 - Abastecimentos atuais/retroativos, preço efetivo derivado, tanque cheio ou
   parcial e associação opcional à Jornada;
 - Passes por faturamento ou tempo, validade derivada, repetição segura por

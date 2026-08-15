@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-typedef AbrirJornadaResultado = ({int odometro, String cidadeOrigem});
+typedef AbrirJornadaResultado = ({
+  int odometro,
+  String cidadeOrigem,
+  DateTime dataHoraInicio,
+});
 
 class AbrirJornadaDialog extends StatefulWidget {
   final int? odometroInicial;
@@ -24,6 +29,8 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
   late final TextEditingController odometroController;
 
   late final TextEditingController cidadeController;
+  late DateTime dataHoraInicio;
+  String? erroDataHora;
 
   @override
   void initState() {
@@ -34,6 +41,33 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
     cidadeController = TextEditingController(
       text: widget.cidadeOrigemInicial ?? '',
     );
+    dataHoraInicio = DateTime.now();
+  }
+
+  Future<void> _alterarDataHora() async {
+    final agora = DateTime.now();
+    final data = await showDatePicker(
+      context: context,
+      initialDate: dataHoraInicio,
+      firstDate: DateTime(2000),
+      lastDate: agora,
+    );
+    if (!mounted || data == null) return;
+    final hora = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(dataHoraInicio),
+    );
+    if (!mounted || hora == null) return;
+    setState(() {
+      dataHoraInicio = DateTime(
+        data.year,
+        data.month,
+        data.day,
+        hora.hour,
+        hora.minute,
+      );
+      erroDataHora = null;
+    });
   }
 
   @override
@@ -46,6 +80,9 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final formato = DateFormat.yMd(
+      Localizations.localeOf(context).toLanguageTag(),
+    ).add_Hm();
     return AlertDialog(
       title: const Text('Abrir Jornada'),
 
@@ -54,6 +91,19 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ListTile(
+              key: const ValueKey('alterar_inicio_jornada'),
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Início'),
+              subtitle: Text(formato.format(dataHoraInicio)),
+              trailing: const Icon(Icons.edit_calendar),
+              onTap: _alterarDataHora,
+            ),
+            if (erroDataHora != null)
+              Text(
+                erroDataHora!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
             TextFormField(
               controller: odometroController,
               autofocus: true,
@@ -117,6 +167,12 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
 
         ElevatedButton(
           onPressed: () {
+            if (dataHoraInicio.isAfter(DateTime.now())) {
+              setState(() {
+                erroDataHora = 'O início da jornada não pode estar no futuro.';
+              });
+              return;
+            }
             if (!formKey.currentState!.validate()) {
               return;
             }
@@ -124,6 +180,7 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
             final resultado = (
               odometro: int.parse(odometroController.text.trim()),
               cidadeOrigem: cidadeController.text.trim(),
+              dataHoraInicio: dataHoraInicio,
             );
 
             Navigator.pop<AbrirJornadaResultado>(context, resultado);

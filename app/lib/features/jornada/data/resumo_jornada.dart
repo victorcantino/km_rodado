@@ -44,6 +44,7 @@ class ResumoJornada {
   final List<ResultadoPlataformaJornada> resultadosPlataformas;
   final List<PasseComPlataforma> passes;
   final List<BonusPromocaoComPlataforma> bonusPromocoes;
+  final bool coberturaFinanceiraInicialCompleta;
 
   const ResumoJornada({
     required this.jornada,
@@ -56,6 +57,7 @@ class ResumoJornada {
     required this.resultadosPlataformas,
     this.passes = const [],
     this.bonusPromocoes = const [],
+    this.coberturaFinanceiraInicialCompleta = true,
   });
 
   int get custoPassesCentavos => passes.fold<int>(
@@ -76,6 +78,7 @@ class ResumoJornada {
       : null;
 
   bool get financeiroCompleto =>
+      coberturaFinanceiraInicialCompleta &&
       resultadosPlataformas.isNotEmpty &&
       resultadosPlataformas.every((resultado) => resultado.calculavel);
 

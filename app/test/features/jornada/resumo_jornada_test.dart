@@ -177,7 +177,7 @@ void main() {
     await inserirLeitura(
       jornadaId,
       TipoLeituraGanhos.inicial,
-      DateTime(2026, 8, 10, 8, 1),
+      DateTime(2026, 8, 10, 8),
       {uberId: (10000, 10), noventaNoveId: (5000, 4)},
     );
     await inserirLeitura(
@@ -197,6 +197,7 @@ void main() {
 
     expect(resumo, isNotNull);
     expect(resumo!.duracaoTotal, const Duration(hours: 8, minutes: 6));
+    expect(resumo.coberturaFinanceiraInicialCompleta, isTrue);
     expect(resumo.tempoPausa, const Duration(hours: 1, minutes: 12));
     expect(resumo.tempoAtivo, const Duration(hours: 6, minutes: 54));
     expect(resumo.quilometrosTotal, 187);
@@ -214,6 +215,43 @@ void main() {
     expect(uber.quantidadeViagens, 11);
     expect(uber.ticketMedio, closeTo(15.309, 0.001));
   });
+
+  test(
+    'baseline posterior ao início deixa cobertura financeira parcial',
+    () async {
+      final jornadaId = await inserirJornada(
+        inicio: DateTime(2026, 8, 10, 8),
+        fim: DateTime(2026, 8, 10, 18),
+        odometroFim: 1200,
+      );
+      final uberId = await inserirPlataforma('Uber');
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.inicial,
+        DateTime(2026, 8, 10, 8, 30),
+        {uberId: (5000, 5)},
+      );
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.finalDaJornada,
+        DateTime(2026, 8, 10, 18),
+        {uberId: (15000, 15)},
+      );
+
+      final resumo = (await service.resumoUltimaJornada())!;
+
+      expect(resumo.coberturaFinanceiraInicialCompleta, isFalse);
+      expect(resumo.financeiroCompleto, isFalse);
+      expect(resumo.receitaTotalCentavos, isNull);
+      expect(resumo.quantidadeTotalViagens, isNull);
+      expect(resumo.ticketMedioGeral, isNull);
+      expect(resumo.receitaPorHoraAtiva, isNull);
+      expect(resumo.receitaPorKmAtivo, isNull);
+      expect(resumo.resultadoOperacionalCentavos, isNull);
+      expect(resumo.resultadosPlataformas.single.receitaCentavos, 10000);
+      expect(resumo.resultadosPlataformas.single.quantidadeViagens, 10);
+    },
+  );
 
   test('sem Pausas aceita receita, viagens e quilômetros zero', () async {
     final jornadaId = await inserirJornada(

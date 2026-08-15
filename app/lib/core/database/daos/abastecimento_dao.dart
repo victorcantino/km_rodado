@@ -27,6 +27,17 @@ class AbastecimentoDao extends DatabaseAccessor<AppDatabase>
             ..limit(1))
           .getSingleOrNull();
 
+  Future<List<Abastecimento>> listarPorJornada(int jornadaId) =>
+      (select(abastecimentos)
+            ..where(
+              (abastecimento) => abastecimento.jornadaId.equals(jornadaId),
+            )
+            ..orderBy([
+              (abastecimento) => OrderingTerm.asc(abastecimento.dataHora),
+              (abastecimento) => OrderingTerm.asc(abastecimento.id),
+            ]))
+          .get();
+
   Future<List<Abastecimento>> listarPorVeiculoNoIntervalo(
     int veiculoId,
     DateTime inicio,

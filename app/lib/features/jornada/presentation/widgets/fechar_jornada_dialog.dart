@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 typedef FecharJornadaResultado = ({
   int odometroFim,
   String? cidadeDestino,
   String? observacoes,
+  DateTime dataHoraFim,
 });
 
 class FecharJornadaDialog extends StatefulWidget {
   final int odometroInicio;
   final String? cidadeDestinoInicial;
+  final DateTime? dataHoraInicio;
 
   const FecharJornadaDialog({
     super.key,
     required this.odometroInicio,
+    this.dataHoraInicio,
     this.cidadeDestinoInicial,
   });
 
@@ -25,6 +29,8 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
   late final TextEditingController odometroController;
   late final TextEditingController cidadeController;
   final observacoesController = TextEditingController();
+  late DateTime dataHoraFim;
+  String? erroDataHora;
 
   @override
   void initState() {
@@ -35,6 +41,33 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
     cidadeController = TextEditingController(
       text: widget.cidadeDestinoInicial ?? '',
     );
+    dataHoraFim = DateTime.now();
+  }
+
+  Future<void> _alterarDataHora() async {
+    final agora = DateTime.now();
+    final data = await showDatePicker(
+      context: context,
+      initialDate: dataHoraFim,
+      firstDate: widget.dataHoraInicio ?? DateTime(2000),
+      lastDate: agora,
+    );
+    if (!mounted || data == null) return;
+    final hora = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(dataHoraFim),
+    );
+    if (!mounted || hora == null) return;
+    setState(() {
+      dataHoraFim = DateTime(
+        data.year,
+        data.month,
+        data.day,
+        hora.hour,
+        hora.minute,
+      );
+      erroDataHora = null;
+    });
   }
 
   @override
@@ -52,6 +85,9 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final formato = DateFormat.yMd(
+      Localizations.localeOf(context).toLanguageTag(),
+    ).add_Hm();
     return AlertDialog(
       title: const Text('Fechar Jornada'),
       content: Form(
@@ -60,6 +96,19 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              ListTile(
+                key: const ValueKey('alterar_fim_jornada'),
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Fim'),
+                subtitle: Text(formato.format(dataHoraFim)),
+                trailing: const Icon(Icons.edit_calendar),
+                onTap: _alterarDataHora,
+              ),
+              if (erroDataHora != null)
+                Text(
+                  erroDataHora!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
               TextFormField(
                 controller: odometroController,
                 autofocus: true,
@@ -120,6 +169,20 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
         ),
         ElevatedButton(
           onPressed: () {
+            if (dataHoraFim.isAfter(DateTime.now())) {
+              setState(() {
+                erroDataHora = 'O fim da jornada não pode estar no futuro.';
+              });
+              return;
+            }
+            if (widget.dataHoraInicio != null &&
+                dataHoraFim.isBefore(widget.dataHoraInicio!)) {
+              setState(() {
+                erroDataHora =
+                    'O fim da jornada não pode ser anterior ao início.';
+              });
+              return;
+            }
             if (!formKey.currentState!.validate()) {
               return;
             }
@@ -128,6 +191,7 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
               odometroFim: int.parse(odometroController.text.trim()),
               cidadeDestino: _textoOpcional(cidadeController.text),
               observacoes: _textoOpcional(observacoesController.text),
+              dataHoraFim: dataHoraFim,
             );
 
             Navigator.pop<FecharJornadaResultado>(context, resultado);
