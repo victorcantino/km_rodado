@@ -151,3 +151,8 @@ devem priorizar histórico, valores derivados, defaults seguros, autofocus,
 repetição e campos condicionais, mantendo sempre a possibilidade de correção
 manual. GPS e serviços externos só entram quando agregarem valor, com
 consentimento e confirmação do usuário.
+
+Ao acionar `Próximo`, o foco percorre somente campos editáveis e respeita o
+tipo de teclado do destino. Botões, seletores e calendários ficam fora dessa
+sequência; valores padrão confiáveis permanecem preenchidos e detalhes menos
+frequentes continuam disponíveis sob demanda.

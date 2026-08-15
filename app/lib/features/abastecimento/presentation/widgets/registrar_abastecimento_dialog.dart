@@ -50,6 +50,15 @@ class _RegistrarAbastecimentoDialogState
   final posto = TextEditingController();
   final bandeira = TextEditingController();
   final observacao = TextEditingController();
+  final focoOdometro = FocusNode();
+  final focoVolume = FocusNode();
+  final focoTotal = FocusNode();
+  final focoPrecoCalculo = FocusNode();
+  final focoPrecoBomba = FocusNode();
+  final focoCidade = FocusNode();
+  final focoPosto = FocusNode();
+  final focoBandeira = FocusNode();
+  final focoObservacao = FocusNode();
   late TipoCombustivel combustivel;
   late DateTime dataHora;
   bool tanqueCheio = true;
@@ -175,6 +184,19 @@ class _RegistrarAbastecimentoDialogState
     ]) {
       controller.dispose();
     }
+    for (final focusNode in [
+      focoOdometro,
+      focoVolume,
+      focoTotal,
+      focoPrecoCalculo,
+      focoPrecoBomba,
+      focoCidade,
+      focoPosto,
+      focoBandeira,
+      focoObservacao,
+    ]) {
+      focusNode.dispose();
+    }
     super.dispose();
   }
 
@@ -194,9 +216,12 @@ class _RegistrarAbastecimentoDialogState
                 TextFormField(
                   key: const ValueKey('odometro_abastecimento'),
                   controller: odometro,
+                  focusNode: focoOdometro,
                   autofocus: true,
                   selectAllOnFocus: true,
                   keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => focoVolume.requestFocus(),
                   decoration: const InputDecoration(labelText: 'Odômetro'),
                   validator: (texto) {
                     final valor = int.tryParse(texto?.trim() ?? '');
@@ -237,7 +262,10 @@ class _RegistrarAbastecimentoDialogState
                 TextFormField(
                   key: const ValueKey('volume_abastecimento'),
                   controller: volume,
+                  focusNode: focoVolume,
                   keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => focoTotal.requestFocus(),
                   inputFormatters: const [_MilesimosFormatter()],
                   decoration: const InputDecoration(
                     labelText: 'Volume',
@@ -251,7 +279,10 @@ class _RegistrarAbastecimentoDialogState
                 TextFormField(
                   key: const ValueKey('total_abastecimento'),
                   controller: total,
+                  focusNode: focoTotal,
                   keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => focoPrecoCalculo.requestFocus(),
                   inputFormatters: const [_CentavosFormatter()],
                   decoration: const InputDecoration(
                     labelText: 'Total pago',
@@ -265,7 +296,10 @@ class _RegistrarAbastecimentoDialogState
                 TextFormField(
                   key: const ValueKey('preco_calculo_abastecimento'),
                   controller: precoCalculo,
+                  focusNode: focoPrecoCalculo,
                   keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => focoPrecoBomba.requestFocus(),
                   inputFormatters: const [_MilesimosFormatter()],
                   decoration: const InputDecoration(
                     labelText: 'Preço por litro para cálculo (opcional)',
@@ -296,7 +330,10 @@ class _RegistrarAbastecimentoDialogState
                 TextFormField(
                   key: const ValueKey('preco_bomba_abastecimento'),
                   controller: precoBomba,
+                  focusNode: focoPrecoBomba,
                   keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => focoPrecoBomba.unfocus(),
                   inputFormatters: const [_MilesimosFormatter()],
                   decoration: const InputDecoration(
                     labelText: 'Preço da bomba (opcional)',
@@ -311,20 +348,32 @@ class _RegistrarAbastecimentoDialogState
                   children: [
                     TextFormField(
                       controller: cidade,
+                      focusNode: focoCidade,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => focoPosto.requestFocus(),
                       decoration: const InputDecoration(labelText: 'Cidade'),
                     ),
                     TextFormField(
                       controller: posto,
+                      focusNode: focoPosto,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => focoBandeira.requestFocus(),
                       decoration: const InputDecoration(
                         labelText: 'Nome do posto',
                       ),
                     ),
                     TextFormField(
                       controller: bandeira,
+                      focusNode: focoBandeira,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => focoObservacao.requestFocus(),
                       decoration: const InputDecoration(labelText: 'Bandeira'),
                     ),
                     TextFormField(
                       controller: observacao,
+                      focusNode: focoObservacao,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => focoObservacao.unfocus(),
                       decoration: const InputDecoration(
                         labelText: 'Observação',
                       ),

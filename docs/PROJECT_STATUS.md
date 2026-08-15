@@ -5,7 +5,7 @@
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
 - schema atual: **8**;
-- suíte automatizada: **128 testes aprovados** em 15/08/2026.
+- suíte automatizada: **139 testes aprovados** em 15/08/2026.
 
 ## Implementado
 
@@ -30,6 +30,8 @@
 - baseline protege contra dupla subtração de bônus creditado antes da Jornada,
   sem criar associação cronologicamente falsa;
 - JornadaPage protegida pelos insets seguros inferiores do Android;
+- formulários operacionais navegam pelo teclado entre campos editáveis,
+  ignorando botões, seletores e calendários, e encerram a sequência com Done;
 - migrações preservadoras até schema 8 e seeds idempotentes.
 
 ## Em teste operacional

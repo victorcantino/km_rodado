@@ -354,6 +354,20 @@ void main() {
     await tester.tap(find.text('Faturamento'));
     await tester.pump();
     await tester.enterText(find.byKey(const ValueKey('valor_passe')), '3000');
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pump();
+    expect(
+      tester
+          .widget<EditableText>(
+            find.descendant(
+              of: find.byKey(const ValueKey('limite_passe')),
+              matching: find.byType(EditableText),
+            ),
+          )
+          .focusNode
+          .hasFocus,
+      isTrue,
+    );
     await tester.tap(find.text('Registrar'));
     await tester.pump();
     expect(find.text('Informe um limite maior que zero.'), findsOneWidget);

@@ -64,6 +64,7 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
                 controller: odometroController,
                 autofocus: true,
                 keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
                 selectAllOnFocus: true,
                 decoration: const InputDecoration(labelText: 'Odômetro final'),
                 validator: (valor) {
@@ -93,6 +94,7 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: cidadeController,
+                textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(
                   labelText: 'Cidade de destino (opcional)',
                 ),
@@ -100,6 +102,8 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: observacoesController,
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
                 decoration: const InputDecoration(
                   labelText: 'Observações (opcional)',
                 ),

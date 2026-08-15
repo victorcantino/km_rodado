@@ -697,6 +697,36 @@ void main() {
     expect(find.text('+ Registrar'), findsOneWidget);
     expect(find.byType(TextFormField), findsNWidgets(2));
 
+    await tester.tap(find.byKey(ValueKey('valor_$uberId')));
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pump();
+    expect(
+      tester
+          .widget<EditableText>(
+            find.descendant(
+              of: find.byKey(ValueKey('quantidade_$uberId')),
+              matching: find.byType(EditableText),
+            ),
+          )
+          .focusNode
+          .hasFocus,
+      isTrue,
+    );
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
+    expect(
+      tester
+          .widget<EditableText>(
+            find.descendant(
+              of: find.byKey(ValueKey('quantidade_$uberId')),
+              matching: find.byType(EditableText),
+            ),
+          )
+          .focusNode
+          .hasFocus,
+      isFalse,
+    );
+
     for (var i = 0; i < 6; i++) {
       await tester.tap(find.byKey(ValueKey('menos_$uberId')));
     }

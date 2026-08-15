@@ -34,6 +34,9 @@ class _RegistrarPasseDialogState extends State<RegistrarPasseDialog> {
   final formKey = GlobalKey<FormState>();
   final valor = TextEditingController();
   final limite = TextEditingController();
+  final focoValor = FocusNode();
+  final focoLimite = FocusNode();
+  final focoObservacao = FocusNode();
   String observacao = '';
   late int plataformaId = widget.plataformas.first.id;
   TipoPasse tipo = TipoPasse.faturamento;
@@ -120,6 +123,9 @@ class _RegistrarPasseDialogState extends State<RegistrarPasseDialog> {
   void dispose() {
     valor.dispose();
     limite.dispose();
+    focoValor.dispose();
+    focoLimite.dispose();
+    focoObservacao.dispose();
     super.dispose();
   }
 
@@ -216,8 +222,13 @@ class _RegistrarPasseDialogState extends State<RegistrarPasseDialog> {
               TextFormField(
                 key: const ValueKey('valor_passe'),
                 controller: valor,
+                focusNode: focoValor,
                 autofocus: true,
                 keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) => tipo == TipoPasse.faturamento
+                    ? focoLimite.requestFocus()
+                    : focoObservacao.requestFocus(),
                 inputFormatters: const [_CentavosFormatter()],
                 decoration: const InputDecoration(
                   labelText: 'Valor pago',
@@ -231,7 +242,10 @@ class _RegistrarPasseDialogState extends State<RegistrarPasseDialog> {
                 TextFormField(
                   key: const ValueKey('limite_passe'),
                   controller: limite,
+                  focusNode: focoLimite,
                   keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => focoObservacao.requestFocus(),
                   inputFormatters: const [_CentavosFormatter()],
                   decoration: const InputDecoration(
                     labelText: 'Limite de faturamento',
@@ -269,6 +283,10 @@ class _RegistrarPasseDialogState extends State<RegistrarPasseDialog> {
                 ),
               ),
               TextFormField(
+                key: const ValueKey('observacao_passe'),
+                focusNode: focoObservacao,
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) => focoObservacao.unfocus(),
                 decoration: const InputDecoration(
                   labelText: 'Observação (opcional)',
                 ),

@@ -26,6 +26,8 @@ class _RegistrarBonusPromocaoDialogState
   final formKey = GlobalKey<FormState>();
   final valor = TextEditingController();
   final observacao = TextEditingController();
+  final focoValor = FocusNode();
+  final focoObservacao = FocusNode();
   late int plataformaId = widget.plataformas.first.id;
   DateTime dataHora = DateTime.now();
 
@@ -74,6 +76,8 @@ class _RegistrarBonusPromocaoDialogState
   void dispose() {
     valor.dispose();
     observacao.dispose();
+    focoValor.dispose();
+    focoObservacao.dispose();
     super.dispose();
   }
 
@@ -103,8 +107,11 @@ class _RegistrarBonusPromocaoDialogState
               TextFormField(
                 key: const ValueKey('valor_bonus_promocao'),
                 controller: valor,
+                focusNode: focoValor,
                 autofocus: true,
                 keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) => focoObservacao.requestFocus(),
                 inputFormatters: const [_CentavosFormatter()],
                 decoration: const InputDecoration(
                   labelText: 'Valor creditado',
@@ -124,7 +131,11 @@ class _RegistrarBonusPromocaoDialogState
                 onTap: _alterarDataHora,
               ),
               TextFormField(
+                key: const ValueKey('observacao_bonus_promocao'),
                 controller: observacao,
+                focusNode: focoObservacao,
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) => focoObservacao.unfocus(),
                 decoration: const InputDecoration(
                   labelText: 'Observação opcional',
                 ),

@@ -40,6 +40,8 @@ class _OdometroPausaDialogState extends State<OdometroPausaDialog> {
           controller: controller,
           autofocus: true,
           keyboardType: TextInputType.number,
+          textInputAction: TextInputAction.done,
+          onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
           selectAllOnFocus: true,
           decoration: const InputDecoration(labelText: 'Odômetro atual'),
           validator: (texto) {
