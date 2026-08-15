@@ -12,6 +12,7 @@ import 'package:km_rodado/core/database/daos/jornada_dao.dart';
 import 'package:km_rodado/core/database/seeds/seed.dart';
 import 'package:km_rodado/features/bonus_promocao/data/bonus_promocao_repository.dart';
 import 'package:km_rodado/features/bonus_promocao/data/bonus_promocao_service.dart';
+import 'package:km_rodado/features/bonus_promocao/presentation/controllers/bonus_promocao_controller.dart';
 import 'package:km_rodado/features/jornada/data/jornada_repository.dart';
 import 'package:km_rodado/features/bonus_promocao/presentation/widgets/registrar_bonus_promocao_dialog.dart';
 
@@ -56,7 +57,7 @@ void main() {
         ),
       );
 
-  test('registra retroativo fora de Jornada com criação e trim', () async {
+  test('registro histórico promoção permanece legível', () async {
     final plataformaId = await plataforma();
     final operacional = DateTime(2026, 8, 14, 18);
     await service.registrar(
@@ -74,6 +75,21 @@ void main() {
     expect(bonus.valorCentavos, 2000);
     expect(bonus.tipo, TipoBonusPromocao.promocao);
     expect(bonus.observacao, 'Meta semanal');
+  });
+
+  test('controller persiste novo crédito com tipo técnico canônico', () async {
+    final plataformaId = await plataforma();
+    final controller = BonusPromocaoController(service);
+    await controller.registrar(
+      plataformaId: plataformaId,
+      dataHora: DateTime(2026, 8, 15, 10),
+      valorCentavos: 800,
+    );
+
+    final credito =
+        (await database.select(database.bonusPromocoes).get()).single;
+    expect(credito.tipo, TipoBonusPromocao.bonus);
+    controller.dispose();
   });
 
   test('associa automaticamente à Jornada aberta', () async {
@@ -186,6 +202,8 @@ void main() {
 
     await tester.tap(find.text('Abrir'));
     await tester.pumpAndSettle();
+    expect(find.text('Tipo'), findsNothing);
+    expect(find.text('Promoção'), findsNothing);
     final campo = find.byKey(const ValueKey('valor_bonus_promocao'));
     expect(
       tester
@@ -202,7 +220,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(resultado?.plataformaId, plataformaId);
     expect(resultado?.valorCentavos, 2000);
-    expect(resultado?.tipo, TipoBonusPromocao.bonus);
     expect(tester.takeException(), isNull);
   });
 }

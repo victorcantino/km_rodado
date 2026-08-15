@@ -142,8 +142,9 @@ void main() {
     int jornadaId,
     int plataformaId,
     DateTime dataHora,
-    int valor,
-  ) => database
+    int valor, {
+    TipoBonusPromocao tipo = TipoBonusPromocao.bonus,
+  }) => database
       .into(database.bonusPromocoes)
       .insert(
         BonusPromocoesCompanion.insert(
@@ -151,7 +152,7 @@ void main() {
           jornadaId: Value(jornadaId),
           dataHora: dataHora,
           valorCentavos: valor,
-          tipo: TipoBonusPromocao.bonus,
+          tipo: tipo,
         ),
       );
 
@@ -591,6 +592,7 @@ void main() {
         plataformaId,
         DateTime(2026, 8, 10, 14),
         2000,
+        tipo: TipoBonusPromocao.promocao,
       );
 
       final resultado =

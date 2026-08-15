@@ -1,11 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart' hide Column, isNull;
+import 'package:drift/native.dart';
 
+import 'package:km_rodado/core/constants/enums/status_jornada.dart';
+import 'package:km_rodado/core/database/app_database.dart';
+import 'package:km_rodado/core/database/seeds/seed.dart';
+import 'package:km_rodado/features/jornada/presentation/pages/jornada_page.dart';
 import 'package:km_rodado/features/jornada/presentation/widgets/abrir_jornada_dialog.dart';
 import 'package:km_rodado/features/jornada/presentation/widgets/fechar_jornada_dialog.dart';
 import 'package:km_rodado/features/pausa/presentation/widgets/odometro_pausa_dialog.dart';
 
 void main() {
+  testWidgets('JornadaPage respeita área segura inferior em viewport pequena', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+    await garantirDadosTemporarios(database);
+    await database
+        .into(database.jornadas)
+        .insert(
+          JornadasCompanion.insert(
+            usuarioId: 1,
+            veiculoId: 1,
+            dataHoraInicio: DateTime(2026, 8, 15, 8),
+            dataHoraFim: Value(DateTime(2026, 8, 15, 9)),
+            odometroInicio: 100,
+            odometroFim: const Value(100),
+            cidadeOrigem: 'Curitiba',
+            cidadeDestino: const Value('Curitiba'),
+            status: StatusJornada.finalizada,
+            quilometrosPercorridos: const Value(0),
+          ),
+        );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MediaQuery(
+          data: const MediaQueryData(
+            size: Size(320, 400),
+            padding: EdgeInsets.zero,
+            viewPadding: EdgeInsets.only(bottom: 48),
+            viewInsets: EdgeInsets.zero,
+          ),
+          child: JornadaPage(databaseFactory: () => database),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('jornada_safe_area')), findsOneWidget);
+    final safeArea = tester.widget<SafeArea>(
+      find.byKey(const ValueKey('jornada_safe_area')),
+    );
+    expect(safeArea.bottom, isFalse);
+    final lista = tester.widget<ListView>(find.byType(ListView).first);
+    expect(lista.padding, const EdgeInsets.fromLTRB(16, 16, 16, 64));
+    await tester.scrollUntilVisible(
+      find.text('Abrir Jornada'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pump();
+    expect(tester.getBottomRight(find.text('Abrir Jornada')).dy, lessThan(352));
+  });
+
   testWidgets('exibe os campos e ações para abrir jornada', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(home: Scaffold(body: AbrirJornadaDialog())),

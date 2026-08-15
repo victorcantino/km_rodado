@@ -18,8 +18,13 @@
 
 - Evolução visual móvel/operacional após estabilizar os fluxos.
 - Revisar autofocus e redução de toques nos demais inputs após uso em campo.
-- Corrigir globalmente SafeArea/insets no Android para que o conteúdo não fique
-  sob a barra inferior do sistema; evitar correção pontual de um único botão.
+- Controlar explicitamente a navegação “Próximo” entre campos editáveis: pular
+  botões, ícones, checkboxes e controles auxiliares; trocar teclado conforme o
+  tipo do próximo input e usar Done/Concluir no último campo.
+- Reorganizar futuramente a JornadaPage em seções recolhíveis com resumo curto
+  quando fechadas, como Faturamento, Custos, Pausas, Abastecimentos,
+  Plataformas e Manutenção. Indicadores serão escolhidos com a maturidade das
+  features, sem sanfona nesta etapa.
 - Tela sempre ligada configurável e modo escuro.
 - Onboarding e guias contextuais por módulo, dispensáveis e reabertos sob
   demanda.
@@ -29,6 +34,13 @@
 - Histórico completo por posto, bandeira e cidade; preço médio e promoções.
 - Capacidade real/configurável do tanque por veículo.
 - Consumo por pelo menos três ciclos válidos de tanque cheio, tratando parciais.
+- No ciclo entre tanques cheios A e B, calcular `km desde A / litros colocados
+  em B` e atribuir o rendimento ao ciclo iniciado em A, inclusive ao analisar o
+  posto/bandeira de A. Acumular parciais até o próximo ciclo válido.
+- Com consentimento e infraestrutura apropriada, usar localização/serviço de
+  lugares para sugerir cidade e posto, pedir confirmação, recuperar preços e
+  ciclos anteriores e apoiar a escolha. GPS sozinho não identifica um
+  estabelecimento com garantia; não criar cadastro automático sem confirmação.
 - Autonomia, custo/km e previsão do próximo abastecimento como derivados.
 
 ## Manutenção e veículo
@@ -51,13 +63,14 @@
 ## Plataforma e análises
 
 - Evoluir reconciliação de resets, Passes e outras movimentações conhecidas.
-- Formalizar Passe com mecanismo `tempo | faturamento` e campos coerentes de
-  duração/validade ou limite, mantendo preços e ofertas como dados variáveis.
-- Ao cadastrar Passe após escolher a Plataforma, oferecer “Repetir último
-  Passe” ou “Informar outro”. Copiar somente tipo, valor como sugestão e limite
-  ou duração; nunca copiar ID, `dataHora`, `jornadaId` ou validade absoluta.
-  Para Passe por tempo, reutilizar duração, não a data final. Tudo permanece
-  editável porque ofertas podem mudar.
+- Quando houver necessidade operacional real, generalizar condições de Passe
+  para duração, limite de faturamento, quantidade máxima de usos/pedidos e
+  combinações “o que ocorrer primeiro”. Não antecipar enum de uso nem engine
+  genérica.
+- Modelar futuramente carteira pré-paga separando recarga, saldo e consumo. Uma
+  recarga de R$ 15 seguida por Passe de R$ 12 deixa saldo de R$ 3 e reconhece
+  custo de R$ 12; não somar recarga e compra como duas despesas. Consumo direto
+  posterior do saldo é outro fato econômico.
 - Resultado operacional separando faturamento, bônus, passes e custos, sem
   alterar ticket médio das viagens.
 - Eficiência diária, relatórios e timeline por projeção de tabelas especializadas.

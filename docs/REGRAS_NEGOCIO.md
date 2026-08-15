@@ -16,6 +16,8 @@
 - Quilômetros percorridos são `odometroFim - odometroInicio`.
 - A leitura final e o fechamento são persistidos atomicamente.
 - Não se fecha Jornada com Pausa aberta ou leitura inicial pendente.
+- A superfície operacional respeita os insets seguros do aparelho; ações não
+  podem terminar atrás da navegação inferior do sistema.
 
 Correções históricas de odômetro não pertencem ao fluxo operacional normal e
 deverão exigir justificativa e rastreabilidade.
@@ -118,6 +120,12 @@ deverão exigir justificativa e rastreabilidade.
 Consumo, autonomia e custo/km permanecem futuros e devem considerar ciclos
 válidos de tanque cheio e abastecimentos parciais.
 
+Em um futuro ciclo válido entre tanques cheios A e B, o consumo usa a distância
+percorrida desde A dividida pelo volume abastecido em B. O rendimento pertence
+ao ciclo iniciado em A — inclusive para análise de posto/bandeira — e não é
+atribuído automaticamente ao posto do abastecimento final. Abastecimentos
+parciais devem ser acumulados até um ciclo válido.
+
 ## Passes de plataforma
 
 - Passe é custo operacional factual de uma Plataforma, não faturamento
@@ -128,6 +136,22 @@ válidos de tanque cheio e abastecimentos parciais.
   o cadastro.
 - Valor pago é positivo e persistido em centavos. Modalidade, validade, limite
   de faturamento e observação são opcionais; textos usam `trim`.
+- No fluxo operacional atualmente suportado há dois tipos: `faturamento` e
+  `tempo`, sem regras por nome de Plataforma. Eles atendem aos Passes usados de
+  Uber/99, mas não limitam para sempre todos os mecanismos possíveis. O tipo é
+  gravado canonicamente em `modalidade`, preservando textos legados existentes.
+- Passe por faturamento exige limite positivo e calcula a validade como
+  `dataHora + 180 dias` exatos, preservando hora e minuto.
+- Passe por tempo exige duração de 24 ou 72 horas e calcula a validade a partir
+  de `dataHora`. A duração é derivada, não persistida separadamente.
+- “Repetir último Passe” reutiliza apenas tipo, valor como sugestão e limite ou
+  duração da mesma Plataforma. A nova compra recebe nova `dataHora`, validade
+  recalculada e associação própria; todos os valores continuam editáveis.
+- Passe legado só é repetível se seus dados permitirem reconhecer com segurança
+  um dos tipos atuais. Histórico incompleto ou livre permanece preservado.
+- Jornada é associada somente quando `dataHora` está entre o início da Jornada
+  aberta e o instante atual; cadastro retroativo fora desse intervalo mantém
+  `jornadaId` nulo.
 - Passe é mostrado separadamente no resumo e não reduz ticket médio.
 - Passe de acumulada entre leituras inicial/final exige conferência da receita.
   Não se calcula automaticamente `final - inicial + passe`.
@@ -142,6 +166,15 @@ válidos de tanque cheio e abastecimentos parciais.
 - A 99 também oferece duas opções por tempo e duas por faturamento. Está
   confirmada somente a opção habitual de limite de R$ 200 por R$ 16,98; os
   demais preços não são tratados como fatos.
+- Fonte de pagamento e condições do Passe são conceitos distintos. A inDrive
+  foi observada com carteira pré-paga e também com o Passe “cidade a cidade”,
+  comprado usando esse saldo. A oferta observada custava R$ 12, sem renovação
+  automática, e terminava no primeiro evento entre 24 horas e 7 pedidos
+  aceitos. Nome, preço, duração e quantidade são observações variáveis, nunca
+  regras hardcoded.
+- Recarga de carteira não é despesa por si só. Compra de Passe ou outro consumo
+  do saldo é o fato econômico; contabilizar recarga e consumo como custos
+  duplicaria o mesmo dinheiro.
 
 ## Bônus e promoções
 
@@ -160,7 +193,10 @@ válidos de tanque cheio e abastecimentos parciais.
 - Não se modelam missão, meta, etapas, viagens necessárias, horário da missão,
   origem/competência econômica, Jornada que teria gerado o bônus nem
   lucratividade da promoção. O registro pede somente Plataforma, valor
-  creditado, `dataHora`, classificação simples e observação opcional.
+  creditado, `dataHora` e observação opcional.
+- A distinção técnica histórica entre `bonus` e `promocao` permanece no schema,
+  mas não é apresentada nem exigida no fluxo operacional. Novos registros usam
+  `bonus` como valor canônico; ambos são tratados como o mesmo crédito adicional.
 - Para a reconciliação importa somente quando o crédito apareceu e afetou o
   contador.
 - Bônus anterior à Jornada permanece com `jornadaId` nulo. Se já estiver no

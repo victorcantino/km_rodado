@@ -20,7 +20,6 @@ class BonusPromocaoController extends ChangeNotifier {
     required int plataformaId,
     required DateTime dataHora,
     required int valorCentavos,
-    required TipoBonusPromocao tipo,
     String? observacao,
   }) async {
     carregando = true;
@@ -30,7 +29,7 @@ class BonusPromocaoController extends ChangeNotifier {
         plataformaId: plataformaId,
         dataHora: dataHora,
         valorCentavos: valorCentavos,
-        tipo: tipo,
+        tipo: TipoBonusPromocao.bonus,
         observacao: observacao,
       );
     } finally {

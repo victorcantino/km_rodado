@@ -47,4 +47,14 @@ class PassePlataformaDao extends DatabaseAccessor<AppDatabase>
         )
         .toList();
   }
+
+  Future<PassesPlataformaData?> buscarUltimoPorPlataforma(int plataformaId) =>
+      (select(passesPlataforma)
+            ..where((passe) => passe.plataformaId.equals(plataformaId))
+            ..orderBy([
+              (passe) => OrderingTerm.desc(passe.dataHora),
+              (passe) => OrderingTerm.desc(passe.id),
+            ])
+            ..limit(1))
+          .getSingleOrNull();
 }

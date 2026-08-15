@@ -106,9 +106,23 @@ receita acumulada daquela plataforma dependente de conferência.
 Motivo: o efeito observado varia entre plataformas. O custo é conhecido, mas a
 reconciliação da receita exige regras explícitas ainda não formalizadas.
 
-Os mecanismos conhecidos são `tempo` e `faturamento`; duração, validade,
-limite e preço caracterizam a oferta observada. A futura formalização deve usar
-esses mecanismos sem transformar ofertas concretas em enum ou hardcode.
+Os mecanismos suportados nesta etapa são `tempo` e `faturamento`; duração,
+validade, limite e preço caracterizam a oferta observada. Essa formalização
+atende ao uso operacional atual, sem declarar que são as únicas condições
+possíveis nem transformar ofertas concretas em enum ou hardcode.
+
+A formalização operacional usa enum somente no domínio Dart e persiste os nomes
+canônicos no campo legado `modalidade`. Faturamento deriva validade de 180 dias;
+tempo deriva validade de 24h ou 72h. A duração pode ser recuperada de
+`validadeAte - dataHora`, evitando migração. Repetição só ocorre quando os dados
+anteriores são inequívocos e nunca copia identidade, datas ou Jornada.
+
+Fonte de pagamento não define o tipo do Passe. Carteira pré-paga pode financiar
+um Passe com condições próprias, como a oferta “cidade a cidade” observada na
+inDrive, encerrada por tempo ou quantidade de pedidos — o que ocorrer primeiro.
+Recarga transfere dinheiro para saldo; somente compra/consumo reconhece custo,
+evitando dupla contagem. A condição composta permanece futura até haver uso
+operacional que justifique ampliar o modelo.
 
 ## ADR-013 — Créditos promocionais factuais e reconciliação por intervalos
 
@@ -129,3 +143,11 @@ O módulo não evoluirá para cadastrar missão, meta, etapas, exigências, orig
 econômica, competência em outra Jornada ou lucratividade da promoção.
 `dataHora` é o instante factual em que o crédito apareceu; análises eventuais
 mais complexas não justificam aumentar a carga operacional do motorista.
+
+## ADR-014 — Redução de toques com correção manual preservada
+
+Decisão: quanto menos o motorista precisar digitar e tocar, melhor. Formulários
+devem priorizar histórico, valores derivados, defaults seguros, autofocus,
+repetição e campos condicionais, mantendo sempre a possibilidade de correção
+manual. GPS e serviços externos só entram quando agregarem valor, com
+consentimento e confirmação do usuário.

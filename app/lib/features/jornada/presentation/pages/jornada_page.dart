@@ -47,7 +47,9 @@ import '../widgets/abrir_jornada_dialog.dart';
 import '../widgets/fechar_jornada_dialog.dart';
 
 class JornadaPage extends StatefulWidget {
-  const JornadaPage({super.key});
+  final AppDatabase Function()? databaseFactory;
+
+  const JornadaPage({super.key, this.databaseFactory});
 
   @override
   State<JornadaPage> createState() => _JornadaPageState();
@@ -68,7 +70,7 @@ class _JornadaPageState extends State<JornadaPage> {
   void initState() {
     super.initState();
 
-    database = AppDatabase();
+    database = widget.databaseFactory?.call() ?? AppDatabase();
     atualizadorDuracao = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted && pausaController?.possuiPausaAberta == true) {
         setState(() {});
@@ -181,7 +183,6 @@ class _JornadaPageState extends State<JornadaPage> {
         plataformaId: resultado.plataformaId,
         dataHora: resultado.dataHora,
         valorCentavos: resultado.valorCentavos,
-        tipo: resultado.tipo,
         observacao: resultado.observacao,
       );
       if (!mounted) return;
@@ -204,8 +205,10 @@ class _JornadaPageState extends State<JornadaPage> {
     if (passeController == null || passeController.plataformas.isEmpty) return;
     final resultado = await showDialog<RegistrarPasseResultado>(
       context: context,
-      builder: (_) =>
-          RegistrarPasseDialog(plataformas: passeController.plataformas),
+      builder: (_) => RegistrarPasseDialog(
+        plataformas: passeController.plataformas,
+        ultimosRepetiveis: passeController.ultimosRepetiveis,
+      ),
     );
     if (!mounted || resultado == null) return;
     try {
@@ -213,8 +216,8 @@ class _JornadaPageState extends State<JornadaPage> {
         plataformaId: resultado.plataformaId,
         dataHora: resultado.dataHora,
         valorPagoCentavos: resultado.valorPagoCentavos,
-        modalidade: resultado.modalidade,
-        validadeAte: resultado.validadeAte,
+        tipo: resultado.tipo,
+        duracaoHoras: resultado.duracaoHoras,
         limiteFaturamentoCentavos: resultado.limiteFaturamentoCentavos,
         observacao: resultado.observacao,
       );
@@ -750,225 +753,244 @@ class _JornadaPageState extends State<JornadaPage> {
         icon: const Icon(Icons.local_gas_station),
         label: const Text('Abastecimento'),
       ),
-      body: AnimatedBuilder(
-        animation: Listenable.merge([
-          controller,
-          pausaController,
-          leituraGanhosController,
-          ganhoIndividualController,
-          abastecimentoController,
-          passePlataformaController,
-          bonusPromocaoController,
-        ]),
-        builder: (context, _) {
-          if (controller.carregando ||
-              pausaController.carregando ||
-              leituraGanhosController.carregando ||
-              ganhoIndividualController.carregando ||
-              abastecimentoController.carregando ||
-              passePlataformaController.carregando ||
-              bonusPromocaoController.carregando) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: SafeArea(
+        key: const ValueKey('jornada_safe_area'),
+        bottom: false,
+        child: AnimatedBuilder(
+          animation: Listenable.merge([
+            controller,
+            pausaController,
+            leituraGanhosController,
+            ganhoIndividualController,
+            abastecimentoController,
+            passePlataformaController,
+            bonusPromocaoController,
+          ]),
+          builder: (context, _) {
+            if (controller.carregando ||
+                pausaController.carregando ||
+                leituraGanhosController.carregando ||
+                ganhoIndividualController.carregando ||
+                abastecimentoController.carregando ||
+                passePlataformaController.carregando ||
+                bonusPromocaoController.carregando) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          if (controller.possuiJornadaAberta) {
-            final jornada = controller.jornadaAtual!;
-            final locale = View.of(
-              context,
-            ).platformDispatcher.locale.toLanguageTag();
-            final inicioFormatado = DateFormat.yMd(
-              locale,
-            ).add_jms().format(jornada.dataHoraInicio);
-            final odometroFormatado = NumberFormat.decimalPattern(
-              locale,
-            ).format(jornada.odometroInicio);
+            if (controller.possuiJornadaAberta) {
+              final jornada = controller.jornadaAtual!;
+              final locale = View.of(
+                context,
+              ).platformDispatcher.locale.toLanguageTag();
+              final inicioFormatado = DateFormat.yMd(
+                locale,
+              ).add_jms().format(jornada.dataHoraInicio);
+              final odometroFormatado = NumberFormat.decimalPattern(
+                locale,
+              ).format(jornada.odometroInicio);
 
-            final pausaAberta = pausaController.pausaAberta;
-            final formatoHora = DateFormat.Hm(locale);
-            final inicialConcluida =
-                leituraGanhosController.leituraInicialConcluida;
+              final pausaAberta = pausaController.pausaAberta;
+              final formatoHora = DateFormat.Hm(locale);
+              final inicialConcluida =
+                  leituraGanhosController.leituraInicialConcluida;
 
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Text(
-                  'Status: ${jornada.status.name.toUpperCase()}',
-                  style: Theme.of(context).textTheme.titleLarge,
+              return ListView(
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  16,
+                  16,
+                  16 + MediaQuery.viewPaddingOf(context).bottom,
                 ),
-
-                const SizedBox(height: 16),
-
-                Text('Início: $inicioFormatado'),
-
-                Text('Odômetro inicial: $odometroFormatado km'),
-
-                Text('Cidade de origem: ${jornada.cidadeOrigem}'),
-
-                const SizedBox(height: 24),
-
-                if (ganhoIndividualController.plataformas.isNotEmpty) ...[
-                  OutlinedButton.icon(
-                    onPressed: _registrarGanhoIndividual,
-                    icon: const Icon(Icons.add),
-                    label: Text(
-                      ganhoIndividualController.plataformas.length == 1
-                          ? ganhoIndividualController.plataformas.single.nome
-                          : 'Ganho individual',
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                if (passePlataformaController.plataformas.isNotEmpty) ...[
-                  OutlinedButton.icon(
-                    onPressed: _registrarPasse,
-                    icon: const Icon(Icons.confirmation_number_outlined),
-                    label: const Text('Passe'),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                if (bonusPromocaoController.plataformas.isNotEmpty) ...[
-                  OutlinedButton.icon(
-                    onPressed: _registrarBonusPromocao,
-                    icon: const Icon(Icons.redeem_outlined),
-                    label: const Text('Bônus/promoção'),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-
-                if (!inicialConcluida) ...[
+                children: [
                   Text(
-                    'Ganhos iniciais pendentes',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    'Status: ${jornada.status.name.toUpperCase()}',
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () => _registrarLeituraInicial(jornada.id),
-                    child: const Text('Registrar ganhos iniciais'),
-                  ),
-                ],
 
-                if (inicialConcluida)
-                  if (pausaAberta == null)
-                    ElevatedButton(
-                      onPressed: _iniciarPausa,
-                      child: const Text('Pausar'),
-                    )
-                  else ...[
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Pausa em andamento',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ),
-                        IconButton(
-                          tooltip: 'Editar Pausa',
-                          onPressed: () => _editarPausa(pausaAberta),
-                          icon: const Icon(Icons.edit),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      'Iniciada às ${formatoHora.format(pausaAberta.inicio)}',
-                    ),
-                    Text(
-                      formatarDuracaoPausa(
-                        DateTime.now().difference(pausaAberta.inicio),
+                  const SizedBox(height: 16),
+
+                  Text('Início: $inicioFormatado'),
+
+                  Text('Odômetro inicial: $odometroFormatado km'),
+
+                  Text('Cidade de origem: ${jornada.cidadeOrigem}'),
+
+                  const SizedBox(height: 24),
+
+                  if (ganhoIndividualController.plataformas.isNotEmpty) ...[
+                    OutlinedButton.icon(
+                      onPressed: _registrarGanhoIndividual,
+                      icon: const Icon(Icons.add),
+                      label: Text(
+                        ganhoIndividualController.plataformas.length == 1
+                            ? ganhoIndividualController.plataformas.single.nome
+                            : 'Ganho individual',
                       ),
                     ),
                     const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: _finalizarPausa,
-                      child: const Text('Retomar Jornada'),
+                  ],
+                  if (passePlataformaController.plataformas.isNotEmpty) ...[
+                    OutlinedButton.icon(
+                      onPressed: _registrarPasse,
+                      icon: const Icon(Icons.confirmation_number_outlined),
+                      label: const Text('Passe'),
                     ),
-                    TextButton(
-                      onPressed: () => _registrarLeituraParcial(pausaAberta),
-                      child: const Text('Registrar ganhos'),
+                    const SizedBox(height: 8),
+                  ],
+                  if (bonusPromocaoController.plataformas.isNotEmpty) ...[
+                    OutlinedButton.icon(
+                      onPressed: _registrarBonusPromocao,
+                      icon: const Icon(Icons.redeem_outlined),
+                      label: const Text('Bônus/promoção'),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+
+                  if (!inicialConcluida) ...[
+                    Text(
+                      'Ganhos iniciais pendentes',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: () => _registrarLeituraInicial(jornada.id),
+                      child: const Text('Registrar ganhos iniciais'),
                     ),
                   ],
 
-                if (pausaController.pausas.any(
-                  (pausa) => pausa.fim != null,
-                )) ...[
-                  const SizedBox(height: 24),
-                  Text(
-                    'Pausas da Jornada',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  for (
-                    var indice = 0;
-                    indice < pausaController.pausas.length;
-                    indice++
-                  )
-                    if (pausaController.pausas[indice].fim != null)
-                      _PausaItem(
-                        pausa: pausaController.pausas[indice],
-                        numero: indice + 1,
-                        formatoHora: formatoHora,
-                        onEditar: _editarPausa,
+                  if (inicialConcluida)
+                    if (pausaAberta == null)
+                      ElevatedButton(
+                        onPressed: _iniciarPausa,
+                        child: const Text('Pausar'),
+                      )
+                    else ...[
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Pausa em andamento',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                          IconButton(
+                            tooltip: 'Editar Pausa',
+                            onPressed: () => _editarPausa(pausaAberta),
+                            icon: const Icon(Icons.edit),
+                          ),
+                        ],
                       ),
-                ],
+                      Text(
+                        'Iniciada às ${formatoHora.format(pausaAberta.inicio)}',
+                      ),
+                      Text(
+                        formatarDuracaoPausa(
+                          DateTime.now().difference(pausaAberta.inicio),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: _finalizarPausa,
+                        child: const Text('Retomar Jornada'),
+                      ),
+                      TextButton(
+                        onPressed: () => _registrarLeituraParcial(pausaAberta),
+                        child: const Text('Registrar ganhos'),
+                      ),
+                    ],
 
-                if (inicialConcluida && pausaAberta == null) ...[
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _fecharJornada,
-                    child: const Text('Fechar Jornada'),
+                  if (pausaController.pausas.any(
+                    (pausa) => pausa.fim != null,
+                  )) ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      'Pausas da Jornada',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    for (
+                      var indice = 0;
+                      indice < pausaController.pausas.length;
+                      indice++
+                    )
+                      if (pausaController.pausas[indice].fim != null)
+                        _PausaItem(
+                          pausa: pausaController.pausas[indice],
+                          numero: indice + 1,
+                          formatoHora: formatoHora,
+                          onEditar: _editarPausa,
+                        ),
+                  ],
+
+                  if (inicialConcluida && pausaAberta == null) ...[
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: _fecharJornada,
+                      child: const Text('Fechar Jornada'),
+                    ),
+                  ],
+                ],
+              );
+            }
+
+            final ultimaJornada = controller.ultimaJornadaFinalizada;
+            final resumo = controller.resumoUltimaJornada;
+
+            if (ultimaJornada == null) {
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.viewPaddingOf(context).bottom,
+                ),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: _abrirJornada,
+                    child: const Text('Abrir Jornada'),
+                  ),
+                ),
+              );
+            }
+
+            final locale = View.of(
+              context,
+            ).platformDispatcher.locale.toLanguageTag();
+            final numeros = NumberFormat.decimalPattern(locale);
+
+            return ListView(
+              padding: EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                16 + MediaQuery.viewPaddingOf(context).bottom,
+              ),
+              children: [
+                Text(
+                  'Jornada concluída',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  _formatarLocalizacao(
+                    ultimaJornada.cidadeOrigem,
+                    ultimaJornada.cidadeDestino,
+                  ),
+                ),
+                if (resumo != null) ...[
+                  const SizedBox(height: 16),
+                  _ResumoJornadaConcluida(
+                    resumo: resumo,
+                    numeros: numeros,
+                    formatarDuracao: _formatarDuracao,
                   ),
                 ],
-              ],
-            );
-          }
-
-          final ultimaJornada = controller.ultimaJornadaFinalizada;
-          final resumo = controller.resumoUltimaJornada;
-
-          if (ultimaJornada == null) {
-            return Center(
-              child: ElevatedButton(
-                onPressed: _abrirJornada,
-                child: const Text('Abrir Jornada'),
-              ),
-            );
-          }
-
-          final locale = View.of(
-            context,
-          ).platformDispatcher.locale.toLanguageTag();
-          final numeros = NumberFormat.decimalPattern(locale);
-
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              Text(
-                'Jornada concluída',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                _formatarLocalizacao(
-                  ultimaJornada.cidadeOrigem,
-                  ultimaJornada.cidadeDestino,
-                ),
-              ),
-              if (resumo != null) ...[
-                const SizedBox(height: 16),
-                _ResumoJornadaConcluida(
-                  resumo: resumo,
-                  numeros: numeros,
-                  formatarDuracao: _formatarDuracao,
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: _abrirJornada,
+                  child: const Text('Abrir Jornada'),
                 ),
               ],
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _abrirJornada,
-                child: const Text('Abrir Jornada'),
-              ),
-            ],
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
