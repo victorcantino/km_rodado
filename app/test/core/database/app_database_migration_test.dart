@@ -5,6 +5,7 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:km_rodado/core/constants/enums/tipo_leitura_ganhos.dart';
 import 'package:km_rodado/core/constants/enums/tipo_registro_ganhos.dart';
+import 'package:km_rodado/core/constants/enums/tipo_despesa_veiculo.dart';
 import 'package:km_rodado/core/database/app_database.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite;
 
@@ -25,7 +26,7 @@ void main() {
     }
   });
 
-  test('migra schema 1 vazio para schema 9', () async {
+  test('migra schema 1 vazio para schema 10', () async {
     _criarBancoSchema1(arquivoBanco);
 
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
@@ -34,7 +35,8 @@ void main() {
     expect(await _contar(database, 'pausas'), 0);
     expect(await _contar(database, 'leituras_ganhos'), 0);
     expect(await _contar(database, 'leituras_ganho_plataforma'), 0);
-    expect(await _userVersion(database), 9);
+    expect(await _userVersion(database), 10);
+    expect(await _tabelaExiste(database, 'despesas_veiculo'), isTrue);
     expect(
       await _tabelaExiste(database, 'lancamentos_ganho_individual'),
       isTrue,
@@ -94,7 +96,7 @@ void main() {
       plataformas.map((plataforma) => plataforma.tipoRegistroGanhos).toSet(),
       {TipoRegistroGanhos.acumulado},
     );
-    expect(await _userVersion(database), 9);
+    expect(await _userVersion(database), 10);
     expect(await _contar(database, 'lancamentos_ganho_individual'), 0);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -202,7 +204,7 @@ void main() {
     addTearDown(database.close);
     final pausa = (await database.select(database.pausas).get()).single;
 
-    expect(await _userVersion(database), 9);
+    expect(await _userVersion(database), 10);
     expect(pausa.odometroInicio, isNull);
     expect(pausa.odometroFim, isNull);
   });
@@ -242,7 +244,7 @@ void main() {
     final abastecimento =
         (await database.select(database.abastecimentos).get()).single;
 
-    expect(await _userVersion(database), 9);
+    expect(await _userVersion(database), 10);
     expect(abastecimento.odometro, 123456);
     expect(abastecimento.dataHora, abastecimento.dataCriacao);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -283,7 +285,7 @@ void main() {
     final abastecimento =
         (await database.select(database.abastecimentos).get()).single;
 
-    expect(await _userVersion(database), 9);
+    expect(await _userVersion(database), 10);
     expect(abastecimento.id, 7);
     expect(abastecimento.odometro, 123456);
     expect(abastecimento.dataHora, isNot(abastecimento.dataCriacao));
@@ -321,14 +323,14 @@ void main() {
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 9);
+    expect(await _userVersion(database), 10);
     expect(await _contar(database, 'passes_plataforma'), 1);
     expect(await _tabelaExiste(database, 'bonus_promocoes'), isTrue);
     expect(await _contar(database, 'bonus_promocoes'), 0);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
 
-  test('migra schema 8 populado para 9 preservando dados e FKs', () async {
+  test('migra schema 8 populado para 10 preservando dados e FKs', () async {
     final banco = sqlite.sqlite3.open(arquivoBanco.path);
     banco.execute('''
       PRAGMA foreign_keys = ON;
@@ -357,7 +359,7 @@ void main() {
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 9);
+    expect(await _userVersion(database), 10);
     expect(await _contar(database, 'bonus_promocoes'), 1);
     expect(await _tabelaExiste(database, 'manutencoes'), isTrue);
     expect(await _tabelaExiste(database, 'itens_manutencao'), isTrue);
@@ -378,6 +380,114 @@ void main() {
             descricao: 'Óleo',
           ),
         );
+    expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
+  });
+
+  test('migra schema 9 populado para 10 preservando Manutenções', () async {
+    final banco = sqlite.sqlite3.open(arquivoBanco.path);
+    banco.execute('''
+      PRAGMA foreign_keys = ON;
+      CREATE TABLE veiculos (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE jornadas (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE plataformas (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE leituras_ganhos (
+        id INTEGER NOT NULL PRIMARY KEY,
+        jornada_id INTEGER NOT NULL REFERENCES jornadas (id)
+      );
+      CREATE TABLE leitura_ganho_plataforma (
+        id INTEGER NOT NULL PRIMARY KEY,
+        leitura_ganhos_id INTEGER NOT NULL REFERENCES leituras_ganhos (id),
+        plataforma_id INTEGER NOT NULL REFERENCES plataformas (id)
+      );
+      CREATE TABLE abastecimentos (
+        id INTEGER NOT NULL PRIMARY KEY,
+        veiculo_id INTEGER NOT NULL REFERENCES veiculos (id)
+      );
+      CREATE TABLE passes_plataforma (
+        id INTEGER NOT NULL PRIMARY KEY,
+        plataforma_id INTEGER NOT NULL REFERENCES plataformas (id)
+      );
+      CREATE TABLE bonus_promocoes (
+        id INTEGER NOT NULL PRIMARY KEY,
+        plataforma_id INTEGER NOT NULL REFERENCES plataformas (id)
+      );
+      CREATE TABLE manutencoes (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        veiculo_id INTEGER NOT NULL REFERENCES veiculos (id),
+        data_hora INTEGER NOT NULL,
+        odometro INTEGER NOT NULL,
+        oficina TEXT NULL,
+        observacao TEXT NULL,
+        data_criacao INTEGER NOT NULL,
+        data_atualizacao INTEGER NULL
+      );
+      CREATE TABLE itens_manutencao (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        manutencao_id INTEGER NOT NULL REFERENCES manutencoes (id),
+        descricao TEXT NOT NULL,
+        valor_centavos INTEGER NULL,
+        intervalo_km INTEGER NULL,
+        vencimento_em INTEGER NULL,
+        data_criacao INTEGER NOT NULL
+      );
+      INSERT INTO veiculos VALUES (1);
+      INSERT INTO jornadas VALUES (4);
+      INSERT INTO plataformas VALUES (5);
+      INSERT INTO leituras_ganhos VALUES (6, 4);
+      INSERT INTO leitura_ganho_plataforma VALUES (7, 6, 5);
+      INSERT INTO abastecimentos VALUES (8, 1);
+      INSERT INTO passes_plataforma VALUES (9, 5);
+      INSERT INTO bonus_promocoes VALUES (10, 5);
+      INSERT INTO manutencoes VALUES (
+        2, 1, 1786600000, 130000, 'Oficina', NULL, 1786608000, NULL
+      );
+      INSERT INTO itens_manutencao VALUES (
+        3, 2, 'Óleo', 15000, 10000, NULL, 1786608000
+      );
+      PRAGMA user_version = 9;
+    ''');
+    banco.close();
+
+    final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
+    addTearDown(database.close);
+
+    expect(await _userVersion(database), 10);
+    expect(await _contar(database, 'manutencoes'), 1);
+    expect(await _contar(database, 'itens_manutencao'), 1);
+    expect(await _contar(database, 'jornadas'), 1);
+    expect(await _contar(database, 'abastecimentos'), 1);
+    expect(await _contar(database, 'leituras_ganhos'), 1);
+    expect(await _contar(database, 'leitura_ganho_plataforma'), 1);
+    expect(await _contar(database, 'passes_plataforma'), 1);
+    expect(await _contar(database, 'bonus_promocoes'), 1);
+    expect(await _tabelaExiste(database, 'despesas_veiculo'), isTrue);
+    expect(await _contar(database, 'despesas_veiculo'), 0);
+    await database
+        .into(database.despesasVeiculo)
+        .insert(
+          DespesasVeiculoCompanion.insert(
+            veiculoId: 1,
+            tipo: TipoDespesaVeiculo.ipva,
+            descricao: 'IPVA',
+            valorCentavos: 100,
+            dataHora: DateTime(2026, 8, 15),
+          ),
+        );
+    expect(await _contar(database, 'despesas_veiculo'), 1);
+    await expectLater(
+      database
+          .into(database.despesasVeiculo)
+          .insert(
+            DespesasVeiculoCompanion.insert(
+              veiculoId: 999,
+              tipo: TipoDespesaVeiculo.ipva,
+              descricao: 'Sem veículo',
+              valorCentavos: 100,
+              dataHora: DateTime(2026, 8, 15),
+            ),
+          ),
+      throwsA(anything),
+    );
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
 }

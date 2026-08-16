@@ -93,18 +93,26 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    final despesas = find.byIcon(Icons.receipt_long_outlined);
     final manutencao = find.byIcon(Icons.build_outlined);
     final abastecimento = find.byIcon(Icons.local_gas_station);
+    expect(despesas, findsOneWidget);
     expect(manutencao, findsOneWidget);
     expect(abastecimento, findsOneWidget);
     expect(
       find.descendant(of: find.byType(AppBar), matching: manutencao),
       findsNothing,
     );
+    expect(find.byTooltip('Despesas'), findsOneWidget);
     expect(find.byTooltip('Manutenções'), findsOneWidget);
     expect(find.byTooltip('Abastecimento'), findsOneWidget);
+    expect(find.text('Despesas'), findsNothing);
     expect(find.text('Manutenções'), findsNothing);
     expect(find.text('Abastecimento'), findsNothing);
+    expect(
+      tester.getCenter(despesas).dy,
+      lessThan(tester.getCenter(manutencao).dy),
+    );
     expect(
       tester.getCenter(manutencao).dy,
       lessThan(tester.getCenter(abastecimento).dy),
@@ -116,8 +124,15 @@ void main() {
     expect(tester.getBottomRight(abastecimento).dy, lessThanOrEqualTo(432));
 
     final semantics = tester.ensureSemantics();
+    expect(find.bySemanticsLabel('Despesas'), findsOneWidget);
     expect(find.bySemanticsLabel('Manutenções'), findsOneWidget);
     expect(find.bySemanticsLabel('Abastecimento'), findsOneWidget);
+
+    await tester.tap(despesas);
+    await tester.pumpAndSettle();
+    expect(find.text('Despesas do veículo'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
 
     await tester.longPress(manutencao);
     await tester.pump(const Duration(seconds: 1));

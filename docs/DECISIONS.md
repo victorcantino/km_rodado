@@ -210,3 +210,15 @@ disponível por tooltip/toque longo e pela semântica de acessibilidade.
 ou dependentes de contexto podem manter texto; ações como Salvar e Confirmar
 também preservam texto quando isso evita dúvida. A preferência orienta novos
 botões e revisões oportunas, sem conversão indiscriminada da interface atual.
+
+## ADR-019 — Despesa factual do veículo sem evento financeiro genérico
+
+Decisão: registrar despesas gerais pagas ou ocorridas em `DespesasVeiculo`,
+ligadas obrigatoriamente ao veículo e sem `jornadaId` nesta primeira versão.
+Abastecimento, Manutenção e Passe permanecem fatos especializados e não são
+replicados nessa tabela.
+
+Motivo: a necessidade atual é registrar fatos simples como IPVA, seguro,
+pedágio e estacionamento. Obrigações, parcelas, rateio por Jornada e um motor
+financeiro exigem regras próprias ainda não estabilizadas; antecipá-los agora
+misturaria pagamento realizado com planejamento e produziria dupla contagem.

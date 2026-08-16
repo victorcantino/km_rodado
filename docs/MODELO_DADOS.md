@@ -1,6 +1,6 @@
 # Modelo de dados — KM Rodado
 
-O schema Drift atual é **9**. Esta seção separa o que existe no SQLite do que é
+O schema Drift atual é **10**. Esta seção separa o que existe no SQLite do que é
 derivado ou apenas planejado.
 
 ## Tabelas persistidas
@@ -117,6 +117,16 @@ a uma Jornada e integra a cronologia confiável do odômetro.
 Descrição é livre. Valor ausente significa desconhecido, não zero. Próximo
 odômetro é derivado de `Manutencao.odometro + intervaloKm`; não é persistido.
 
+### DespesasVeiculo
+
+`id`, `veiculoId` → Veiculos, `tipo`, `descricao`, `valorCentavos`,
+`dataHora`, `observacao?`, `dataCriacao`, `dataAtualizacao?`.
+
+Registra uma despesa factual paga ou ocorrida para o veículo, sem associação
+automática a Jornada. O valor é positivo e usa centavos inteiros. O tipo usa
+`TipoDespesaVeiculo`: IPVA, licenciamento, documentação/taxa, seguro, multa,
+pedágio, estacionamento, lavagem ou outra despesa.
+
 ## Relações principais
 
 ```text
@@ -128,6 +138,7 @@ Jornada? ──< Abastecimento >── Veiculo
 Jornada? ──< PassePlataforma >── Plataforma
 Jornada? ──< BonusPromocao >── Plataforma
 Veiculo ──< Manutencao ──< ItemManutencao
+Veiculo ──< DespesaVeiculo
 ```
 
 ## Dados derivados, não persistidos
@@ -147,4 +158,4 @@ Veiculo ──< Manutencao ──< ItemManutencao
 
 Evento financeiro genérico, carteira de
 plataforma, alertas, clima, localização e sincronização não fazem parte do
-schema 9. Suas decisões e ideias permanecem no backlog e nas regras futuras.
+schema 10. Suas decisões e ideias permanecem no backlog e nas regras futuras.

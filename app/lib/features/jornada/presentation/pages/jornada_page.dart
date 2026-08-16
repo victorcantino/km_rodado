@@ -12,6 +12,7 @@ import '../../../../core/database/daos/pausa_dao.dart';
 import '../../../../core/database/daos/passe_plataforma_dao.dart';
 import '../../../../core/database/daos/bonus_promocao_dao.dart';
 import '../../../../core/database/daos/manutencao_dao.dart';
+import '../../../../core/database/daos/despesa_veiculo_dao.dart';
 import '../../../../core/database/seeds/seed.dart';
 import '../../../../core/database/seeds/plataformas_seed.dart';
 import '../../../leitura_ganhos/data/leitura_ganhos_repository.dart';
@@ -45,6 +46,10 @@ import '../../../manutencao/data/manutencao_repository.dart';
 import '../../../manutencao/data/manutencao_service.dart';
 import '../../../manutencao/presentation/controllers/manutencao_controller.dart';
 import '../../../manutencao/presentation/pages/manutencoes_page.dart';
+import '../../../despesa_veiculo/data/despesa_veiculo_repository.dart';
+import '../../../despesa_veiculo/data/despesa_veiculo_service.dart';
+import '../../../despesa_veiculo/presentation/controllers/despesa_veiculo_controller.dart';
+import '../../../despesa_veiculo/presentation/pages/despesas_page.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
 import '../../data/resumo_jornada.dart';
@@ -312,6 +317,23 @@ class _JornadaPageState extends State<JornadaPage> {
     await abastecimentoController?.carregar(
       controller?.jornadaAtual?.veiculoId ?? 1,
     );
+  }
+
+  Future<void> _abrirDespesas() async {
+    final despesasController = DespesaVeiculoController(
+      DespesaVeiculoService(
+        DespesaVeiculoRepository(DespesaVeiculoDao(database)),
+      ),
+    );
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => DespesasPage(
+          veiculoId: controller?.jornadaAtual?.veiculoId ?? 1,
+          controller: despesasController,
+        ),
+      ),
+    );
+    despesasController.dispose();
   }
 
   Future<void> _registrarGanhoIndividual([Plataforma? plataforma]) async {
@@ -854,6 +876,20 @@ class _JornadaPageState extends State<JornadaPage> {
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Tooltip(
+            message: 'Despesas',
+            excludeFromSemantics: true,
+            child: Semantics(
+              label: 'Despesas',
+              button: true,
+              child: FloatingActionButton(
+                heroTag: 'despesas',
+                onPressed: _abrirDespesas,
+                child: const Icon(Icons.receipt_long_outlined),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
           Tooltip(
             message: 'Manutenções',
             excludeFromSemantics: true,

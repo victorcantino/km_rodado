@@ -188,6 +188,25 @@ justificativa e inserção histórica arbitrária permanecem futuras.
   vencimento atingido — sem limiares arbitrários e sem notificações nesta fase.
 - O XLS do AppSheet não é importado nem usado como seed nesta entrega.
 
+## Despesas do veículo
+
+- Despesa representa um pagamento ou custo factual já ocorrido para um
+  veículo. Não representa obrigação futura, parcela planejada ou provisão.
+- Veículo, tipo, descrição, valor e instante operacional são obrigatórios.
+  Descrição usa `trim` e deve permanecer livre; sugestões históricas do mesmo
+  tipo não limitam novos textos.
+- Valor deve ser maior que zero e é persistido em centavos inteiros.
+- `dataHora` é quando a despesa ocorreu, inicia como agora, pode ser retroativa
+  e não pode estar no futuro. `dataCriacao` é o instante técnico do cadastro.
+- Observação é opcional e normalizada com `trim`.
+- Nesta versão, Despesa não possui `jornadaId`: IPVA, seguro, multa, pedágio,
+  estacionamento e fatos semelhantes pertencem ao veículo sem atribuição
+  econômica automática a uma Jornada.
+- Sugestão histórica reutiliza somente a descrição de despesas do mesmo tipo.
+  Valor, data, observação e veículo nunca são copiados pela sugestão.
+- Abastecimentos, Manutenções e Passes continuam em entidades especializadas e
+  não devem ser duplicados como Despesa apenas para formar um total genérico.
+
 ## Passes de plataforma
 
 - Passe é custo operacional factual de uma Plataforma, não faturamento

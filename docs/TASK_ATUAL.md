@@ -1,16 +1,17 @@
-# Tarefa atual — Manutenções
+# Tarefa atual — Despesas do veículo
 
 ## Estado
 
-Primeira versão operacional com Manutenção como cabeçalho de visita e itens 1:N.
-Permite criação e edição atômicas, múltiplos itens, descrição livre com
-sugestões, valores opcionais em centavos, recorrência opcional por km/data e
-histórico próprio.
+Primeira versão operacional de despesas factuais pagas ou ocorridas para o
+veículo. Permite criação e edição, cadastro retroativo, valor positivo em
+centavos, descrição livre com sugestões históricas por tipo e histórico
+ordenado pelo instante operacional.
 
-Manutenção é fato do veículo sem associação automática à Jornada. Seu odômetro
-passa a integrar a cronologia física usada pelos demais fluxos. O schema evolui
-de 8 para 9 com migração preservadora; o XLS histórico não é importado.
+Despesa não recebe associação automática à Jornada e não substitui os fatos
+especializados de Abastecimento, Manutenção ou Passe. O schema evolui de 9 para
+10 por migração aditiva e preservadora.
 
 ## Validação
 
-Aguardando validação operacional no Android.
+Implementação, migração e suíte automatizada concluídas. Aguardando validação
+operacional no Android.
