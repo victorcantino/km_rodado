@@ -28,6 +28,8 @@ a margem desejada.
 - Manutenções por veículo com múltiplos itens, histórico e recorrências por
   odômetro ou data.
 - Despesas factuais do veículo, atuais ou retroativas, com histórico e edição.
+- Custos recorrentes como referências de competência econômica, separados dos
+  pagamentos efetivos.
 
 ## Arquitetura
 

@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:km_rodado/core/constants/enums/tipo_leitura_ganhos.dart';
 import 'package:km_rodado/core/constants/enums/tipo_registro_ganhos.dart';
 import 'package:km_rodado/core/constants/enums/tipo_despesa_veiculo.dart';
+import 'package:km_rodado/core/constants/enums/tipo_custo_recorrente.dart';
+import 'package:km_rodado/core/constants/enums/escopo_custo_recorrente.dart';
 import 'package:km_rodado/core/database/app_database.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite;
 
@@ -26,7 +28,7 @@ void main() {
     }
   });
 
-  test('migra schema 1 vazio para schema 10', () async {
+  test('migra schema 1 vazio para schema 11', () async {
     _criarBancoSchema1(arquivoBanco);
 
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
@@ -35,7 +37,7 @@ void main() {
     expect(await _contar(database, 'pausas'), 0);
     expect(await _contar(database, 'leituras_ganhos'), 0);
     expect(await _contar(database, 'leituras_ganho_plataforma'), 0);
-    expect(await _userVersion(database), 10);
+    expect(await _userVersion(database), 11);
     expect(await _tabelaExiste(database, 'despesas_veiculo'), isTrue);
     expect(
       await _tabelaExiste(database, 'lancamentos_ganho_individual'),
@@ -96,7 +98,7 @@ void main() {
       plataformas.map((plataforma) => plataforma.tipoRegistroGanhos).toSet(),
       {TipoRegistroGanhos.acumulado},
     );
-    expect(await _userVersion(database), 10);
+    expect(await _userVersion(database), 11);
     expect(await _contar(database, 'lancamentos_ganho_individual'), 0);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -204,7 +206,7 @@ void main() {
     addTearDown(database.close);
     final pausa = (await database.select(database.pausas).get()).single;
 
-    expect(await _userVersion(database), 10);
+    expect(await _userVersion(database), 11);
     expect(pausa.odometroInicio, isNull);
     expect(pausa.odometroFim, isNull);
   });
@@ -244,7 +246,7 @@ void main() {
     final abastecimento =
         (await database.select(database.abastecimentos).get()).single;
 
-    expect(await _userVersion(database), 10);
+    expect(await _userVersion(database), 11);
     expect(abastecimento.odometro, 123456);
     expect(abastecimento.dataHora, abastecimento.dataCriacao);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -285,7 +287,7 @@ void main() {
     final abastecimento =
         (await database.select(database.abastecimentos).get()).single;
 
-    expect(await _userVersion(database), 10);
+    expect(await _userVersion(database), 11);
     expect(abastecimento.id, 7);
     expect(abastecimento.odometro, 123456);
     expect(abastecimento.dataHora, isNot(abastecimento.dataCriacao));
@@ -323,7 +325,7 @@ void main() {
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 10);
+    expect(await _userVersion(database), 11);
     expect(await _contar(database, 'passes_plataforma'), 1);
     expect(await _tabelaExiste(database, 'bonus_promocoes'), isTrue);
     expect(await _contar(database, 'bonus_promocoes'), 0);
@@ -359,7 +361,7 @@ void main() {
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 10);
+    expect(await _userVersion(database), 11);
     expect(await _contar(database, 'bonus_promocoes'), 1);
     expect(await _tabelaExiste(database, 'manutencoes'), isTrue);
     expect(await _tabelaExiste(database, 'itens_manutencao'), isTrue);
@@ -383,7 +385,7 @@ void main() {
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
 
-  test('migra schema 9 populado para 10 preservando Manutenções', () async {
+  test('migra schema 9 populado para 11 preservando Manutenções', () async {
     final banco = sqlite.sqlite3.open(arquivoBanco.path);
     banco.execute('''
       PRAGMA foreign_keys = ON;
@@ -451,7 +453,7 @@ void main() {
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 10);
+    expect(await _userVersion(database), 11);
     expect(await _contar(database, 'manutencoes'), 1);
     expect(await _contar(database, 'itens_manutencao'), 1);
     expect(await _contar(database, 'jornadas'), 1);
@@ -484,6 +486,121 @@ void main() {
               descricao: 'Sem veículo',
               valorCentavos: 100,
               dataHora: DateTime(2026, 8, 15),
+            ),
+          ),
+      throwsA(anything),
+    );
+    expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
+  });
+
+  test('migra schema 10 populado para 11 preservando Despesas', () async {
+    final banco = sqlite.sqlite3.open(arquivoBanco.path);
+    banco.execute('''
+      PRAGMA foreign_keys = ON;
+      CREATE TABLE veiculos (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE plataformas (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE despesas_veiculo (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        veiculo_id INTEGER NOT NULL REFERENCES veiculos (id),
+        tipo TEXT NOT NULL,
+        descricao TEXT NOT NULL,
+        valor_centavos INTEGER NOT NULL,
+        data_hora INTEGER NOT NULL,
+        observacao TEXT NULL,
+        data_criacao INTEGER NOT NULL,
+        data_atualizacao INTEGER NULL
+      );
+      CREATE TABLE manutencoes (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE itens_manutencao (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE abastecimentos (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE jornadas (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE passes_plataforma (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE bonus_promocoes (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE leituras_ganhos (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE leitura_ganho_plataforma (id INTEGER NOT NULL PRIMARY KEY);
+      CREATE TABLE lancamentos_ganho_individual (id INTEGER NOT NULL PRIMARY KEY);
+      INSERT INTO veiculos VALUES (1);
+      INSERT INTO plataformas VALUES (2);
+      INSERT INTO despesas_veiculo VALUES (
+        3, 1, 'ipva', 'IPVA pago', 91000, 1786600000, NULL,
+        1786608000, NULL
+      );
+      INSERT INTO manutencoes VALUES (4);
+      INSERT INTO itens_manutencao VALUES (5);
+      INSERT INTO abastecimentos VALUES (6);
+      INSERT INTO jornadas VALUES (7);
+      INSERT INTO passes_plataforma VALUES (8);
+      INSERT INTO bonus_promocoes VALUES (9);
+      INSERT INTO leituras_ganhos VALUES (10);
+      INSERT INTO leitura_ganho_plataforma VALUES (11);
+      INSERT INTO lancamentos_ganho_individual VALUES (12);
+      PRAGMA user_version = 10;
+    ''');
+    banco.close();
+
+    final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
+    addTearDown(database.close);
+
+    expect(await _userVersion(database), 11);
+    for (final tabela in [
+      'despesas_veiculo',
+      'manutencoes',
+      'itens_manutencao',
+      'abastecimentos',
+      'jornadas',
+      'passes_plataforma',
+      'bonus_promocoes',
+      'leituras_ganhos',
+      'leitura_ganho_plataforma',
+      'lancamentos_ganho_individual',
+    ]) {
+      expect(await _contar(database, tabela), 1, reason: tabela);
+    }
+    expect(await _tabelaExiste(database, 'custos_recorrentes'), isTrue);
+    await database
+        .into(database.custosRecorrentes)
+        .insert(
+          CustosRecorrentesCompanion.insert(
+            tipo: TipoCustoRecorrente.ipva,
+            descricao: 'IPVA anual',
+            escopo: EscopoCustoRecorrente.veiculo,
+            veiculoId: const Value(1),
+            periodicidadeMeses: 12,
+          ),
+        );
+    await database
+        .into(database.custosRecorrentes)
+        .insert(
+          CustosRecorrentesCompanion.insert(
+            tipo: TipoCustoRecorrente.telefoneProfissional,
+            descricao: 'Linha profissional',
+            escopo: EscopoCustoRecorrente.atividade,
+            periodicidadeMeses: 1,
+          ),
+        );
+    await database
+        .into(database.custosRecorrentes)
+        .insert(
+          CustosRecorrentesCompanion.insert(
+            tipo: TipoCustoRecorrente.contaPlataforma,
+            descricao: 'Conta de plataforma',
+            escopo: EscopoCustoRecorrente.plataforma,
+            plataformaId: const Value(2),
+            periodicidadeMeses: 1,
+          ),
+        );
+    expect(await _contar(database, 'custos_recorrentes'), 3);
+    await expectLater(
+      database
+          .into(database.custosRecorrentes)
+          .insert(
+            CustosRecorrentesCompanion.insert(
+              tipo: TipoCustoRecorrente.outro,
+              descricao: 'Escopos misturados',
+              escopo: EscopoCustoRecorrente.veiculo,
+              veiculoId: const Value(1),
+              plataformaId: const Value(2),
+              periodicidadeMeses: 1,
             ),
           ),
       throwsA(anything),

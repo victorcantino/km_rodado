@@ -131,6 +131,31 @@ void main() {
     await tester.tap(despesas);
     await tester.pumpAndSettle();
     expect(find.text('Despesas do veículo'), findsOneWidget);
+    expect(find.text('Custos recorrentes'), findsOneWidget);
+    expect(find.byKey(const ValueKey('despesas_scroll_unico')), findsOneWidget);
+    expect(find.byTooltip('Novo custo recorrente'), findsOneWidget);
+    expect(find.byTooltip('Nova despesa'), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNWidgets(2));
+    expect(
+      tester.getCenter(find.byTooltip('Novo custo recorrente')).dy,
+      lessThan(tester.getCenter(find.byTooltip('Nova despesa')).dy),
+    );
+    expect(find.bySemanticsLabel('Novo custo recorrente'), findsOneWidget);
+    expect(find.bySemanticsLabel('Nova despesa'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Novo custo recorrente'));
+    await tester.pumpAndSettle();
+    expect(find.text('Novo custo recorrente'), findsOneWidget);
+    expect(find.text('IPVA'), findsWidgets);
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Nova despesa'));
+    await tester.pumpAndSettle();
+    expect(find.text('Nova despesa'), findsOneWidget);
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+
     await tester.pageBack();
     await tester.pumpAndSettle();
 

@@ -1,15 +1,22 @@
-# Tarefa atual — Despesas do veículo
+# Tarefa atual — Custos recorrentes e competência econômica
 
 ## Estado
 
-Primeira versão operacional de despesas factuais pagas ou ocorridas para o
-veículo. Permite criação e edição, cadastro retroativo, valor positivo em
-centavos, descrição livre com sugestões históricas por tipo e histórico
-ordenado pelo instante operacional.
+Primeira versão de referências econômicas recorrentes, separadas das Despesas
+efetivamente pagas. Permite competência mensal, anual ou personalizada, padrão
+habitual de parcelas, valor exato/estimado/ausente, prazo previsto opcional,
+ativação e escopos veículo, atividade ou Plataforma.
 
-Despesa não recebe associação automática à Jornada e não substitui os fatos
-especializados de Abastecimento, Manutenção ou Passe. O schema evolui de 9 para
-10 por migração aditiva e preservadora.
+O equivalente mensal é derivado e nenhuma Despesa, parcela, obrigação ou
+vencimento é gerado. Financiamento e depreciação continuam fora. O schema evolui
+de 10 para 11 por migração aditiva e preservadora.
+
+Na interface, Despesas pagas e Custos Recorrentes permanecem em seções
+conceitualmente separadas, mas compartilham a mesma `DespesasPage` e rolagem.
+As duas ações abrem diretamente seus formulários, sem página intermediária.
+Novas Despesas oferecem somente fatos esporádicos; IPVA, licenciamento e seguro
+entram normalmente como Custos Recorrentes. Registros antigos desses tipos de
+Despesa continuam compatíveis e editáveis, sem mudança de schema.
 
 ## Validação
 

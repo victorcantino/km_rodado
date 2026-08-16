@@ -218,7 +218,38 @@ ligadas obrigatoriamente ao veículo e sem `jornadaId` nesta primeira versão.
 Abastecimento, Manutenção e Passe permanecem fatos especializados e não são
 replicados nessa tabela.
 
-Motivo: a necessidade atual é registrar fatos simples como IPVA, seguro,
-pedágio e estacionamento. Obrigações, parcelas, rateio por Jornada e um motor
-financeiro exigem regras próprias ainda não estabilizadas; antecipá-los agora
-misturaria pagamento realizado com planejamento e produziria dupla contagem.
+Motivo: a necessidade atual é registrar fatos esporádicos como multa, pedágio,
+estacionamento, lavagem e taxas/documentações eventuais. IPVA, licenciamento e
+seguro seguem o fluxo normal de Custos Recorrentes. Os valores técnicos antigos
+permanecem compatíveis, mas deixam de ser oferecidos em novas Despesas para
+evitar mistura e futura dupla contagem.
+
+## ADR-020 — Competência recorrente separada do pagamento
+
+Decisão: representar referências econômicas em `CustosRecorrentes`, sem gerar
+ou vincular automaticamente `DespesasVeiculo`. Periodicidade em meses define a
+competência; parcelas por ciclo descrevem somente o hábito de pagamento. O
+equivalente mensal é derivado e valor ausente permanece desconhecido.
+
+O escopo é explícito — veículo, atividade ou Plataforma — com FKs condicionais.
+Não há data inicial inventada, vencimentos, contas a pagar ou motor econômico.
+
+Motivo: um IPVA anual pode ser pago à vista ou parcelado sem deixar de ser custo
+do ciclo anual. Da mesma forma, telefone profissional pertence à atividade e
+conta de Plataforma não pertence ao veículo. Separar competência de caixa
+evita dupla contagem e preserva fatos suficientes para análises futuras.
+
+Financiamento/aquisição e depreciação não pertencem a este modelo. O primeiro
+precisa separar capital, amortização, juros e necessidade de caixa; a segunda
+representa perda econômica do ativo. Ambos dependem de modelagem própria.
+
+## ADR-021 — Contexto visual único para despesas e recorrências
+
+Decisão: Despesas do Veículo e Custos Recorrentes mantêm modelos, regras e
+listas semanticamente separados, mas aparecem na mesma `DespesasPage` e na
+mesma rolagem. Cada formulário abre diretamente por sua própria ação compacta,
+sem página intermediária.
+
+Motivo: os dois conceitos pertencem ao mesmo contexto econômico para o usuário,
+embora pagamento e competência não possam ser misturados. Uma tela única reduz
+etapas sem esconder a distinção nem alterar as fontes de verdade.
