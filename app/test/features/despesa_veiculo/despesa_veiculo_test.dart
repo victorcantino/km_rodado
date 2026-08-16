@@ -61,6 +61,77 @@ void main() {
       TipoDespesaVeiculo.values.map((tipo) => tipo.name),
       isNot(containsAll(<String>['abastecimento', 'manutencao'])),
     );
+    expect(TipoDespesaVeiculo.ipva.label, 'IPVA');
+    expect(TipoDespesaVeiculo.licenciamento.label, 'Licenciamento');
+    expect(TipoDespesaVeiculo.seguro.label, 'Seguro');
+  });
+
+  testWidgets('novo cadastro oferece somente despesas esporádicas', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: EditarDespesaVeiculoDialog(
+            buscarSugestoes: (_) async => const [],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('tipo_despesa')));
+    await tester.pumpAndSettle();
+
+    for (final label in const [
+      'Multa',
+      'Pedágio',
+      'Estacionamento',
+      'Lavagem',
+      'Taxa/documentação eventual',
+      'Outra despesa',
+    ]) {
+      expect(find.text(label), findsWidgets);
+    }
+    for (final label in const ['IPVA', 'Licenciamento', 'Seguro']) {
+      expect(find.text(label), findsNothing);
+    }
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('tipo recorrente legado permanece legível e editável', (
+    tester,
+  ) async {
+    for (final tipo in const [
+      TipoDespesaVeiculo.ipva,
+      TipoDespesaVeiculo.licenciamento,
+      TipoDespesaVeiculo.seguro,
+    ]) {
+      final id = await service.criar(
+        veiculoId: 1,
+        tipo: tipo,
+        descricao: '${tipo.label} legado',
+        valorCentavos: 100,
+        dataHora: agora.subtract(Duration(minutes: tipo.index + 1)),
+      );
+      final existente = (await service.listar(
+        1,
+      )).singleWhere((despesa) => despesa.id == id);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: EditarDespesaVeiculoDialog(
+              key: ValueKey(tipo),
+              existente: existente,
+              buscarSugestoes: (_) async => const [],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(tipo.label), findsOneWidget);
+      expect(find.text('${tipo.label} legado'), findsOneWidget);
+    }
+    expect(tester.takeException(), isNull);
   });
 
   test(

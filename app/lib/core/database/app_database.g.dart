@@ -8648,6 +8648,934 @@ class DespesasVeiculoCompanion extends UpdateCompanion<DespesaVeiculo> {
   }
 }
 
+class $CustosRecorrentesTable extends CustosRecorrentes
+    with TableInfo<$CustosRecorrentesTable, CustoRecorrente> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CustosRecorrentesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<TipoCustoRecorrente, String>
+  tipo = GeneratedColumn<String>(
+    'tipo',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  ).withConverter<TipoCustoRecorrente>($CustosRecorrentesTable.$convertertipo);
+  static const VerificationMeta _descricaoMeta = const VerificationMeta(
+    'descricao',
+  );
+  @override
+  late final GeneratedColumn<String> descricao = GeneratedColumn<String>(
+    'descricao',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<EscopoCustoRecorrente, String>
+  escopo =
+      GeneratedColumn<String>(
+        'escopo',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<EscopoCustoRecorrente>(
+        $CustosRecorrentesTable.$converterescopo,
+      );
+  static const VerificationMeta _veiculoIdMeta = const VerificationMeta(
+    'veiculoId',
+  );
+  @override
+  late final GeneratedColumn<int> veiculoId = GeneratedColumn<int>(
+    'veiculo_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES veiculos (id)',
+    ),
+  );
+  static const VerificationMeta _plataformaIdMeta = const VerificationMeta(
+    'plataformaId',
+  );
+  @override
+  late final GeneratedColumn<int> plataformaId = GeneratedColumn<int>(
+    'plataforma_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES plataformas (id)',
+    ),
+  );
+  static const VerificationMeta _valorReferenciaCentavosMeta =
+      const VerificationMeta('valorReferenciaCentavos');
+  @override
+  late final GeneratedColumn<int> valorReferenciaCentavos =
+      GeneratedColumn<int>(
+        'valor_referencia_centavos',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _valorEstimadoMeta = const VerificationMeta(
+    'valorEstimado',
+  );
+  @override
+  late final GeneratedColumn<bool> valorEstimado = GeneratedColumn<bool>(
+    'valor_estimado',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("valor_estimado" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _periodicidadeMesesMeta =
+      const VerificationMeta('periodicidadeMeses');
+  @override
+  late final GeneratedColumn<int> periodicidadeMeses = GeneratedColumn<int>(
+    'periodicidade_meses',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _parcelasPorCicloMeta = const VerificationMeta(
+    'parcelasPorCiclo',
+  );
+  @override
+  late final GeneratedColumn<int> parcelasPorCiclo = GeneratedColumn<int>(
+    'parcelas_por_ciclo',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _ativoMeta = const VerificationMeta('ativo');
+  @override
+  late final GeneratedColumn<bool> ativo = GeneratedColumn<bool>(
+    'ativo',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("ativo" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _quantidadeCiclosPrevistaMeta =
+      const VerificationMeta('quantidadeCiclosPrevista');
+  @override
+  late final GeneratedColumn<int> quantidadeCiclosPrevista =
+      GeneratedColumn<int>(
+        'quantidade_ciclos_prevista',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _observacaoMeta = const VerificationMeta(
+    'observacao',
+  );
+  @override
+  late final GeneratedColumn<String> observacao = GeneratedColumn<String>(
+    'observacao',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dataCriacaoMeta = const VerificationMeta(
+    'dataCriacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataCriacao = GeneratedColumn<DateTime>(
+    'data_criacao',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _dataAtualizacaoMeta = const VerificationMeta(
+    'dataAtualizacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataAtualizacao =
+      GeneratedColumn<DateTime>(
+        'data_atualizacao',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    tipo,
+    descricao,
+    escopo,
+    veiculoId,
+    plataformaId,
+    valorReferenciaCentavos,
+    valorEstimado,
+    periodicidadeMeses,
+    parcelasPorCiclo,
+    ativo,
+    quantidadeCiclosPrevista,
+    observacao,
+    dataCriacao,
+    dataAtualizacao,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'custos_recorrentes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CustoRecorrente> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('descricao')) {
+      context.handle(
+        _descricaoMeta,
+        descricao.isAcceptableOrUnknown(data['descricao']!, _descricaoMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_descricaoMeta);
+    }
+    if (data.containsKey('veiculo_id')) {
+      context.handle(
+        _veiculoIdMeta,
+        veiculoId.isAcceptableOrUnknown(data['veiculo_id']!, _veiculoIdMeta),
+      );
+    }
+    if (data.containsKey('plataforma_id')) {
+      context.handle(
+        _plataformaIdMeta,
+        plataformaId.isAcceptableOrUnknown(
+          data['plataforma_id']!,
+          _plataformaIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('valor_referencia_centavos')) {
+      context.handle(
+        _valorReferenciaCentavosMeta,
+        valorReferenciaCentavos.isAcceptableOrUnknown(
+          data['valor_referencia_centavos']!,
+          _valorReferenciaCentavosMeta,
+        ),
+      );
+    }
+    if (data.containsKey('valor_estimado')) {
+      context.handle(
+        _valorEstimadoMeta,
+        valorEstimado.isAcceptableOrUnknown(
+          data['valor_estimado']!,
+          _valorEstimadoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('periodicidade_meses')) {
+      context.handle(
+        _periodicidadeMesesMeta,
+        periodicidadeMeses.isAcceptableOrUnknown(
+          data['periodicidade_meses']!,
+          _periodicidadeMesesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_periodicidadeMesesMeta);
+    }
+    if (data.containsKey('parcelas_por_ciclo')) {
+      context.handle(
+        _parcelasPorCicloMeta,
+        parcelasPorCiclo.isAcceptableOrUnknown(
+          data['parcelas_por_ciclo']!,
+          _parcelasPorCicloMeta,
+        ),
+      );
+    }
+    if (data.containsKey('ativo')) {
+      context.handle(
+        _ativoMeta,
+        ativo.isAcceptableOrUnknown(data['ativo']!, _ativoMeta),
+      );
+    }
+    if (data.containsKey('quantidade_ciclos_prevista')) {
+      context.handle(
+        _quantidadeCiclosPrevistaMeta,
+        quantidadeCiclosPrevista.isAcceptableOrUnknown(
+          data['quantidade_ciclos_prevista']!,
+          _quantidadeCiclosPrevistaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('observacao')) {
+      context.handle(
+        _observacaoMeta,
+        observacao.isAcceptableOrUnknown(data['observacao']!, _observacaoMeta),
+      );
+    }
+    if (data.containsKey('data_criacao')) {
+      context.handle(
+        _dataCriacaoMeta,
+        dataCriacao.isAcceptableOrUnknown(
+          data['data_criacao']!,
+          _dataCriacaoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('data_atualizacao')) {
+      context.handle(
+        _dataAtualizacaoMeta,
+        dataAtualizacao.isAcceptableOrUnknown(
+          data['data_atualizacao']!,
+          _dataAtualizacaoMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CustoRecorrente map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CustoRecorrente(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      tipo: $CustosRecorrentesTable.$convertertipo.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}tipo'],
+        )!,
+      ),
+      descricao: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}descricao'],
+      )!,
+      escopo: $CustosRecorrentesTable.$converterescopo.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}escopo'],
+        )!,
+      ),
+      veiculoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}veiculo_id'],
+      ),
+      plataformaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}plataforma_id'],
+      ),
+      valorReferenciaCentavos: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_referencia_centavos'],
+      ),
+      valorEstimado: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}valor_estimado'],
+      )!,
+      periodicidadeMeses: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}periodicidade_meses'],
+      )!,
+      parcelasPorCiclo: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}parcelas_por_ciclo'],
+      )!,
+      ativo: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}ativo'],
+      )!,
+      quantidadeCiclosPrevista: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quantidade_ciclos_prevista'],
+      ),
+      observacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}observacao'],
+      ),
+      dataCriacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_criacao'],
+      )!,
+      dataAtualizacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_atualizacao'],
+      ),
+    );
+  }
+
+  @override
+  $CustosRecorrentesTable createAlias(String alias) {
+    return $CustosRecorrentesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<TipoCustoRecorrente, String, String>
+  $convertertipo = const EnumNameConverter<TipoCustoRecorrente>(
+    TipoCustoRecorrente.values,
+  );
+  static JsonTypeConverter2<EscopoCustoRecorrente, String, String>
+  $converterescopo = const EnumNameConverter<EscopoCustoRecorrente>(
+    EscopoCustoRecorrente.values,
+  );
+}
+
+class CustoRecorrente extends DataClass implements Insertable<CustoRecorrente> {
+  final int id;
+  final TipoCustoRecorrente tipo;
+  final String descricao;
+  final EscopoCustoRecorrente escopo;
+  final int? veiculoId;
+  final int? plataformaId;
+  final int? valorReferenciaCentavos;
+  final bool valorEstimado;
+  final int periodicidadeMeses;
+  final int parcelasPorCiclo;
+  final bool ativo;
+  final int? quantidadeCiclosPrevista;
+  final String? observacao;
+  final DateTime dataCriacao;
+  final DateTime? dataAtualizacao;
+  const CustoRecorrente({
+    required this.id,
+    required this.tipo,
+    required this.descricao,
+    required this.escopo,
+    this.veiculoId,
+    this.plataformaId,
+    this.valorReferenciaCentavos,
+    required this.valorEstimado,
+    required this.periodicidadeMeses,
+    required this.parcelasPorCiclo,
+    required this.ativo,
+    this.quantidadeCiclosPrevista,
+    this.observacao,
+    required this.dataCriacao,
+    this.dataAtualizacao,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    {
+      map['tipo'] = Variable<String>(
+        $CustosRecorrentesTable.$convertertipo.toSql(tipo),
+      );
+    }
+    map['descricao'] = Variable<String>(descricao);
+    {
+      map['escopo'] = Variable<String>(
+        $CustosRecorrentesTable.$converterescopo.toSql(escopo),
+      );
+    }
+    if (!nullToAbsent || veiculoId != null) {
+      map['veiculo_id'] = Variable<int>(veiculoId);
+    }
+    if (!nullToAbsent || plataformaId != null) {
+      map['plataforma_id'] = Variable<int>(plataformaId);
+    }
+    if (!nullToAbsent || valorReferenciaCentavos != null) {
+      map['valor_referencia_centavos'] = Variable<int>(valorReferenciaCentavos);
+    }
+    map['valor_estimado'] = Variable<bool>(valorEstimado);
+    map['periodicidade_meses'] = Variable<int>(periodicidadeMeses);
+    map['parcelas_por_ciclo'] = Variable<int>(parcelasPorCiclo);
+    map['ativo'] = Variable<bool>(ativo);
+    if (!nullToAbsent || quantidadeCiclosPrevista != null) {
+      map['quantidade_ciclos_prevista'] = Variable<int>(
+        quantidadeCiclosPrevista,
+      );
+    }
+    if (!nullToAbsent || observacao != null) {
+      map['observacao'] = Variable<String>(observacao);
+    }
+    map['data_criacao'] = Variable<DateTime>(dataCriacao);
+    if (!nullToAbsent || dataAtualizacao != null) {
+      map['data_atualizacao'] = Variable<DateTime>(dataAtualizacao);
+    }
+    return map;
+  }
+
+  CustosRecorrentesCompanion toCompanion(bool nullToAbsent) {
+    return CustosRecorrentesCompanion(
+      id: Value(id),
+      tipo: Value(tipo),
+      descricao: Value(descricao),
+      escopo: Value(escopo),
+      veiculoId: veiculoId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(veiculoId),
+      plataformaId: plataformaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(plataformaId),
+      valorReferenciaCentavos: valorReferenciaCentavos == null && nullToAbsent
+          ? const Value.absent()
+          : Value(valorReferenciaCentavos),
+      valorEstimado: Value(valorEstimado),
+      periodicidadeMeses: Value(periodicidadeMeses),
+      parcelasPorCiclo: Value(parcelasPorCiclo),
+      ativo: Value(ativo),
+      quantidadeCiclosPrevista: quantidadeCiclosPrevista == null && nullToAbsent
+          ? const Value.absent()
+          : Value(quantidadeCiclosPrevista),
+      observacao: observacao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(observacao),
+      dataCriacao: Value(dataCriacao),
+      dataAtualizacao: dataAtualizacao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dataAtualizacao),
+    );
+  }
+
+  factory CustoRecorrente.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CustoRecorrente(
+      id: serializer.fromJson<int>(json['id']),
+      tipo: $CustosRecorrentesTable.$convertertipo.fromJson(
+        serializer.fromJson<String>(json['tipo']),
+      ),
+      descricao: serializer.fromJson<String>(json['descricao']),
+      escopo: $CustosRecorrentesTable.$converterescopo.fromJson(
+        serializer.fromJson<String>(json['escopo']),
+      ),
+      veiculoId: serializer.fromJson<int?>(json['veiculoId']),
+      plataformaId: serializer.fromJson<int?>(json['plataformaId']),
+      valorReferenciaCentavos: serializer.fromJson<int?>(
+        json['valorReferenciaCentavos'],
+      ),
+      valorEstimado: serializer.fromJson<bool>(json['valorEstimado']),
+      periodicidadeMeses: serializer.fromJson<int>(json['periodicidadeMeses']),
+      parcelasPorCiclo: serializer.fromJson<int>(json['parcelasPorCiclo']),
+      ativo: serializer.fromJson<bool>(json['ativo']),
+      quantidadeCiclosPrevista: serializer.fromJson<int?>(
+        json['quantidadeCiclosPrevista'],
+      ),
+      observacao: serializer.fromJson<String?>(json['observacao']),
+      dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
+      dataAtualizacao: serializer.fromJson<DateTime?>(json['dataAtualizacao']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'tipo': serializer.toJson<String>(
+        $CustosRecorrentesTable.$convertertipo.toJson(tipo),
+      ),
+      'descricao': serializer.toJson<String>(descricao),
+      'escopo': serializer.toJson<String>(
+        $CustosRecorrentesTable.$converterescopo.toJson(escopo),
+      ),
+      'veiculoId': serializer.toJson<int?>(veiculoId),
+      'plataformaId': serializer.toJson<int?>(plataformaId),
+      'valorReferenciaCentavos': serializer.toJson<int?>(
+        valorReferenciaCentavos,
+      ),
+      'valorEstimado': serializer.toJson<bool>(valorEstimado),
+      'periodicidadeMeses': serializer.toJson<int>(periodicidadeMeses),
+      'parcelasPorCiclo': serializer.toJson<int>(parcelasPorCiclo),
+      'ativo': serializer.toJson<bool>(ativo),
+      'quantidadeCiclosPrevista': serializer.toJson<int?>(
+        quantidadeCiclosPrevista,
+      ),
+      'observacao': serializer.toJson<String?>(observacao),
+      'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
+      'dataAtualizacao': serializer.toJson<DateTime?>(dataAtualizacao),
+    };
+  }
+
+  CustoRecorrente copyWith({
+    int? id,
+    TipoCustoRecorrente? tipo,
+    String? descricao,
+    EscopoCustoRecorrente? escopo,
+    Value<int?> veiculoId = const Value.absent(),
+    Value<int?> plataformaId = const Value.absent(),
+    Value<int?> valorReferenciaCentavos = const Value.absent(),
+    bool? valorEstimado,
+    int? periodicidadeMeses,
+    int? parcelasPorCiclo,
+    bool? ativo,
+    Value<int?> quantidadeCiclosPrevista = const Value.absent(),
+    Value<String?> observacao = const Value.absent(),
+    DateTime? dataCriacao,
+    Value<DateTime?> dataAtualizacao = const Value.absent(),
+  }) => CustoRecorrente(
+    id: id ?? this.id,
+    tipo: tipo ?? this.tipo,
+    descricao: descricao ?? this.descricao,
+    escopo: escopo ?? this.escopo,
+    veiculoId: veiculoId.present ? veiculoId.value : this.veiculoId,
+    plataformaId: plataformaId.present ? plataformaId.value : this.plataformaId,
+    valorReferenciaCentavos: valorReferenciaCentavos.present
+        ? valorReferenciaCentavos.value
+        : this.valorReferenciaCentavos,
+    valorEstimado: valorEstimado ?? this.valorEstimado,
+    periodicidadeMeses: periodicidadeMeses ?? this.periodicidadeMeses,
+    parcelasPorCiclo: parcelasPorCiclo ?? this.parcelasPorCiclo,
+    ativo: ativo ?? this.ativo,
+    quantidadeCiclosPrevista: quantidadeCiclosPrevista.present
+        ? quantidadeCiclosPrevista.value
+        : this.quantidadeCiclosPrevista,
+    observacao: observacao.present ? observacao.value : this.observacao,
+    dataCriacao: dataCriacao ?? this.dataCriacao,
+    dataAtualizacao: dataAtualizacao.present
+        ? dataAtualizacao.value
+        : this.dataAtualizacao,
+  );
+  CustoRecorrente copyWithCompanion(CustosRecorrentesCompanion data) {
+    return CustoRecorrente(
+      id: data.id.present ? data.id.value : this.id,
+      tipo: data.tipo.present ? data.tipo.value : this.tipo,
+      descricao: data.descricao.present ? data.descricao.value : this.descricao,
+      escopo: data.escopo.present ? data.escopo.value : this.escopo,
+      veiculoId: data.veiculoId.present ? data.veiculoId.value : this.veiculoId,
+      plataformaId: data.plataformaId.present
+          ? data.plataformaId.value
+          : this.plataformaId,
+      valorReferenciaCentavos: data.valorReferenciaCentavos.present
+          ? data.valorReferenciaCentavos.value
+          : this.valorReferenciaCentavos,
+      valorEstimado: data.valorEstimado.present
+          ? data.valorEstimado.value
+          : this.valorEstimado,
+      periodicidadeMeses: data.periodicidadeMeses.present
+          ? data.periodicidadeMeses.value
+          : this.periodicidadeMeses,
+      parcelasPorCiclo: data.parcelasPorCiclo.present
+          ? data.parcelasPorCiclo.value
+          : this.parcelasPorCiclo,
+      ativo: data.ativo.present ? data.ativo.value : this.ativo,
+      quantidadeCiclosPrevista: data.quantidadeCiclosPrevista.present
+          ? data.quantidadeCiclosPrevista.value
+          : this.quantidadeCiclosPrevista,
+      observacao: data.observacao.present
+          ? data.observacao.value
+          : this.observacao,
+      dataCriacao: data.dataCriacao.present
+          ? data.dataCriacao.value
+          : this.dataCriacao,
+      dataAtualizacao: data.dataAtualizacao.present
+          ? data.dataAtualizacao.value
+          : this.dataAtualizacao,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustoRecorrente(')
+          ..write('id: $id, ')
+          ..write('tipo: $tipo, ')
+          ..write('descricao: $descricao, ')
+          ..write('escopo: $escopo, ')
+          ..write('veiculoId: $veiculoId, ')
+          ..write('plataformaId: $plataformaId, ')
+          ..write('valorReferenciaCentavos: $valorReferenciaCentavos, ')
+          ..write('valorEstimado: $valorEstimado, ')
+          ..write('periodicidadeMeses: $periodicidadeMeses, ')
+          ..write('parcelasPorCiclo: $parcelasPorCiclo, ')
+          ..write('ativo: $ativo, ')
+          ..write('quantidadeCiclosPrevista: $quantidadeCiclosPrevista, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao, ')
+          ..write('dataAtualizacao: $dataAtualizacao')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    tipo,
+    descricao,
+    escopo,
+    veiculoId,
+    plataformaId,
+    valorReferenciaCentavos,
+    valorEstimado,
+    periodicidadeMeses,
+    parcelasPorCiclo,
+    ativo,
+    quantidadeCiclosPrevista,
+    observacao,
+    dataCriacao,
+    dataAtualizacao,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CustoRecorrente &&
+          other.id == this.id &&
+          other.tipo == this.tipo &&
+          other.descricao == this.descricao &&
+          other.escopo == this.escopo &&
+          other.veiculoId == this.veiculoId &&
+          other.plataformaId == this.plataformaId &&
+          other.valorReferenciaCentavos == this.valorReferenciaCentavos &&
+          other.valorEstimado == this.valorEstimado &&
+          other.periodicidadeMeses == this.periodicidadeMeses &&
+          other.parcelasPorCiclo == this.parcelasPorCiclo &&
+          other.ativo == this.ativo &&
+          other.quantidadeCiclosPrevista == this.quantidadeCiclosPrevista &&
+          other.observacao == this.observacao &&
+          other.dataCriacao == this.dataCriacao &&
+          other.dataAtualizacao == this.dataAtualizacao);
+}
+
+class CustosRecorrentesCompanion extends UpdateCompanion<CustoRecorrente> {
+  final Value<int> id;
+  final Value<TipoCustoRecorrente> tipo;
+  final Value<String> descricao;
+  final Value<EscopoCustoRecorrente> escopo;
+  final Value<int?> veiculoId;
+  final Value<int?> plataformaId;
+  final Value<int?> valorReferenciaCentavos;
+  final Value<bool> valorEstimado;
+  final Value<int> periodicidadeMeses;
+  final Value<int> parcelasPorCiclo;
+  final Value<bool> ativo;
+  final Value<int?> quantidadeCiclosPrevista;
+  final Value<String?> observacao;
+  final Value<DateTime> dataCriacao;
+  final Value<DateTime?> dataAtualizacao;
+  const CustosRecorrentesCompanion({
+    this.id = const Value.absent(),
+    this.tipo = const Value.absent(),
+    this.descricao = const Value.absent(),
+    this.escopo = const Value.absent(),
+    this.veiculoId = const Value.absent(),
+    this.plataformaId = const Value.absent(),
+    this.valorReferenciaCentavos = const Value.absent(),
+    this.valorEstimado = const Value.absent(),
+    this.periodicidadeMeses = const Value.absent(),
+    this.parcelasPorCiclo = const Value.absent(),
+    this.ativo = const Value.absent(),
+    this.quantidadeCiclosPrevista = const Value.absent(),
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+    this.dataAtualizacao = const Value.absent(),
+  });
+  CustosRecorrentesCompanion.insert({
+    this.id = const Value.absent(),
+    required TipoCustoRecorrente tipo,
+    required String descricao,
+    required EscopoCustoRecorrente escopo,
+    this.veiculoId = const Value.absent(),
+    this.plataformaId = const Value.absent(),
+    this.valorReferenciaCentavos = const Value.absent(),
+    this.valorEstimado = const Value.absent(),
+    required int periodicidadeMeses,
+    this.parcelasPorCiclo = const Value.absent(),
+    this.ativo = const Value.absent(),
+    this.quantidadeCiclosPrevista = const Value.absent(),
+    this.observacao = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+    this.dataAtualizacao = const Value.absent(),
+  }) : tipo = Value(tipo),
+       descricao = Value(descricao),
+       escopo = Value(escopo),
+       periodicidadeMeses = Value(periodicidadeMeses);
+  static Insertable<CustoRecorrente> custom({
+    Expression<int>? id,
+    Expression<String>? tipo,
+    Expression<String>? descricao,
+    Expression<String>? escopo,
+    Expression<int>? veiculoId,
+    Expression<int>? plataformaId,
+    Expression<int>? valorReferenciaCentavos,
+    Expression<bool>? valorEstimado,
+    Expression<int>? periodicidadeMeses,
+    Expression<int>? parcelasPorCiclo,
+    Expression<bool>? ativo,
+    Expression<int>? quantidadeCiclosPrevista,
+    Expression<String>? observacao,
+    Expression<DateTime>? dataCriacao,
+    Expression<DateTime>? dataAtualizacao,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (tipo != null) 'tipo': tipo,
+      if (descricao != null) 'descricao': descricao,
+      if (escopo != null) 'escopo': escopo,
+      if (veiculoId != null) 'veiculo_id': veiculoId,
+      if (plataformaId != null) 'plataforma_id': plataformaId,
+      if (valorReferenciaCentavos != null)
+        'valor_referencia_centavos': valorReferenciaCentavos,
+      if (valorEstimado != null) 'valor_estimado': valorEstimado,
+      if (periodicidadeMeses != null) 'periodicidade_meses': periodicidadeMeses,
+      if (parcelasPorCiclo != null) 'parcelas_por_ciclo': parcelasPorCiclo,
+      if (ativo != null) 'ativo': ativo,
+      if (quantidadeCiclosPrevista != null)
+        'quantidade_ciclos_prevista': quantidadeCiclosPrevista,
+      if (observacao != null) 'observacao': observacao,
+      if (dataCriacao != null) 'data_criacao': dataCriacao,
+      if (dataAtualizacao != null) 'data_atualizacao': dataAtualizacao,
+    });
+  }
+
+  CustosRecorrentesCompanion copyWith({
+    Value<int>? id,
+    Value<TipoCustoRecorrente>? tipo,
+    Value<String>? descricao,
+    Value<EscopoCustoRecorrente>? escopo,
+    Value<int?>? veiculoId,
+    Value<int?>? plataformaId,
+    Value<int?>? valorReferenciaCentavos,
+    Value<bool>? valorEstimado,
+    Value<int>? periodicidadeMeses,
+    Value<int>? parcelasPorCiclo,
+    Value<bool>? ativo,
+    Value<int?>? quantidadeCiclosPrevista,
+    Value<String?>? observacao,
+    Value<DateTime>? dataCriacao,
+    Value<DateTime?>? dataAtualizacao,
+  }) {
+    return CustosRecorrentesCompanion(
+      id: id ?? this.id,
+      tipo: tipo ?? this.tipo,
+      descricao: descricao ?? this.descricao,
+      escopo: escopo ?? this.escopo,
+      veiculoId: veiculoId ?? this.veiculoId,
+      plataformaId: plataformaId ?? this.plataformaId,
+      valorReferenciaCentavos:
+          valorReferenciaCentavos ?? this.valorReferenciaCentavos,
+      valorEstimado: valorEstimado ?? this.valorEstimado,
+      periodicidadeMeses: periodicidadeMeses ?? this.periodicidadeMeses,
+      parcelasPorCiclo: parcelasPorCiclo ?? this.parcelasPorCiclo,
+      ativo: ativo ?? this.ativo,
+      quantidadeCiclosPrevista:
+          quantidadeCiclosPrevista ?? this.quantidadeCiclosPrevista,
+      observacao: observacao ?? this.observacao,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+      dataAtualizacao: dataAtualizacao ?? this.dataAtualizacao,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (tipo.present) {
+      map['tipo'] = Variable<String>(
+        $CustosRecorrentesTable.$convertertipo.toSql(tipo.value),
+      );
+    }
+    if (descricao.present) {
+      map['descricao'] = Variable<String>(descricao.value);
+    }
+    if (escopo.present) {
+      map['escopo'] = Variable<String>(
+        $CustosRecorrentesTable.$converterescopo.toSql(escopo.value),
+      );
+    }
+    if (veiculoId.present) {
+      map['veiculo_id'] = Variable<int>(veiculoId.value);
+    }
+    if (plataformaId.present) {
+      map['plataforma_id'] = Variable<int>(plataformaId.value);
+    }
+    if (valorReferenciaCentavos.present) {
+      map['valor_referencia_centavos'] = Variable<int>(
+        valorReferenciaCentavos.value,
+      );
+    }
+    if (valorEstimado.present) {
+      map['valor_estimado'] = Variable<bool>(valorEstimado.value);
+    }
+    if (periodicidadeMeses.present) {
+      map['periodicidade_meses'] = Variable<int>(periodicidadeMeses.value);
+    }
+    if (parcelasPorCiclo.present) {
+      map['parcelas_por_ciclo'] = Variable<int>(parcelasPorCiclo.value);
+    }
+    if (ativo.present) {
+      map['ativo'] = Variable<bool>(ativo.value);
+    }
+    if (quantidadeCiclosPrevista.present) {
+      map['quantidade_ciclos_prevista'] = Variable<int>(
+        quantidadeCiclosPrevista.value,
+      );
+    }
+    if (observacao.present) {
+      map['observacao'] = Variable<String>(observacao.value);
+    }
+    if (dataCriacao.present) {
+      map['data_criacao'] = Variable<DateTime>(dataCriacao.value);
+    }
+    if (dataAtualizacao.present) {
+      map['data_atualizacao'] = Variable<DateTime>(dataAtualizacao.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustosRecorrentesCompanion(')
+          ..write('id: $id, ')
+          ..write('tipo: $tipo, ')
+          ..write('descricao: $descricao, ')
+          ..write('escopo: $escopo, ')
+          ..write('veiculoId: $veiculoId, ')
+          ..write('plataformaId: $plataformaId, ')
+          ..write('valorReferenciaCentavos: $valorReferenciaCentavos, ')
+          ..write('valorEstimado: $valorEstimado, ')
+          ..write('periodicidadeMeses: $periodicidadeMeses, ')
+          ..write('parcelasPorCiclo: $parcelasPorCiclo, ')
+          ..write('ativo: $ativo, ')
+          ..write('quantidadeCiclosPrevista: $quantidadeCiclosPrevista, ')
+          ..write('observacao: $observacao, ')
+          ..write('dataCriacao: $dataCriacao, ')
+          ..write('dataAtualizacao: $dataAtualizacao')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -8674,6 +9602,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DespesasVeiculoTable despesasVeiculo = $DespesasVeiculoTable(
     this,
   );
+  late final $CustosRecorrentesTable custosRecorrentes =
+      $CustosRecorrentesTable(this);
   late final JornadaDao jornadaDao = JornadaDao(this as AppDatabase);
   late final PausaDao pausaDao = PausaDao(this as AppDatabase);
   late final LeituraGanhosDao leituraGanhosDao = LeituraGanhosDao(
@@ -8693,6 +9623,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final ManutencaoDao manutencaoDao = ManutencaoDao(this as AppDatabase);
   late final DespesaVeiculoDao despesaVeiculoDao = DespesaVeiculoDao(
+    this as AppDatabase,
+  );
+  late final CustoRecorrenteDao custoRecorrenteDao = CustoRecorrenteDao(
     this as AppDatabase,
   );
   @override
@@ -8715,6 +9648,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     manutencoes,
     itensManutencao,
     despesasVeiculo,
+    custosRecorrentes,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -9148,6 +10082,27 @@ final class $$VeiculosTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$CustosRecorrentesTable, List<CustoRecorrente>>
+  _custosRecorrentesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.custosRecorrentes,
+        aliasName: 'veiculos__id__custos_recorrentes__veiculo_id',
+      );
+
+  $$CustosRecorrentesTableProcessedTableManager get custosRecorrentesRefs {
+    final manager = $$CustosRecorrentesTableTableManager(
+      $_db,
+      $_db.custosRecorrentes,
+    ).filter((f) => f.veiculoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _custosRecorrentesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$VeiculosTableFilterComposer
@@ -9315,6 +10270,31 @@ class $$VeiculosTableFilterComposer
           }) => $$DespesasVeiculoTableFilterComposer(
             $db: $db,
             $table: $db.despesasVeiculo,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> custosRecorrentesRefs(
+    Expression<bool> Function($$CustosRecorrentesTableFilterComposer f) f,
+  ) {
+    final $$CustosRecorrentesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.custosRecorrentes,
+      getReferencedColumn: (t) => t.veiculoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CustosRecorrentesTableFilterComposer(
+            $db: $db,
+            $table: $db.custosRecorrentes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -9559,6 +10539,32 @@ class $$VeiculosTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> custosRecorrentesRefs<T extends Object>(
+    Expression<T> Function($$CustosRecorrentesTableAnnotationComposer a) f,
+  ) {
+    final $$CustosRecorrentesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.custosRecorrentes,
+          getReferencedColumn: (t) => t.veiculoId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CustosRecorrentesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.custosRecorrentes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$VeiculosTableTableManager
@@ -9579,6 +10585,7 @@ class $$VeiculosTableTableManager
             bool abastecimentosRefs,
             bool manutencoesRefs,
             bool despesasVeiculoRefs,
+            bool custosRecorrentesRefs,
           })
         > {
   $$VeiculosTableTableManager(_$AppDatabase db, $VeiculosTable table)
@@ -9666,6 +10673,7 @@ class $$VeiculosTableTableManager
                 abastecimentosRefs = false,
                 manutencoesRefs = false,
                 despesasVeiculoRefs = false,
+                custosRecorrentesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -9674,6 +10682,7 @@ class $$VeiculosTableTableManager
                     if (abastecimentosRefs) db.abastecimentos,
                     if (manutencoesRefs) db.manutencoes,
                     if (despesasVeiculoRefs) db.despesasVeiculo,
+                    if (custosRecorrentesRefs) db.custosRecorrentes,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -9762,6 +10771,27 @@ class $$VeiculosTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (custosRecorrentesRefs)
+                        await $_getPrefetchedData<
+                          Veiculo,
+                          $VeiculosTable,
+                          CustoRecorrente
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VeiculosTableReferences
+                              ._custosRecorrentesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VeiculosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).custosRecorrentesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.veiculoId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -9787,6 +10817,7 @@ typedef $$VeiculosTableProcessedTableManager =
         bool abastecimentosRefs,
         bool manutencoesRefs,
         bool despesasVeiculoRefs,
+        bool custosRecorrentesRefs,
       })
     >;
 typedef $$ConfiguracoesTableCreateCompanionBuilder =
@@ -11806,6 +12837,27 @@ final class $$PlataformasTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$CustosRecorrentesTable, List<CustoRecorrente>>
+  _custosRecorrentesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.custosRecorrentes,
+        aliasName: 'plataformas__id__custos_recorrentes__plataforma_id',
+      );
+
+  $$CustosRecorrentesTableProcessedTableManager get custosRecorrentesRefs {
+    final manager = $$CustosRecorrentesTableTableManager(
+      $_db,
+      $_db.custosRecorrentes,
+    ).filter((f) => f.plataformaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _custosRecorrentesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$PlataformasTableFilterComposer
@@ -11952,6 +13004,31 @@ class $$PlataformasTableFilterComposer
           }) => $$BonusPromocoesTableFilterComposer(
             $db: $db,
             $table: $db.bonusPromocoes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> custosRecorrentesRefs(
+    Expression<bool> Function($$CustosRecorrentesTableFilterComposer f) f,
+  ) {
+    final $$CustosRecorrentesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.custosRecorrentes,
+      getReferencedColumn: (t) => t.plataformaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CustosRecorrentesTableFilterComposer(
+            $db: $db,
+            $table: $db.custosRecorrentes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -12155,6 +13232,32 @@ class $$PlataformasTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> custosRecorrentesRefs<T extends Object>(
+    Expression<T> Function($$CustosRecorrentesTableAnnotationComposer a) f,
+  ) {
+    final $$CustosRecorrentesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.custosRecorrentes,
+          getReferencedColumn: (t) => t.plataformaId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CustosRecorrentesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.custosRecorrentes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$PlataformasTableTableManager
@@ -12175,6 +13278,7 @@ class $$PlataformasTableTableManager
             bool lancamentosGanhoIndividualRefs,
             bool passesPlataformaRefs,
             bool bonusPromocoesRefs,
+            bool custosRecorrentesRefs,
           })
         > {
   $$PlataformasTableTableManager(_$AppDatabase db, $PlataformasTable table)
@@ -12243,6 +13347,7 @@ class $$PlataformasTableTableManager
                 lancamentosGanhoIndividualRefs = false,
                 passesPlataformaRefs = false,
                 bonusPromocoesRefs = false,
+                custosRecorrentesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -12252,6 +13357,7 @@ class $$PlataformasTableTableManager
                       db.lancamentosGanhoIndividual,
                     if (passesPlataformaRefs) db.passesPlataforma,
                     if (bonusPromocoesRefs) db.bonusPromocoes,
+                    if (custosRecorrentesRefs) db.custosRecorrentes,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -12340,6 +13446,27 @@ class $$PlataformasTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (custosRecorrentesRefs)
+                        await $_getPrefetchedData<
+                          Plataforma,
+                          $PlataformasTable,
+                          CustoRecorrente
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlataformasTableReferences
+                              ._custosRecorrentesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlataformasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).custosRecorrentesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.plataformaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -12365,6 +13492,7 @@ typedef $$PlataformasTableProcessedTableManager =
         bool lancamentosGanhoIndividualRefs,
         bool passesPlataformaRefs,
         bool bonusPromocoesRefs,
+        bool custosRecorrentesRefs,
       })
     >;
 typedef $$LeiturasGanhosTableCreateCompanionBuilder =
@@ -16692,6 +17820,638 @@ typedef $$DespesasVeiculoTableProcessedTableManager =
       DespesaVeiculo,
       PrefetchHooks Function({bool veiculoId})
     >;
+typedef $$CustosRecorrentesTableCreateCompanionBuilder =
+    CustosRecorrentesCompanion Function({
+      Value<int> id,
+      required TipoCustoRecorrente tipo,
+      required String descricao,
+      required EscopoCustoRecorrente escopo,
+      Value<int?> veiculoId,
+      Value<int?> plataformaId,
+      Value<int?> valorReferenciaCentavos,
+      Value<bool> valorEstimado,
+      required int periodicidadeMeses,
+      Value<int> parcelasPorCiclo,
+      Value<bool> ativo,
+      Value<int?> quantidadeCiclosPrevista,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+      Value<DateTime?> dataAtualizacao,
+    });
+typedef $$CustosRecorrentesTableUpdateCompanionBuilder =
+    CustosRecorrentesCompanion Function({
+      Value<int> id,
+      Value<TipoCustoRecorrente> tipo,
+      Value<String> descricao,
+      Value<EscopoCustoRecorrente> escopo,
+      Value<int?> veiculoId,
+      Value<int?> plataformaId,
+      Value<int?> valorReferenciaCentavos,
+      Value<bool> valorEstimado,
+      Value<int> periodicidadeMeses,
+      Value<int> parcelasPorCiclo,
+      Value<bool> ativo,
+      Value<int?> quantidadeCiclosPrevista,
+      Value<String?> observacao,
+      Value<DateTime> dataCriacao,
+      Value<DateTime?> dataAtualizacao,
+    });
+
+final class $$CustosRecorrentesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $CustosRecorrentesTable,
+          CustoRecorrente
+        > {
+  $$CustosRecorrentesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $VeiculosTable _veiculoIdTable(_$AppDatabase db) =>
+      db.veiculos.createAlias('custos_recorrentes__veiculo_id__veiculos__id');
+
+  $$VeiculosTableProcessedTableManager? get veiculoId {
+    final $_column = $_itemColumn<int>('veiculo_id');
+    if ($_column == null) return null;
+    final manager = $$VeiculosTableTableManager(
+      $_db,
+      $_db.veiculos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_veiculoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PlataformasTable _plataformaIdTable(_$AppDatabase db) => db
+      .plataformas
+      .createAlias('custos_recorrentes__plataforma_id__plataformas__id');
+
+  $$PlataformasTableProcessedTableManager? get plataformaId {
+    final $_column = $_itemColumn<int>('plataforma_id');
+    if ($_column == null) return null;
+    final manager = $$PlataformasTableTableManager(
+      $_db,
+      $_db.plataformas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_plataformaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CustosRecorrentesTableFilterComposer
+    extends Composer<_$AppDatabase, $CustosRecorrentesTable> {
+  $$CustosRecorrentesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    TipoCustoRecorrente,
+    TipoCustoRecorrente,
+    String
+  >
+  get tipo => $composableBuilder(
+    column: $table.tipo,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get descricao => $composableBuilder(
+    column: $table.descricao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    EscopoCustoRecorrente,
+    EscopoCustoRecorrente,
+    String
+  >
+  get escopo => $composableBuilder(
+    column: $table.escopo,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get valorReferenciaCentavos => $composableBuilder(
+    column: $table.valorReferenciaCentavos,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get valorEstimado => $composableBuilder(
+    column: $table.valorEstimado,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get periodicidadeMeses => $composableBuilder(
+    column: $table.periodicidadeMeses,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get parcelasPorCiclo => $composableBuilder(
+    column: $table.parcelasPorCiclo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get ativo => $composableBuilder(
+    column: $table.ativo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quantidadeCiclosPrevista => $composableBuilder(
+    column: $table.quantidadeCiclosPrevista,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VeiculosTableFilterComposer get veiculoId {
+    final $$VeiculosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableFilterComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlataformasTableFilterComposer get plataformaId {
+    final $$PlataformasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableFilterComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CustosRecorrentesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CustosRecorrentesTable> {
+  $$CustosRecorrentesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tipo => $composableBuilder(
+    column: $table.tipo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get descricao => $composableBuilder(
+    column: $table.descricao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get escopo => $composableBuilder(
+    column: $table.escopo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get valorReferenciaCentavos => $composableBuilder(
+    column: $table.valorReferenciaCentavos,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get valorEstimado => $composableBuilder(
+    column: $table.valorEstimado,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get periodicidadeMeses => $composableBuilder(
+    column: $table.periodicidadeMeses,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get parcelasPorCiclo => $composableBuilder(
+    column: $table.parcelasPorCiclo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get ativo => $composableBuilder(
+    column: $table.ativo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quantidadeCiclosPrevista => $composableBuilder(
+    column: $table.quantidadeCiclosPrevista,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VeiculosTableOrderingComposer get veiculoId {
+    final $$VeiculosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableOrderingComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlataformasTableOrderingComposer get plataformaId {
+    final $$PlataformasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableOrderingComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CustosRecorrentesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CustosRecorrentesTable> {
+  $$CustosRecorrentesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<TipoCustoRecorrente, String> get tipo =>
+      $composableBuilder(column: $table.tipo, builder: (column) => column);
+
+  GeneratedColumn<String> get descricao =>
+      $composableBuilder(column: $table.descricao, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<EscopoCustoRecorrente, String> get escopo =>
+      $composableBuilder(column: $table.escopo, builder: (column) => column);
+
+  GeneratedColumn<int> get valorReferenciaCentavos => $composableBuilder(
+    column: $table.valorReferenciaCentavos,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get valorEstimado => $composableBuilder(
+    column: $table.valorEstimado,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get periodicidadeMeses => $composableBuilder(
+    column: $table.periodicidadeMeses,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get parcelasPorCiclo => $composableBuilder(
+    column: $table.parcelasPorCiclo,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get ativo =>
+      $composableBuilder(column: $table.ativo, builder: (column) => column);
+
+  GeneratedColumn<int> get quantidadeCiclosPrevista => $composableBuilder(
+    column: $table.quantidadeCiclosPrevista,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get observacao => $composableBuilder(
+    column: $table.observacao,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => column,
+  );
+
+  $$VeiculosTableAnnotationComposer get veiculoId {
+    final $$VeiculosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PlataformasTableAnnotationComposer get plataformaId {
+    final $$PlataformasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.plataformaId,
+      referencedTable: $db.plataformas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlataformasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.plataformas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CustosRecorrentesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CustosRecorrentesTable,
+          CustoRecorrente,
+          $$CustosRecorrentesTableFilterComposer,
+          $$CustosRecorrentesTableOrderingComposer,
+          $$CustosRecorrentesTableAnnotationComposer,
+          $$CustosRecorrentesTableCreateCompanionBuilder,
+          $$CustosRecorrentesTableUpdateCompanionBuilder,
+          (CustoRecorrente, $$CustosRecorrentesTableReferences),
+          CustoRecorrente,
+          PrefetchHooks Function({bool veiculoId, bool plataformaId})
+        > {
+  $$CustosRecorrentesTableTableManager(
+    _$AppDatabase db,
+    $CustosRecorrentesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CustosRecorrentesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CustosRecorrentesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CustosRecorrentesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<TipoCustoRecorrente> tipo = const Value.absent(),
+                Value<String> descricao = const Value.absent(),
+                Value<EscopoCustoRecorrente> escopo = const Value.absent(),
+                Value<int?> veiculoId = const Value.absent(),
+                Value<int?> plataformaId = const Value.absent(),
+                Value<int?> valorReferenciaCentavos = const Value.absent(),
+                Value<bool> valorEstimado = const Value.absent(),
+                Value<int> periodicidadeMeses = const Value.absent(),
+                Value<int> parcelasPorCiclo = const Value.absent(),
+                Value<bool> ativo = const Value.absent(),
+                Value<int?> quantidadeCiclosPrevista = const Value.absent(),
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+                Value<DateTime?> dataAtualizacao = const Value.absent(),
+              }) => CustosRecorrentesCompanion(
+                id: id,
+                tipo: tipo,
+                descricao: descricao,
+                escopo: escopo,
+                veiculoId: veiculoId,
+                plataformaId: plataformaId,
+                valorReferenciaCentavos: valorReferenciaCentavos,
+                valorEstimado: valorEstimado,
+                periodicidadeMeses: periodicidadeMeses,
+                parcelasPorCiclo: parcelasPorCiclo,
+                ativo: ativo,
+                quantidadeCiclosPrevista: quantidadeCiclosPrevista,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+                dataAtualizacao: dataAtualizacao,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required TipoCustoRecorrente tipo,
+                required String descricao,
+                required EscopoCustoRecorrente escopo,
+                Value<int?> veiculoId = const Value.absent(),
+                Value<int?> plataformaId = const Value.absent(),
+                Value<int?> valorReferenciaCentavos = const Value.absent(),
+                Value<bool> valorEstimado = const Value.absent(),
+                required int periodicidadeMeses,
+                Value<int> parcelasPorCiclo = const Value.absent(),
+                Value<bool> ativo = const Value.absent(),
+                Value<int?> quantidadeCiclosPrevista = const Value.absent(),
+                Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+                Value<DateTime?> dataAtualizacao = const Value.absent(),
+              }) => CustosRecorrentesCompanion.insert(
+                id: id,
+                tipo: tipo,
+                descricao: descricao,
+                escopo: escopo,
+                veiculoId: veiculoId,
+                plataformaId: plataformaId,
+                valorReferenciaCentavos: valorReferenciaCentavos,
+                valorEstimado: valorEstimado,
+                periodicidadeMeses: periodicidadeMeses,
+                parcelasPorCiclo: parcelasPorCiclo,
+                ativo: ativo,
+                quantidadeCiclosPrevista: quantidadeCiclosPrevista,
+                observacao: observacao,
+                dataCriacao: dataCriacao,
+                dataAtualizacao: dataAtualizacao,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$CustosRecorrentesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({veiculoId = false, plataformaId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (veiculoId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.veiculoId,
+                                referencedTable:
+                                    $$CustosRecorrentesTableReferences
+                                        ._veiculoIdTable(db),
+                                referencedColumn:
+                                    $$CustosRecorrentesTableReferences
+                                        ._veiculoIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (plataformaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.plataformaId,
+                                referencedTable:
+                                    $$CustosRecorrentesTableReferences
+                                        ._plataformaIdTable(db),
+                                referencedColumn:
+                                    $$CustosRecorrentesTableReferences
+                                        ._plataformaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CustosRecorrentesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CustosRecorrentesTable,
+      CustoRecorrente,
+      $$CustosRecorrentesTableFilterComposer,
+      $$CustosRecorrentesTableOrderingComposer,
+      $$CustosRecorrentesTableAnnotationComposer,
+      $$CustosRecorrentesTableCreateCompanionBuilder,
+      $$CustosRecorrentesTableUpdateCompanionBuilder,
+      (CustoRecorrente, $$CustosRecorrentesTableReferences),
+      CustoRecorrente,
+      PrefetchHooks Function({bool veiculoId, bool plataformaId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -16733,4 +18493,6 @@ class $AppDatabaseManager {
       $$ItensManutencaoTableTableManager(_db, _db.itensManutencao);
   $$DespesasVeiculoTableTableManager get despesasVeiculo =>
       $$DespesasVeiculoTableTableManager(_db, _db.despesasVeiculo);
+  $$CustosRecorrentesTableTableManager get custosRecorrentes =>
+      $$CustosRecorrentesTableTableManager(_db, _db.custosRecorrentes);
 }

@@ -190,8 +190,9 @@ justificativa e inserção histórica arbitrária permanecem futuras.
 
 ## Despesas do veículo
 
-- Despesa representa um pagamento ou custo factual já ocorrido para um
-  veículo. Não representa obrigação futura, parcela planejada ou provisão.
+- Despesa representa um fato esporádico que efetivamente ocorreu para um
+  veículo. Não representa obrigação futura, parcela planejada, provisão ou
+  referência periódica.
 - Veículo, tipo, descrição, valor e instante operacional são obrigatórios.
   Descrição usa `trim` e deve permanecer livre; sugestões históricas do mesmo
   tipo não limitam novos textos.
@@ -199,13 +200,57 @@ justificativa e inserção histórica arbitrária permanecem futuras.
 - `dataHora` é quando a despesa ocorreu, inicia como agora, pode ser retroativa
   e não pode estar no futuro. `dataCriacao` é o instante técnico do cadastro.
 - Observação é opcional e normalizada com `trim`.
-- Nesta versão, Despesa não possui `jornadaId`: IPVA, seguro, multa, pedágio,
-  estacionamento e fatos semelhantes pertencem ao veículo sem atribuição
-  econômica automática a uma Jornada.
+- No fluxo de novo cadastro são oferecidos multa, pedágio, estacionamento,
+  lavagem, taxa/documentação eventual e outra despesa. IPVA, licenciamento e
+  seguro pertencem normalmente a Custos Recorrentes e não são oferecidos como
+  novas Despesas; valores técnicos antigos continuam legíveis e editáveis.
+- Taxa/documentação eventual cobre ocorrências extraordinárias, como segunda
+  via, transferência ou vistoria avulsa. Não substitui IPVA, licenciamento ou
+  seguro.
+- Nesta versão, Despesa não possui `jornadaId` e não recebe atribuição econômica
+  automática a uma Jornada.
 - Sugestão histórica reutiliza somente a descrição de despesas do mesmo tipo.
   Valor, data, observação e veículo nunca são copiados pela sugestão.
 - Abastecimentos, Manutenções e Passes continuam em entidades especializadas e
   não devem ser duplicados como Despesa apenas para formar um total genérico.
+
+## Custos recorrentes e competência econômica
+
+- Custo Recorrente é referência econômica, não pagamento, Despesa, obrigação
+  ou lançamento futuro. Nunca gera automaticamente Despesas, parcelas,
+  vencimentos ou notificações.
+- `periodicidadeMeses > 0` representa a competência do ciclo: mensal é 1,
+  anual é 12 e a personalizada aceita outro número positivo de meses.
+- `parcelasPorCiclo >= 1` registra somente o padrão habitual de pagamento. Não
+  altera a competência nem o equivalente mensal e não representa parcelas
+  efetivamente pagas.
+- O equivalente mensal é derivado de
+  `valorReferenciaCentavos / periodicidadeMeses`, arredondado somente na
+  apresentação e nunca persistido.
+- Valor de referência pode ser exato, aproximado ou ausente. Quando ausente, o
+  equivalente fica indisponível; ausência não significa zero. Valor informado
+  deve ser positivo.
+- Descrição é obrigatória, livre e normalizada com `trim`. Sugestões históricas
+  por tipo nunca copiam valor, escopo, periodicidade ou demais campos.
+- Escopo veículo exige veículo e proíbe Plataforma; escopo atividade não recebe
+  nenhum dos dois; escopo Plataforma exige Plataforma e proíbe veículo.
+- Quantidade de ciclos prevista é opcional e positiva. Ausência representa
+  prazo indeterminado; nenhum ciclo é materializado como lançamento.
+- `ativo` indica se a referência ainda compõe a estrutura econômica atual. A
+  desativação preserva o histórico.
+- Defaults por tipo reduzem digitação, mas são editáveis: IPVA/licenciamento
+  sugerem veículo e 12 meses; seguro sugere veículo e 1 mês; telefone sugere
+  atividade e 1 mês; conta de Plataforma sugere Plataforma e 1 mês.
+- Não se inventa data de início/vigência. Informação aproximada pode permanecer
+  em observação até existir uma modelagem temporal semanticamente segura.
+- DespesaVeiculo continua sendo o fato financeiro pago. Não há vínculo ou
+  reconciliação automática entre pagamento e competência nesta versão.
+- IPVA, licenciamento e seguro devem ser cadastrados normalmente somente como
+  Custos Recorrentes enquanto essa reconciliação não existir. Pagamento à
+  vista ou em parcelas não muda a competência do ciclo e não exige uma
+  Despesa duplicada para alimentar o futuro Motor Econômico.
+- Financiamento e depreciação ficam fora para evitar misturar fluxo de caixa,
+  amortização do ativo e custo econômico.
 
 ## Passes de plataforma
 

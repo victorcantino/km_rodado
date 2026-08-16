@@ -4,8 +4,8 @@
 
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
-- schema atual: **10**;
-- suíte automatizada: **178 testes aprovados** em 15/08/2026.
+- schema atual: **11**;
+- suíte automatizada: **194 testes aprovados** em 16/08/2026.
 
 ## Implementado
 
@@ -29,8 +29,14 @@
   comportamental conservadora para abastecer;
 - Manutenções por veículo com cabeçalho e múltiplos itens, valores opcionais,
   edição atômica, histórico, sugestões e recorrências derivadas por km/data;
-- Despesas factuais por veículo com tipo, descrição livre, valor em centavos,
-  cadastro retroativo, histórico, edição e sugestões por tipo;
+- Despesas esporádicas por veículo — multa, pedágio, estacionamento, lavagem,
+  taxa/documentação eventual e outras — com descrição livre, valor em
+  centavos, cadastro retroativo, histórico, edição e compatibilidade de leitura
+  dos antigos tipos IPVA/licenciamento/seguro;
+- Custos Recorrentes separados do fluxo de caixa, com competência mensal,
+  anual ou personalizada, escopo veículo/atividade/Plataforma, valor exato ou
+  estimado e equivalente mensal derivado; Despesas e recorrências aparecem em
+  seções distintas da mesma tela, com criação e edição diretas;
 - Passes por faturamento ou tempo, validade derivada, repetição segura por
   Plataforma, cadastro retroativo, custos separados e Jornada opcional;
 - crédito promocional retroativo sem escolha de subtipo pelo motorista; valores
@@ -41,7 +47,7 @@
 - JornadaPage protegida pelos insets seguros inferiores do Android;
 - formulários operacionais navegam pelo teclado entre campos editáveis,
   ignorando botões, seletores e calendários, e encerram a sequência com Done;
-- migrações preservadoras até schema 10 e seeds idempotentes.
+- migrações preservadoras até schema 11 e seeds idempotentes.
 
 ## Em teste operacional
 
@@ -55,7 +61,7 @@ entregas mais recentes; a interface segue funcional e provisória.
 - resets e efeitos de Passes sobre snapshots não são inferidos; bônus conhecidos
   são reconciliados somente quando a matemática é segura;
 - não há custo/km, análise por posto, consolidação financeira geral,
-  obrigações/parcelas, notificações, GPS,
+  motor econômico, obrigações/vencimentos, notificações, GPS,
   nuvem ou importação do AppSheet; previsão por data é omitida sem histórico
   calendário confiável;
 - tratamento visual e navegação ainda estão concentrados na `JornadaPage`;

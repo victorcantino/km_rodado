@@ -45,7 +45,7 @@ class _EditarDespesaVeiculoDialogState
   void initState() {
     super.initState();
     final existente = widget.existente;
-    tipo = existente?.tipo ?? TipoDespesaVeiculo.ipva;
+    tipo = existente?.tipo ?? TipoDespesaVeiculo.multa;
     dataHora = existente?.dataHora ?? DateTime.now();
     descricao = TextEditingController(text: existente?.descricao ?? '');
     valor = TextEditingController(
@@ -126,10 +126,12 @@ class _EditarDespesaVeiculoDialogState
               DropdownButtonFormField<TipoDespesaVeiculo>(
                 key: const ValueKey('tipo_despesa'),
                 initialValue: tipo,
+                isExpanded: true,
                 decoration: const InputDecoration(labelText: 'Tipo'),
                 items: [
                   for (final opcao in TipoDespesaVeiculo.values)
-                    DropdownMenuItem(value: opcao, child: Text(opcao.label)),
+                    if (opcao.disponivelEmNovoCadastro || opcao == tipo)
+                      DropdownMenuItem(value: opcao, child: Text(opcao.label)),
                 ],
                 onChanged: (valor) {
                   if (valor == null) return;

@@ -24,9 +24,14 @@
   quando fechadas, como Faturamento, Custos, Pausas, Abastecimentos,
   Plataformas e Manutenção. Indicadores serão escolhidos com a maturidade das
   features, sem sanfona nesta etapa.
+- DespesasPage com seções recolhíveis independentes para Despesas do veículo e
+  Custos recorrentes. Ambas podem ficar abertas ou fechadas sem obrigar o
+  fechamento da outra; o objetivo é reduzir altura quando houver muitos dados.
 - Tela sempre ligada configurável e modo escuro.
-- Onboarding e guias contextuais por módulo, dispensáveis e reabertos sob
-  demanda.
+- Onboarding e ajuda contextual por feature, dispensáveis, com Próximo,
+  Entendi, “não mostrar novamente” e reabertura sob demanda. Na DespesasPage,
+  explicar separadamente que Nova despesa registra pagamento ocorrido e Novo
+  custo recorrente registra uma referência econômica periódica.
 
 ## Abastecimento
 
@@ -43,7 +48,10 @@
 
 ## Manutenção e veículo
 
-- Componentes por posição/lado e mapa visual do veículo (pneus, faróis etc.).
+- Mapa visual/interativo de Manutenção do veículo: tocar diretamente na peça
+  (como pneu dianteiro direito ou farol direito) para abrir o formulário atual
+  com componente e posição pré-preenchidos; manter o formulário textual como
+  fallback e oferecer opções contextuais somente quando fizerem sentido.
 - Alertas/notificações configuráveis por data e/ou odômetro, sem limiares
   arbitrários.
 - Importação histórica das 38 linhas do AppSheet, agrupando visitas e revisando
@@ -53,6 +61,14 @@
 
 ## Custos e obrigações
 
+- Reconciliação entre Custo Recorrente e pagamento real, separando competência
+  econômica e fluxo de caixa sem dupla contagem.
+- Modelar aquisição/financiamento do veículo separando fluxo de caixa,
+  amortização e custo financeiro antes de integrar ao Motor Econômico.
+- Modelar depreciação do veículo separadamente do financiamento, apenas quando
+  preço de aquisição e referência de valor atual forem confiáveis; na ausência,
+  apresentar “Depreciação indisponível” sem inventar valores nem somar parcela
+  integral e depreciação sem metodologia explícita.
 - Avaliar associação opcional de Despesa a Jornada somente quando houver regra
   econômica segura, sem atribuir retroativamente custos gerais ao trabalho.
 - Evoluir despesas factuais para obrigações, competência, parcelas,
@@ -64,8 +80,8 @@
   custos gerais do dia sem atribuição artificial.
 - Pedágio e estacionamento pré-pagos: separar recarga de consumo efetivo.
 - Multas com valor original, desconto, pago, vencimento e status.
-- IPVA por exercício, à vista/parcelado e regras configuráveis.
-- Licenciamento, seguro e financiamento com parcelas e vencimentos.
+- Evoluir IPVA, licenciamento e seguro para competência por exercício,
+  pagamentos, parcelas e vencimentos somente após definir a reconciliação.
 
 ## Plataforma e análises
 

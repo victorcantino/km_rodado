@@ -1,6 +1,6 @@
 # Modelo de dados — KM Rodado
 
-O schema Drift atual é **10**. Esta seção separa o que existe no SQLite do que é
+O schema Drift atual é **11**. Esta seção separa o que existe no SQLite do que é
 derivado ou apenas planejado.
 
 ## Tabelas persistidas
@@ -127,6 +127,18 @@ automática a Jornada. O valor é positivo e usa centavos inteiros. O tipo usa
 `TipoDespesaVeiculo`: IPVA, licenciamento, documentação/taxa, seguro, multa,
 pedágio, estacionamento, lavagem ou outra despesa.
 
+### CustosRecorrentes
+
+`id`, `tipo`, `descricao`, `escopo`, `veiculoId?` → Veiculos,
+`plataformaId?` → Plataformas, `valorReferenciaCentavos?`, `valorEstimado`,
+`periodicidadeMeses`, `parcelasPorCiclo`, `ativo`,
+`quantidadeCiclosPrevista?`, `observacao?`, `dataCriacao`,
+`dataAtualizacao?`.
+
+É referência de competência econômica, não pagamento. Escopos possíveis:
+veículo exige `veiculoId`; atividade não recebe veículo nem Plataforma;
+Plataforma exige `plataformaId`. Valor ausente é desconhecido, nunca zero.
+
 ## Relações principais
 
 ```text
@@ -139,6 +151,7 @@ Jornada? ──< PassePlataforma >── Plataforma
 Jornada? ──< BonusPromocao >── Plataforma
 Veiculo ──< Manutencao ──< ItemManutencao
 Veiculo ──< DespesaVeiculo
+Veiculo? ──< CustoRecorrente >── Plataforma?
 ```
 
 ## Dados derivados, não persistidos
@@ -153,9 +166,10 @@ Veiculo ──< DespesaVeiculo
 - preço efetivo do combustível.
 - custo conhecido/completo da Manutenção, próximo hodômetro e estados de
   recorrência por km/data.
+- equivalente mensal de cada Custo Recorrente.
 
 ## Planejado, sem tabela atual
 
 Evento financeiro genérico, carteira de
 plataforma, alertas, clima, localização e sincronização não fazem parte do
-schema 10. Suas decisões e ideias permanecem no backlog e nas regras futuras.
+schema 11. Suas decisões e ideias permanecem no backlog e nas regras futuras.

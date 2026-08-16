@@ -11,6 +11,8 @@ import '../constants/enums/tipo_registro_ganhos.dart';
 import '../constants/enums/tipo_combustivel.dart';
 import '../constants/enums/tipo_bonus_promocao.dart';
 import '../constants/enums/tipo_despesa_veiculo.dart';
+import '../constants/enums/tipo_custo_recorrente.dart';
+import '../constants/enums/escopo_custo_recorrente.dart';
 import 'tables/usuario.dart';
 import 'tables/veiculo.dart';
 import 'tables/configuracao.dart';
@@ -26,6 +28,7 @@ import 'tables/bonus_promocao.dart';
 import 'tables/manutencao.dart';
 import 'tables/item_manutencao.dart';
 import 'tables/despesa_veiculo.dart';
+import 'tables/custo_recorrente.dart';
 
 import 'daos/jornada_dao.dart';
 import 'daos/leitura_ganhos_dao.dart';
@@ -36,6 +39,7 @@ import 'daos/passe_plataforma_dao.dart';
 import 'daos/bonus_promocao_dao.dart';
 import 'daos/manutencao_dao.dart';
 import 'daos/despesa_veiculo_dao.dart';
+import 'daos/custo_recorrente_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -56,6 +60,7 @@ part 'app_database.g.dart';
     Manutencoes,
     ItensManutencao,
     DespesasVeiculo,
+    CustosRecorrentes,
   ],
   daos: [
     JornadaDao,
@@ -67,6 +72,7 @@ part 'app_database.g.dart';
     BonusPromocaoDao,
     ManutencaoDao,
     DespesaVeiculoDao,
+    CustoRecorrenteDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -75,7 +81,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -109,6 +115,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 10) {
         await migrator.createTable(despesasVeiculo);
+      }
+      if (from < 11) {
+        await migrator.createTable(custosRecorrentes);
       }
     },
     beforeOpen: (details) async {
