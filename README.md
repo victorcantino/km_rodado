@@ -27,6 +27,7 @@ a margem desejada.
   receita de viagens;
 - Manutenções por veículo com múltiplos itens, histórico e recorrências por
   odômetro ou data.
+- Despesas factuais do veículo, atuais ou retroativas, com histórico e edição.
 
 ## Arquitetura
 

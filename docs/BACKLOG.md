@@ -53,6 +53,11 @@
 
 ## Custos e obrigações
 
+- Avaliar associação opcional de Despesa a Jornada somente quando houver regra
+  econômica segura, sem atribuir retroativamente custos gerais ao trabalho.
+- Evoluir despesas factuais para obrigações, competência, parcelas,
+  vencimentos e status apenas em fluxo próprio; não inferir esses dados do
+  registro operacional atual.
 - Separar custos diretamente atribuíveis à Jornada, custos gerais do dia e
   custos independentes.
 - Resumo futuro: receita bruta, custos da Jornada, resultado operacional e
