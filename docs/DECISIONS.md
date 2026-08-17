@@ -239,9 +239,17 @@ do ciclo anual. Da mesma forma, telefone profissional pertence à atividade e
 conta de Plataforma não pertence ao veículo. Separar competência de caixa
 evita dupla contagem e preserva fatos suficientes para análises futuras.
 
-Financiamento/aquisição e depreciação não pertencem a este modelo. O primeiro
-precisa separar capital, amortização, juros e necessidade de caixa; a segunda
-representa perda econômica do ativo. Ambos dependem de modelagem própria.
+Parcela do veículo pode ser registrada neste modelo como referência periódica
+simples de caixa e é deliberadamente genérica: financiamento, consórcio,
+parcelamento direto, acordo de pagamento ou modalidade equivalente são
+diferenciados pela descrição livre, não por novos tipos. Só serão separados se
+o uso real exigir tratamento econômico ou operacional distinto.
+
+Depreciação, por outro lado, não é uma referência manual conhecida pelo
+usuário e não é oferecida em novos Custos Recorrentes. Será calculada por uma
+feature própria, anterior ao Motor Econômico, sem percentuais arbitrários. O
+valor técnico existente no enum é preservado apenas para compatibilidade. O
+Motor Econômico decidirá depois como usar a estimativa sem dupla contagem.
 
 ## ADR-021 — Contexto visual único para despesas e recorrências
 

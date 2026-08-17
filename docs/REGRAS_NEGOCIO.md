@@ -101,6 +101,9 @@ justificativa e inserção histórica arbitrária permanecem futuras.
 - Um lançamento pode agrupar viagens; não se inferem valores unitários.
 - Totais são `SUM(valorTotalCentavos)` e `SUM(quantidadeViagens)`.
 - Particular usa este mecanismo e continua aparecendo com as demais fontes.
+- Na `JornadaPage`, a ação de ganho Particular/individual só aparece quando há
+  ao menos uma Plataforma individual ativa e disponível no fluxo operacional.
+  Desativar ou indisponibilizar a Plataforma remove a ação sem apagar histórico.
 
 ## Resumo da Jornada
 
@@ -239,8 +242,9 @@ justificativa e inserção histórica arbitrária permanecem futuras.
 - `ativo` indica se a referência ainda compõe a estrutura econômica atual. A
   desativação preserva o histórico.
 - Defaults por tipo reduzem digitação, mas são editáveis: IPVA/licenciamento
-  sugerem veículo e 12 meses; seguro sugere veículo e 1 mês; telefone sugere
-  atividade e 1 mês; conta de Plataforma sugere Plataforma e 1 mês.
+  sugerem veículo e 12 meses; seguro e parcela do veículo sugerem veículo e 1
+  mês; telefone sugere atividade e 1 mês; conta de Plataforma sugere Plataforma
+  e 1 mês.
 - Não se inventa data de início/vigência. Informação aproximada pode permanecer
   em observação até existir uma modelagem temporal semanticamente segura.
 - DespesaVeiculo continua sendo o fato financeiro pago. Não há vínculo ou
@@ -249,8 +253,24 @@ justificativa e inserção histórica arbitrária permanecem futuras.
   Custos Recorrentes enquanto essa reconciliação não existir. Pagamento à
   vista ou em parcelas não muda a competência do ciclo e não exige uma
   Despesa duplicada para alimentar o futuro Motor Econômico.
-- Financiamento e depreciação ficam fora para evitar misturar fluxo de caixa,
-  amortização do ativo e custo econômico.
+- Parcela do veículo é uma referência recorrente de necessidade de caixa; não
+  controla contrato, saldo devedor, vencimentos nem pagamentos. O tipo é
+  deliberadamente genérico e pode representar financiamento, consórcio,
+  parcelamento direto, acordo de pagamento ou compromisso periódico equivalente
+  ligado à aquisição do veículo. A descrição livre pode identificar a
+  modalidade, como “Financiamento do carro” ou “Consórcio do veículo”. Não se
+  criam tipos separados enquanto o uso real não exigir tratamento econômico ou
+  operacional diferente.
+- Depreciação não é oferecida como Custo Recorrente manual. Ela será derivada
+  por uma feature própria, anterior ao Motor Econômico, com metodologia simples
+  e explicável baseada em fatos do veículo. Não se pede percentual, valor
+  mensal, periodicidade ou parcelas e não se sugere taxa arbitrária. Se faltarem
+  dados, a apresentação deverá informar “Depreciação indisponível”. O valor
+  técnico legado permanece apenas para compatibilidade de leitura/edição.
+- Parcela do veículo é obrigação conhecida de caixa; depreciação é perda
+  econômica estimada/calculada do valor do veículo. O futuro Motor Econômico
+  decidirá explicitamente como usar a depreciação derivada e evitar dupla
+  contagem.
 
 ## Passes de plataforma
 
@@ -301,6 +321,12 @@ justificativa e inserção histórica arbitrária permanecem futuras.
 - Recarga de carteira não é despesa por si só. Compra de Passe ou outro consumo
   do saldo é o fato econômico; contabilizar recarga e consumo como custos
   duplicaria o mesmo dinheiro.
+- A mesma regra vale para outros saldos pré-pagos: PIX para carregar carteira
+  de estacionamento não é Despesa, mas a ativação profissional da vaga é
+  Despesa Estacionamento; recarga da tag de pedágio não é Despesa, mas a
+  passagem efetiva é Despesa Pedágio. Em carteira de Plataforma, somente o
+  consumo efetivo é registrado no domínio correspondente. Não há módulo de
+  Carteira nesta fase.
 
 ## Bônus e promoções
 
