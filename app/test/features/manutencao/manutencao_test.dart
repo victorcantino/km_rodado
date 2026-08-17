@@ -324,7 +324,7 @@ void main() {
       );
       await tester.tap(find.text('Abrir'));
       await tester.pumpAndSettle();
-      expect(find.text('130200'), findsOneWidget);
+      expect(find.text('130.200'), findsOneWidget);
       expect(
         find.textContaining(DateTime.now().year.toString()),
         findsOneWidget,

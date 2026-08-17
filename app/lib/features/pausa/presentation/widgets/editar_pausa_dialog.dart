@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/database/app_database.dart';
+import '../../../../core/formatters/quilometragem_input_formatter.dart';
 
 typedef EditarPausaResultado = ({
   String? titulo,
@@ -48,10 +49,10 @@ class _EditarPausaDialogState extends State<EditarPausaDialog> {
     super.initState();
     titulo = TextEditingController(text: widget.pausa.titulo ?? '');
     odometroInicio = TextEditingController(
-      text: widget.pausa.odometroInicio?.toString() ?? '',
+      text: formatarQuilometragem(widget.pausa.odometroInicio),
     );
     odometroFim = TextEditingController(
-      text: widget.pausa.odometroFim?.toString() ?? '',
+      text: formatarQuilometragem(widget.pausa.odometroFim),
     );
     observacao = TextEditingController(text: widget.pausa.observacao ?? '');
     inicio = widget.pausa.inicio;
@@ -78,7 +79,7 @@ class _EditarPausaDialogState extends State<EditarPausaDialog> {
 
   int? _odometroOpcional(TextEditingController controller) {
     final texto = controller.text.trim();
-    return texto.isEmpty ? null : int.tryParse(texto);
+    return texto.isEmpty ? null : parseQuilometragem(texto);
   }
 
   String? _validarOdometro(String? texto, {required bool obrigatorio}) {
@@ -86,7 +87,7 @@ class _EditarPausaDialogState extends State<EditarPausaDialog> {
     if (normalizado.isEmpty) {
       return obrigatorio ? 'Informe o odômetro.' : null;
     }
-    final valor = int.tryParse(normalizado);
+    final valor = parseQuilometragem(normalizado);
     if (valor == null) return 'Informe um número inteiro válido.';
     if (valor < 0) return 'O odômetro não pode ser negativo.';
     return null;
@@ -185,6 +186,7 @@ class _EditarPausaDialogState extends State<EditarPausaDialog> {
                   controller: odometroInicio,
                   focusNode: focoOdometroInicio,
                   keyboardType: TextInputType.number,
+                  inputFormatters: const [QuilometragemInputFormatter()],
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => concluida
                       ? focoOdometroFim.requestFocus()
@@ -213,6 +215,7 @@ class _EditarPausaDialogState extends State<EditarPausaDialog> {
                     controller: odometroFim,
                     focusNode: focoOdometroFim,
                     keyboardType: TextInputType.number,
+                    inputFormatters: const [QuilometragemInputFormatter()],
                     textInputAction: TextInputAction.next,
                     onFieldSubmitted: (_) => focoObservacao.requestFocus(),
                     selectAllOnFocus: true,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/formatters/quilometragem_input_formatter.dart';
+
 typedef FecharJornadaResultado = ({
   int odometroFim,
   String? cidadeDestino,
@@ -36,7 +38,7 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
   void initState() {
     super.initState();
     odometroController = TextEditingController(
-      text: widget.odometroInicio.toString(),
+      text: formatarQuilometragem(widget.odometroInicio),
     );
     cidadeController = TextEditingController(
       text: widget.cidadeDestinoInicial ?? '',
@@ -113,6 +115,7 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
                 controller: odometroController,
                 autofocus: true,
                 keyboardType: TextInputType.number,
+                inputFormatters: const [QuilometragemInputFormatter()],
                 textInputAction: TextInputAction.next,
                 selectAllOnFocus: true,
                 decoration: const InputDecoration(labelText: 'Odômetro final'),
@@ -123,7 +126,7 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
                     return 'Informe o odômetro final.';
                   }
 
-                  final odometro = int.tryParse(texto);
+                  final odometro = parseQuilometragem(texto);
 
                   if (odometro == null) {
                     return 'Informe um número inteiro válido.';
@@ -188,7 +191,7 @@ class _FecharJornadaDialogState extends State<FecharJornadaDialog> {
             }
 
             final resultado = (
-              odometroFim: int.parse(odometroController.text.trim()),
+              odometroFim: parseQuilometragem(odometroController.text)!,
               cidadeDestino: _textoOpcional(cidadeController.text),
               observacoes: _textoOpcional(observacoesController.text),
               dataHoraFim: dataHoraFim,

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/database/daos/manutencao_dao.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/formatters/quilometragem_input_formatter.dart';
 import '../../data/manutencao_service.dart';
 
 typedef EditarManutencaoResultado = ({
@@ -46,10 +47,9 @@ class _EditarManutencaoDialogState extends State<EditarManutencaoDialog> {
     final existente = widget.existente;
     dataHora = existente?.manutencao.dataHora ?? DateTime.now();
     odometro = TextEditingController(
-      text:
-          (existente?.manutencao.odometro ?? widget.odometroInicial)
-              ?.toString() ??
-          '',
+      text: formatarQuilometragem(
+        existente?.manutencao.odometro ?? widget.odometroInicial,
+      ),
     );
     oficina = TextEditingController(text: existente?.manutencao.oficina ?? '');
     observacao = TextEditingController(
@@ -122,7 +122,7 @@ class _EditarManutencaoDialogState extends State<EditarManutencaoDialog> {
     FocusManager.instance.primaryFocus?.unfocus();
     Navigator.pop<EditarManutencaoResultado>(context, (
       dataHora: dataHora,
-      odometro: int.parse(odometro.text),
+      odometro: parseQuilometragem(odometro.text)!,
       oficina: _opcional(oficina.text),
       observacao: _opcional(observacao.text),
       itens: resultadoItens,
@@ -154,10 +154,11 @@ class _EditarManutencaoDialogState extends State<EditarManutencaoDialog> {
                 key: const ValueKey('odometro_manutencao'),
                 controller: odometro,
                 keyboardType: TextInputType.number,
+                inputFormatters: const [QuilometragemInputFormatter()],
                 textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(labelText: 'Odômetro'),
                 validator: (texto) {
-                  final valor = int.tryParse(texto?.trim() ?? '');
+                  final valor = parseQuilometragem(texto);
                   if (valor == null) return 'Informe o odômetro.';
                   if (valor < 0) return 'O odômetro não pode ser negativo.';
                   return null;
@@ -183,7 +184,7 @@ class _EditarManutencaoDialogState extends State<EditarManutencaoDialog> {
                 _ItemEditor(
                   key: ObjectKey(itens[indice]),
                   item: itens[indice],
-                  manutencaoOdometro: int.tryParse(odometro.text),
+                  manutencaoOdometro: parseQuilometragem(odometro.text),
                   sugestoes: widget.sugestoes,
                   autofocus: widget.existente == null && indice == 0,
                   podeRemover: itens.length > 1,

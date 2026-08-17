@@ -9576,6 +9576,1093 @@ class CustosRecorrentesCompanion extends UpdateCompanion<CustoRecorrente> {
   }
 }
 
+class $DepreciacoesVeiculoTable extends DepreciacoesVeiculo
+    with TableInfo<$DepreciacoesVeiculoTable, DepreciacaoVeiculo> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DepreciacoesVeiculoTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _veiculoIdMeta = const VerificationMeta(
+    'veiculoId',
+  );
+  @override
+  late final GeneratedColumn<int> veiculoId = GeneratedColumn<int>(
+    'veiculo_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES veiculos (id)',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<MetodoDepreciacao?, String>
+  metodoSelecionado =
+      GeneratedColumn<String>(
+        'metodo_selecionado',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<MetodoDepreciacao?>(
+        $DepreciacoesVeiculoTable.$convertermetodoSelecionadon,
+      );
+  static const VerificationMeta _valorAquisicaoCentavosMeta =
+      const VerificationMeta('valorAquisicaoCentavos');
+  @override
+  late final GeneratedColumn<int> valorAquisicaoCentavos = GeneratedColumn<int>(
+    'valor_aquisicao_centavos',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _valorAquisicaoEstimadoMeta =
+      const VerificationMeta('valorAquisicaoEstimado');
+  @override
+  late final GeneratedColumn<bool> valorAquisicaoEstimado =
+      GeneratedColumn<bool>(
+        'valor_aquisicao_estimado',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("valor_aquisicao_estimado" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
+  static const VerificationMeta _odometroAquisicaoMeta = const VerificationMeta(
+    'odometroAquisicao',
+  );
+  @override
+  late final GeneratedColumn<int> odometroAquisicao = GeneratedColumn<int>(
+    'odometro_aquisicao',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _valorReferenciaCentavosMeta =
+      const VerificationMeta('valorReferenciaCentavos');
+  @override
+  late final GeneratedColumn<int> valorReferenciaCentavos =
+      GeneratedColumn<int>(
+        'valor_referencia_centavos',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _valorReferenciaEstimadoMeta =
+      const VerificationMeta('valorReferenciaEstimado');
+  @override
+  late final GeneratedColumn<bool> valorReferenciaEstimado =
+      GeneratedColumn<bool>(
+        'valor_referencia_estimado',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("valor_referencia_estimado" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
+  @override
+  late final GeneratedColumnWithTypeConverter<
+    FonteReferenciaDepreciacao?,
+    String
+  >
+  fonteReferencia =
+      GeneratedColumn<String>(
+        'fonte_referencia',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<FonteReferenciaDepreciacao?>(
+        $DepreciacoesVeiculoTable.$converterfonteReferencian,
+      );
+  static const VerificationMeta _dataReferenciaMeta = const VerificationMeta(
+    'dataReferencia',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataReferencia =
+      GeneratedColumn<DateTime>(
+        'data_referencia',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _odometroReferenciaMeta =
+      const VerificationMeta('odometroReferencia');
+  @override
+  late final GeneratedColumn<int> odometroReferencia = GeneratedColumn<int>(
+    'odometro_referencia',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _valorVendaProjetadoCentavosMeta =
+      const VerificationMeta('valorVendaProjetadoCentavos');
+  @override
+  late final GeneratedColumn<int> valorVendaProjetadoCentavos =
+      GeneratedColumn<int>(
+        'valor_venda_projetado_centavos',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _valorVendaProjetadoEstimadoMeta =
+      const VerificationMeta('valorVendaProjetadoEstimado');
+  @override
+  late final GeneratedColumn<bool> valorVendaProjetadoEstimado =
+      GeneratedColumn<bool>(
+        'valor_venda_projetado_estimado',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("valor_venda_projetado_estimado" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
+  static const VerificationMeta _odometroVendaProjetadoMeta =
+      const VerificationMeta('odometroVendaProjetado');
+  @override
+  late final GeneratedColumn<int> odometroVendaProjetado = GeneratedColumn<int>(
+    'odometro_venda_projetado',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dataCriacaoMeta = const VerificationMeta(
+    'dataCriacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataCriacao = GeneratedColumn<DateTime>(
+    'data_criacao',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _dataAtualizacaoMeta = const VerificationMeta(
+    'dataAtualizacao',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataAtualizacao =
+      GeneratedColumn<DateTime>(
+        'data_atualizacao',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    veiculoId,
+    metodoSelecionado,
+    valorAquisicaoCentavos,
+    valorAquisicaoEstimado,
+    odometroAquisicao,
+    valorReferenciaCentavos,
+    valorReferenciaEstimado,
+    fonteReferencia,
+    dataReferencia,
+    odometroReferencia,
+    valorVendaProjetadoCentavos,
+    valorVendaProjetadoEstimado,
+    odometroVendaProjetado,
+    dataCriacao,
+    dataAtualizacao,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'depreciacoes_veiculo';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DepreciacaoVeiculo> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('veiculo_id')) {
+      context.handle(
+        _veiculoIdMeta,
+        veiculoId.isAcceptableOrUnknown(data['veiculo_id']!, _veiculoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_veiculoIdMeta);
+    }
+    if (data.containsKey('valor_aquisicao_centavos')) {
+      context.handle(
+        _valorAquisicaoCentavosMeta,
+        valorAquisicaoCentavos.isAcceptableOrUnknown(
+          data['valor_aquisicao_centavos']!,
+          _valorAquisicaoCentavosMeta,
+        ),
+      );
+    }
+    if (data.containsKey('valor_aquisicao_estimado')) {
+      context.handle(
+        _valorAquisicaoEstimadoMeta,
+        valorAquisicaoEstimado.isAcceptableOrUnknown(
+          data['valor_aquisicao_estimado']!,
+          _valorAquisicaoEstimadoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('odometro_aquisicao')) {
+      context.handle(
+        _odometroAquisicaoMeta,
+        odometroAquisicao.isAcceptableOrUnknown(
+          data['odometro_aquisicao']!,
+          _odometroAquisicaoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('valor_referencia_centavos')) {
+      context.handle(
+        _valorReferenciaCentavosMeta,
+        valorReferenciaCentavos.isAcceptableOrUnknown(
+          data['valor_referencia_centavos']!,
+          _valorReferenciaCentavosMeta,
+        ),
+      );
+    }
+    if (data.containsKey('valor_referencia_estimado')) {
+      context.handle(
+        _valorReferenciaEstimadoMeta,
+        valorReferenciaEstimado.isAcceptableOrUnknown(
+          data['valor_referencia_estimado']!,
+          _valorReferenciaEstimadoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('data_referencia')) {
+      context.handle(
+        _dataReferenciaMeta,
+        dataReferencia.isAcceptableOrUnknown(
+          data['data_referencia']!,
+          _dataReferenciaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('odometro_referencia')) {
+      context.handle(
+        _odometroReferenciaMeta,
+        odometroReferencia.isAcceptableOrUnknown(
+          data['odometro_referencia']!,
+          _odometroReferenciaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('valor_venda_projetado_centavos')) {
+      context.handle(
+        _valorVendaProjetadoCentavosMeta,
+        valorVendaProjetadoCentavos.isAcceptableOrUnknown(
+          data['valor_venda_projetado_centavos']!,
+          _valorVendaProjetadoCentavosMeta,
+        ),
+      );
+    }
+    if (data.containsKey('valor_venda_projetado_estimado')) {
+      context.handle(
+        _valorVendaProjetadoEstimadoMeta,
+        valorVendaProjetadoEstimado.isAcceptableOrUnknown(
+          data['valor_venda_projetado_estimado']!,
+          _valorVendaProjetadoEstimadoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('odometro_venda_projetado')) {
+      context.handle(
+        _odometroVendaProjetadoMeta,
+        odometroVendaProjetado.isAcceptableOrUnknown(
+          data['odometro_venda_projetado']!,
+          _odometroVendaProjetadoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('data_criacao')) {
+      context.handle(
+        _dataCriacaoMeta,
+        dataCriacao.isAcceptableOrUnknown(
+          data['data_criacao']!,
+          _dataCriacaoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('data_atualizacao')) {
+      context.handle(
+        _dataAtualizacaoMeta,
+        dataAtualizacao.isAcceptableOrUnknown(
+          data['data_atualizacao']!,
+          _dataAtualizacaoMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DepreciacaoVeiculo map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DepreciacaoVeiculo(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      veiculoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}veiculo_id'],
+      )!,
+      metodoSelecionado: $DepreciacoesVeiculoTable.$convertermetodoSelecionadon
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.string,
+              data['${effectivePrefix}metodo_selecionado'],
+            ),
+          ),
+      valorAquisicaoCentavos: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_aquisicao_centavos'],
+      ),
+      valorAquisicaoEstimado: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}valor_aquisicao_estimado'],
+      )!,
+      odometroAquisicao: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}odometro_aquisicao'],
+      ),
+      valorReferenciaCentavos: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_referencia_centavos'],
+      ),
+      valorReferenciaEstimado: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}valor_referencia_estimado'],
+      )!,
+      fonteReferencia: $DepreciacoesVeiculoTable.$converterfonteReferencian
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.string,
+              data['${effectivePrefix}fonte_referencia'],
+            ),
+          ),
+      dataReferencia: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_referencia'],
+      ),
+      odometroReferencia: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}odometro_referencia'],
+      ),
+      valorVendaProjetadoCentavos: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}valor_venda_projetado_centavos'],
+      ),
+      valorVendaProjetadoEstimado: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}valor_venda_projetado_estimado'],
+      )!,
+      odometroVendaProjetado: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}odometro_venda_projetado'],
+      ),
+      dataCriacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_criacao'],
+      )!,
+      dataAtualizacao: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_atualizacao'],
+      ),
+    );
+  }
+
+  @override
+  $DepreciacoesVeiculoTable createAlias(String alias) {
+    return $DepreciacoesVeiculoTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<MetodoDepreciacao, String, String>
+  $convertermetodoSelecionado = const EnumNameConverter<MetodoDepreciacao>(
+    MetodoDepreciacao.values,
+  );
+  static JsonTypeConverter2<MetodoDepreciacao?, String?, String?>
+  $convertermetodoSelecionadon = JsonTypeConverter2.asNullable(
+    $convertermetodoSelecionado,
+  );
+  static JsonTypeConverter2<FonteReferenciaDepreciacao, String, String>
+  $converterfonteReferencia =
+      const EnumNameConverter<FonteReferenciaDepreciacao>(
+        FonteReferenciaDepreciacao.values,
+      );
+  static JsonTypeConverter2<FonteReferenciaDepreciacao?, String?, String?>
+  $converterfonteReferencian = JsonTypeConverter2.asNullable(
+    $converterfonteReferencia,
+  );
+}
+
+class DepreciacaoVeiculo extends DataClass
+    implements Insertable<DepreciacaoVeiculo> {
+  final int id;
+  final int veiculoId;
+  final MetodoDepreciacao? metodoSelecionado;
+  final int? valorAquisicaoCentavos;
+  final bool valorAquisicaoEstimado;
+  final int? odometroAquisicao;
+  final int? valorReferenciaCentavos;
+  final bool valorReferenciaEstimado;
+  final FonteReferenciaDepreciacao? fonteReferencia;
+  final DateTime? dataReferencia;
+  final int? odometroReferencia;
+  final int? valorVendaProjetadoCentavos;
+  final bool valorVendaProjetadoEstimado;
+  final int? odometroVendaProjetado;
+  final DateTime dataCriacao;
+  final DateTime? dataAtualizacao;
+  const DepreciacaoVeiculo({
+    required this.id,
+    required this.veiculoId,
+    this.metodoSelecionado,
+    this.valorAquisicaoCentavos,
+    required this.valorAquisicaoEstimado,
+    this.odometroAquisicao,
+    this.valorReferenciaCentavos,
+    required this.valorReferenciaEstimado,
+    this.fonteReferencia,
+    this.dataReferencia,
+    this.odometroReferencia,
+    this.valorVendaProjetadoCentavos,
+    required this.valorVendaProjetadoEstimado,
+    this.odometroVendaProjetado,
+    required this.dataCriacao,
+    this.dataAtualizacao,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['veiculo_id'] = Variable<int>(veiculoId);
+    if (!nullToAbsent || metodoSelecionado != null) {
+      map['metodo_selecionado'] = Variable<String>(
+        $DepreciacoesVeiculoTable.$convertermetodoSelecionadon.toSql(
+          metodoSelecionado,
+        ),
+      );
+    }
+    if (!nullToAbsent || valorAquisicaoCentavos != null) {
+      map['valor_aquisicao_centavos'] = Variable<int>(valorAquisicaoCentavos);
+    }
+    map['valor_aquisicao_estimado'] = Variable<bool>(valorAquisicaoEstimado);
+    if (!nullToAbsent || odometroAquisicao != null) {
+      map['odometro_aquisicao'] = Variable<int>(odometroAquisicao);
+    }
+    if (!nullToAbsent || valorReferenciaCentavos != null) {
+      map['valor_referencia_centavos'] = Variable<int>(valorReferenciaCentavos);
+    }
+    map['valor_referencia_estimado'] = Variable<bool>(valorReferenciaEstimado);
+    if (!nullToAbsent || fonteReferencia != null) {
+      map['fonte_referencia'] = Variable<String>(
+        $DepreciacoesVeiculoTable.$converterfonteReferencian.toSql(
+          fonteReferencia,
+        ),
+      );
+    }
+    if (!nullToAbsent || dataReferencia != null) {
+      map['data_referencia'] = Variable<DateTime>(dataReferencia);
+    }
+    if (!nullToAbsent || odometroReferencia != null) {
+      map['odometro_referencia'] = Variable<int>(odometroReferencia);
+    }
+    if (!nullToAbsent || valorVendaProjetadoCentavos != null) {
+      map['valor_venda_projetado_centavos'] = Variable<int>(
+        valorVendaProjetadoCentavos,
+      );
+    }
+    map['valor_venda_projetado_estimado'] = Variable<bool>(
+      valorVendaProjetadoEstimado,
+    );
+    if (!nullToAbsent || odometroVendaProjetado != null) {
+      map['odometro_venda_projetado'] = Variable<int>(odometroVendaProjetado);
+    }
+    map['data_criacao'] = Variable<DateTime>(dataCriacao);
+    if (!nullToAbsent || dataAtualizacao != null) {
+      map['data_atualizacao'] = Variable<DateTime>(dataAtualizacao);
+    }
+    return map;
+  }
+
+  DepreciacoesVeiculoCompanion toCompanion(bool nullToAbsent) {
+    return DepreciacoesVeiculoCompanion(
+      id: Value(id),
+      veiculoId: Value(veiculoId),
+      metodoSelecionado: metodoSelecionado == null && nullToAbsent
+          ? const Value.absent()
+          : Value(metodoSelecionado),
+      valorAquisicaoCentavos: valorAquisicaoCentavos == null && nullToAbsent
+          ? const Value.absent()
+          : Value(valorAquisicaoCentavos),
+      valorAquisicaoEstimado: Value(valorAquisicaoEstimado),
+      odometroAquisicao: odometroAquisicao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(odometroAquisicao),
+      valorReferenciaCentavos: valorReferenciaCentavos == null && nullToAbsent
+          ? const Value.absent()
+          : Value(valorReferenciaCentavos),
+      valorReferenciaEstimado: Value(valorReferenciaEstimado),
+      fonteReferencia: fonteReferencia == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fonteReferencia),
+      dataReferencia: dataReferencia == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dataReferencia),
+      odometroReferencia: odometroReferencia == null && nullToAbsent
+          ? const Value.absent()
+          : Value(odometroReferencia),
+      valorVendaProjetadoCentavos:
+          valorVendaProjetadoCentavos == null && nullToAbsent
+          ? const Value.absent()
+          : Value(valorVendaProjetadoCentavos),
+      valorVendaProjetadoEstimado: Value(valorVendaProjetadoEstimado),
+      odometroVendaProjetado: odometroVendaProjetado == null && nullToAbsent
+          ? const Value.absent()
+          : Value(odometroVendaProjetado),
+      dataCriacao: Value(dataCriacao),
+      dataAtualizacao: dataAtualizacao == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dataAtualizacao),
+    );
+  }
+
+  factory DepreciacaoVeiculo.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DepreciacaoVeiculo(
+      id: serializer.fromJson<int>(json['id']),
+      veiculoId: serializer.fromJson<int>(json['veiculoId']),
+      metodoSelecionado: $DepreciacoesVeiculoTable.$convertermetodoSelecionadon
+          .fromJson(serializer.fromJson<String?>(json['metodoSelecionado'])),
+      valorAquisicaoCentavos: serializer.fromJson<int?>(
+        json['valorAquisicaoCentavos'],
+      ),
+      valorAquisicaoEstimado: serializer.fromJson<bool>(
+        json['valorAquisicaoEstimado'],
+      ),
+      odometroAquisicao: serializer.fromJson<int?>(json['odometroAquisicao']),
+      valorReferenciaCentavos: serializer.fromJson<int?>(
+        json['valorReferenciaCentavos'],
+      ),
+      valorReferenciaEstimado: serializer.fromJson<bool>(
+        json['valorReferenciaEstimado'],
+      ),
+      fonteReferencia: $DepreciacoesVeiculoTable.$converterfonteReferencian
+          .fromJson(serializer.fromJson<String?>(json['fonteReferencia'])),
+      dataReferencia: serializer.fromJson<DateTime?>(json['dataReferencia']),
+      odometroReferencia: serializer.fromJson<int?>(json['odometroReferencia']),
+      valorVendaProjetadoCentavos: serializer.fromJson<int?>(
+        json['valorVendaProjetadoCentavos'],
+      ),
+      valorVendaProjetadoEstimado: serializer.fromJson<bool>(
+        json['valorVendaProjetadoEstimado'],
+      ),
+      odometroVendaProjetado: serializer.fromJson<int?>(
+        json['odometroVendaProjetado'],
+      ),
+      dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
+      dataAtualizacao: serializer.fromJson<DateTime?>(json['dataAtualizacao']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'veiculoId': serializer.toJson<int>(veiculoId),
+      'metodoSelecionado': serializer.toJson<String?>(
+        $DepreciacoesVeiculoTable.$convertermetodoSelecionadon.toJson(
+          metodoSelecionado,
+        ),
+      ),
+      'valorAquisicaoCentavos': serializer.toJson<int?>(valorAquisicaoCentavos),
+      'valorAquisicaoEstimado': serializer.toJson<bool>(valorAquisicaoEstimado),
+      'odometroAquisicao': serializer.toJson<int?>(odometroAquisicao),
+      'valorReferenciaCentavos': serializer.toJson<int?>(
+        valorReferenciaCentavos,
+      ),
+      'valorReferenciaEstimado': serializer.toJson<bool>(
+        valorReferenciaEstimado,
+      ),
+      'fonteReferencia': serializer.toJson<String?>(
+        $DepreciacoesVeiculoTable.$converterfonteReferencian.toJson(
+          fonteReferencia,
+        ),
+      ),
+      'dataReferencia': serializer.toJson<DateTime?>(dataReferencia),
+      'odometroReferencia': serializer.toJson<int?>(odometroReferencia),
+      'valorVendaProjetadoCentavos': serializer.toJson<int?>(
+        valorVendaProjetadoCentavos,
+      ),
+      'valorVendaProjetadoEstimado': serializer.toJson<bool>(
+        valorVendaProjetadoEstimado,
+      ),
+      'odometroVendaProjetado': serializer.toJson<int?>(odometroVendaProjetado),
+      'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
+      'dataAtualizacao': serializer.toJson<DateTime?>(dataAtualizacao),
+    };
+  }
+
+  DepreciacaoVeiculo copyWith({
+    int? id,
+    int? veiculoId,
+    Value<MetodoDepreciacao?> metodoSelecionado = const Value.absent(),
+    Value<int?> valorAquisicaoCentavos = const Value.absent(),
+    bool? valorAquisicaoEstimado,
+    Value<int?> odometroAquisicao = const Value.absent(),
+    Value<int?> valorReferenciaCentavos = const Value.absent(),
+    bool? valorReferenciaEstimado,
+    Value<FonteReferenciaDepreciacao?> fonteReferencia = const Value.absent(),
+    Value<DateTime?> dataReferencia = const Value.absent(),
+    Value<int?> odometroReferencia = const Value.absent(),
+    Value<int?> valorVendaProjetadoCentavos = const Value.absent(),
+    bool? valorVendaProjetadoEstimado,
+    Value<int?> odometroVendaProjetado = const Value.absent(),
+    DateTime? dataCriacao,
+    Value<DateTime?> dataAtualizacao = const Value.absent(),
+  }) => DepreciacaoVeiculo(
+    id: id ?? this.id,
+    veiculoId: veiculoId ?? this.veiculoId,
+    metodoSelecionado: metodoSelecionado.present
+        ? metodoSelecionado.value
+        : this.metodoSelecionado,
+    valorAquisicaoCentavos: valorAquisicaoCentavos.present
+        ? valorAquisicaoCentavos.value
+        : this.valorAquisicaoCentavos,
+    valorAquisicaoEstimado:
+        valorAquisicaoEstimado ?? this.valorAquisicaoEstimado,
+    odometroAquisicao: odometroAquisicao.present
+        ? odometroAquisicao.value
+        : this.odometroAquisicao,
+    valorReferenciaCentavos: valorReferenciaCentavos.present
+        ? valorReferenciaCentavos.value
+        : this.valorReferenciaCentavos,
+    valorReferenciaEstimado:
+        valorReferenciaEstimado ?? this.valorReferenciaEstimado,
+    fonteReferencia: fonteReferencia.present
+        ? fonteReferencia.value
+        : this.fonteReferencia,
+    dataReferencia: dataReferencia.present
+        ? dataReferencia.value
+        : this.dataReferencia,
+    odometroReferencia: odometroReferencia.present
+        ? odometroReferencia.value
+        : this.odometroReferencia,
+    valorVendaProjetadoCentavos: valorVendaProjetadoCentavos.present
+        ? valorVendaProjetadoCentavos.value
+        : this.valorVendaProjetadoCentavos,
+    valorVendaProjetadoEstimado:
+        valorVendaProjetadoEstimado ?? this.valorVendaProjetadoEstimado,
+    odometroVendaProjetado: odometroVendaProjetado.present
+        ? odometroVendaProjetado.value
+        : this.odometroVendaProjetado,
+    dataCriacao: dataCriacao ?? this.dataCriacao,
+    dataAtualizacao: dataAtualizacao.present
+        ? dataAtualizacao.value
+        : this.dataAtualizacao,
+  );
+  DepreciacaoVeiculo copyWithCompanion(DepreciacoesVeiculoCompanion data) {
+    return DepreciacaoVeiculo(
+      id: data.id.present ? data.id.value : this.id,
+      veiculoId: data.veiculoId.present ? data.veiculoId.value : this.veiculoId,
+      metodoSelecionado: data.metodoSelecionado.present
+          ? data.metodoSelecionado.value
+          : this.metodoSelecionado,
+      valorAquisicaoCentavos: data.valorAquisicaoCentavos.present
+          ? data.valorAquisicaoCentavos.value
+          : this.valorAquisicaoCentavos,
+      valorAquisicaoEstimado: data.valorAquisicaoEstimado.present
+          ? data.valorAquisicaoEstimado.value
+          : this.valorAquisicaoEstimado,
+      odometroAquisicao: data.odometroAquisicao.present
+          ? data.odometroAquisicao.value
+          : this.odometroAquisicao,
+      valorReferenciaCentavos: data.valorReferenciaCentavos.present
+          ? data.valorReferenciaCentavos.value
+          : this.valorReferenciaCentavos,
+      valorReferenciaEstimado: data.valorReferenciaEstimado.present
+          ? data.valorReferenciaEstimado.value
+          : this.valorReferenciaEstimado,
+      fonteReferencia: data.fonteReferencia.present
+          ? data.fonteReferencia.value
+          : this.fonteReferencia,
+      dataReferencia: data.dataReferencia.present
+          ? data.dataReferencia.value
+          : this.dataReferencia,
+      odometroReferencia: data.odometroReferencia.present
+          ? data.odometroReferencia.value
+          : this.odometroReferencia,
+      valorVendaProjetadoCentavos: data.valorVendaProjetadoCentavos.present
+          ? data.valorVendaProjetadoCentavos.value
+          : this.valorVendaProjetadoCentavos,
+      valorVendaProjetadoEstimado: data.valorVendaProjetadoEstimado.present
+          ? data.valorVendaProjetadoEstimado.value
+          : this.valorVendaProjetadoEstimado,
+      odometroVendaProjetado: data.odometroVendaProjetado.present
+          ? data.odometroVendaProjetado.value
+          : this.odometroVendaProjetado,
+      dataCriacao: data.dataCriacao.present
+          ? data.dataCriacao.value
+          : this.dataCriacao,
+      dataAtualizacao: data.dataAtualizacao.present
+          ? data.dataAtualizacao.value
+          : this.dataAtualizacao,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DepreciacaoVeiculo(')
+          ..write('id: $id, ')
+          ..write('veiculoId: $veiculoId, ')
+          ..write('metodoSelecionado: $metodoSelecionado, ')
+          ..write('valorAquisicaoCentavos: $valorAquisicaoCentavos, ')
+          ..write('valorAquisicaoEstimado: $valorAquisicaoEstimado, ')
+          ..write('odometroAquisicao: $odometroAquisicao, ')
+          ..write('valorReferenciaCentavos: $valorReferenciaCentavos, ')
+          ..write('valorReferenciaEstimado: $valorReferenciaEstimado, ')
+          ..write('fonteReferencia: $fonteReferencia, ')
+          ..write('dataReferencia: $dataReferencia, ')
+          ..write('odometroReferencia: $odometroReferencia, ')
+          ..write('valorVendaProjetadoCentavos: $valorVendaProjetadoCentavos, ')
+          ..write('valorVendaProjetadoEstimado: $valorVendaProjetadoEstimado, ')
+          ..write('odometroVendaProjetado: $odometroVendaProjetado, ')
+          ..write('dataCriacao: $dataCriacao, ')
+          ..write('dataAtualizacao: $dataAtualizacao')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    veiculoId,
+    metodoSelecionado,
+    valorAquisicaoCentavos,
+    valorAquisicaoEstimado,
+    odometroAquisicao,
+    valorReferenciaCentavos,
+    valorReferenciaEstimado,
+    fonteReferencia,
+    dataReferencia,
+    odometroReferencia,
+    valorVendaProjetadoCentavos,
+    valorVendaProjetadoEstimado,
+    odometroVendaProjetado,
+    dataCriacao,
+    dataAtualizacao,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DepreciacaoVeiculo &&
+          other.id == this.id &&
+          other.veiculoId == this.veiculoId &&
+          other.metodoSelecionado == this.metodoSelecionado &&
+          other.valorAquisicaoCentavos == this.valorAquisicaoCentavos &&
+          other.valorAquisicaoEstimado == this.valorAquisicaoEstimado &&
+          other.odometroAquisicao == this.odometroAquisicao &&
+          other.valorReferenciaCentavos == this.valorReferenciaCentavos &&
+          other.valorReferenciaEstimado == this.valorReferenciaEstimado &&
+          other.fonteReferencia == this.fonteReferencia &&
+          other.dataReferencia == this.dataReferencia &&
+          other.odometroReferencia == this.odometroReferencia &&
+          other.valorVendaProjetadoCentavos ==
+              this.valorVendaProjetadoCentavos &&
+          other.valorVendaProjetadoEstimado ==
+              this.valorVendaProjetadoEstimado &&
+          other.odometroVendaProjetado == this.odometroVendaProjetado &&
+          other.dataCriacao == this.dataCriacao &&
+          other.dataAtualizacao == this.dataAtualizacao);
+}
+
+class DepreciacoesVeiculoCompanion extends UpdateCompanion<DepreciacaoVeiculo> {
+  final Value<int> id;
+  final Value<int> veiculoId;
+  final Value<MetodoDepreciacao?> metodoSelecionado;
+  final Value<int?> valorAquisicaoCentavos;
+  final Value<bool> valorAquisicaoEstimado;
+  final Value<int?> odometroAquisicao;
+  final Value<int?> valorReferenciaCentavos;
+  final Value<bool> valorReferenciaEstimado;
+  final Value<FonteReferenciaDepreciacao?> fonteReferencia;
+  final Value<DateTime?> dataReferencia;
+  final Value<int?> odometroReferencia;
+  final Value<int?> valorVendaProjetadoCentavos;
+  final Value<bool> valorVendaProjetadoEstimado;
+  final Value<int?> odometroVendaProjetado;
+  final Value<DateTime> dataCriacao;
+  final Value<DateTime?> dataAtualizacao;
+  const DepreciacoesVeiculoCompanion({
+    this.id = const Value.absent(),
+    this.veiculoId = const Value.absent(),
+    this.metodoSelecionado = const Value.absent(),
+    this.valorAquisicaoCentavos = const Value.absent(),
+    this.valorAquisicaoEstimado = const Value.absent(),
+    this.odometroAquisicao = const Value.absent(),
+    this.valorReferenciaCentavos = const Value.absent(),
+    this.valorReferenciaEstimado = const Value.absent(),
+    this.fonteReferencia = const Value.absent(),
+    this.dataReferencia = const Value.absent(),
+    this.odometroReferencia = const Value.absent(),
+    this.valorVendaProjetadoCentavos = const Value.absent(),
+    this.valorVendaProjetadoEstimado = const Value.absent(),
+    this.odometroVendaProjetado = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+    this.dataAtualizacao = const Value.absent(),
+  });
+  DepreciacoesVeiculoCompanion.insert({
+    this.id = const Value.absent(),
+    required int veiculoId,
+    this.metodoSelecionado = const Value.absent(),
+    this.valorAquisicaoCentavos = const Value.absent(),
+    this.valorAquisicaoEstimado = const Value.absent(),
+    this.odometroAquisicao = const Value.absent(),
+    this.valorReferenciaCentavos = const Value.absent(),
+    this.valorReferenciaEstimado = const Value.absent(),
+    this.fonteReferencia = const Value.absent(),
+    this.dataReferencia = const Value.absent(),
+    this.odometroReferencia = const Value.absent(),
+    this.valorVendaProjetadoCentavos = const Value.absent(),
+    this.valorVendaProjetadoEstimado = const Value.absent(),
+    this.odometroVendaProjetado = const Value.absent(),
+    this.dataCriacao = const Value.absent(),
+    this.dataAtualizacao = const Value.absent(),
+  }) : veiculoId = Value(veiculoId);
+  static Insertable<DepreciacaoVeiculo> custom({
+    Expression<int>? id,
+    Expression<int>? veiculoId,
+    Expression<String>? metodoSelecionado,
+    Expression<int>? valorAquisicaoCentavos,
+    Expression<bool>? valorAquisicaoEstimado,
+    Expression<int>? odometroAquisicao,
+    Expression<int>? valorReferenciaCentavos,
+    Expression<bool>? valorReferenciaEstimado,
+    Expression<String>? fonteReferencia,
+    Expression<DateTime>? dataReferencia,
+    Expression<int>? odometroReferencia,
+    Expression<int>? valorVendaProjetadoCentavos,
+    Expression<bool>? valorVendaProjetadoEstimado,
+    Expression<int>? odometroVendaProjetado,
+    Expression<DateTime>? dataCriacao,
+    Expression<DateTime>? dataAtualizacao,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (veiculoId != null) 'veiculo_id': veiculoId,
+      if (metodoSelecionado != null) 'metodo_selecionado': metodoSelecionado,
+      if (valorAquisicaoCentavos != null)
+        'valor_aquisicao_centavos': valorAquisicaoCentavos,
+      if (valorAquisicaoEstimado != null)
+        'valor_aquisicao_estimado': valorAquisicaoEstimado,
+      if (odometroAquisicao != null) 'odometro_aquisicao': odometroAquisicao,
+      if (valorReferenciaCentavos != null)
+        'valor_referencia_centavos': valorReferenciaCentavos,
+      if (valorReferenciaEstimado != null)
+        'valor_referencia_estimado': valorReferenciaEstimado,
+      if (fonteReferencia != null) 'fonte_referencia': fonteReferencia,
+      if (dataReferencia != null) 'data_referencia': dataReferencia,
+      if (odometroReferencia != null) 'odometro_referencia': odometroReferencia,
+      if (valorVendaProjetadoCentavos != null)
+        'valor_venda_projetado_centavos': valorVendaProjetadoCentavos,
+      if (valorVendaProjetadoEstimado != null)
+        'valor_venda_projetado_estimado': valorVendaProjetadoEstimado,
+      if (odometroVendaProjetado != null)
+        'odometro_venda_projetado': odometroVendaProjetado,
+      if (dataCriacao != null) 'data_criacao': dataCriacao,
+      if (dataAtualizacao != null) 'data_atualizacao': dataAtualizacao,
+    });
+  }
+
+  DepreciacoesVeiculoCompanion copyWith({
+    Value<int>? id,
+    Value<int>? veiculoId,
+    Value<MetodoDepreciacao?>? metodoSelecionado,
+    Value<int?>? valorAquisicaoCentavos,
+    Value<bool>? valorAquisicaoEstimado,
+    Value<int?>? odometroAquisicao,
+    Value<int?>? valorReferenciaCentavos,
+    Value<bool>? valorReferenciaEstimado,
+    Value<FonteReferenciaDepreciacao?>? fonteReferencia,
+    Value<DateTime?>? dataReferencia,
+    Value<int?>? odometroReferencia,
+    Value<int?>? valorVendaProjetadoCentavos,
+    Value<bool>? valorVendaProjetadoEstimado,
+    Value<int?>? odometroVendaProjetado,
+    Value<DateTime>? dataCriacao,
+    Value<DateTime?>? dataAtualizacao,
+  }) {
+    return DepreciacoesVeiculoCompanion(
+      id: id ?? this.id,
+      veiculoId: veiculoId ?? this.veiculoId,
+      metodoSelecionado: metodoSelecionado ?? this.metodoSelecionado,
+      valorAquisicaoCentavos:
+          valorAquisicaoCentavos ?? this.valorAquisicaoCentavos,
+      valorAquisicaoEstimado:
+          valorAquisicaoEstimado ?? this.valorAquisicaoEstimado,
+      odometroAquisicao: odometroAquisicao ?? this.odometroAquisicao,
+      valorReferenciaCentavos:
+          valorReferenciaCentavos ?? this.valorReferenciaCentavos,
+      valorReferenciaEstimado:
+          valorReferenciaEstimado ?? this.valorReferenciaEstimado,
+      fonteReferencia: fonteReferencia ?? this.fonteReferencia,
+      dataReferencia: dataReferencia ?? this.dataReferencia,
+      odometroReferencia: odometroReferencia ?? this.odometroReferencia,
+      valorVendaProjetadoCentavos:
+          valorVendaProjetadoCentavos ?? this.valorVendaProjetadoCentavos,
+      valorVendaProjetadoEstimado:
+          valorVendaProjetadoEstimado ?? this.valorVendaProjetadoEstimado,
+      odometroVendaProjetado:
+          odometroVendaProjetado ?? this.odometroVendaProjetado,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+      dataAtualizacao: dataAtualizacao ?? this.dataAtualizacao,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (veiculoId.present) {
+      map['veiculo_id'] = Variable<int>(veiculoId.value);
+    }
+    if (metodoSelecionado.present) {
+      map['metodo_selecionado'] = Variable<String>(
+        $DepreciacoesVeiculoTable.$convertermetodoSelecionadon.toSql(
+          metodoSelecionado.value,
+        ),
+      );
+    }
+    if (valorAquisicaoCentavos.present) {
+      map['valor_aquisicao_centavos'] = Variable<int>(
+        valorAquisicaoCentavos.value,
+      );
+    }
+    if (valorAquisicaoEstimado.present) {
+      map['valor_aquisicao_estimado'] = Variable<bool>(
+        valorAquisicaoEstimado.value,
+      );
+    }
+    if (odometroAquisicao.present) {
+      map['odometro_aquisicao'] = Variable<int>(odometroAquisicao.value);
+    }
+    if (valorReferenciaCentavos.present) {
+      map['valor_referencia_centavos'] = Variable<int>(
+        valorReferenciaCentavos.value,
+      );
+    }
+    if (valorReferenciaEstimado.present) {
+      map['valor_referencia_estimado'] = Variable<bool>(
+        valorReferenciaEstimado.value,
+      );
+    }
+    if (fonteReferencia.present) {
+      map['fonte_referencia'] = Variable<String>(
+        $DepreciacoesVeiculoTable.$converterfonteReferencian.toSql(
+          fonteReferencia.value,
+        ),
+      );
+    }
+    if (dataReferencia.present) {
+      map['data_referencia'] = Variable<DateTime>(dataReferencia.value);
+    }
+    if (odometroReferencia.present) {
+      map['odometro_referencia'] = Variable<int>(odometroReferencia.value);
+    }
+    if (valorVendaProjetadoCentavos.present) {
+      map['valor_venda_projetado_centavos'] = Variable<int>(
+        valorVendaProjetadoCentavos.value,
+      );
+    }
+    if (valorVendaProjetadoEstimado.present) {
+      map['valor_venda_projetado_estimado'] = Variable<bool>(
+        valorVendaProjetadoEstimado.value,
+      );
+    }
+    if (odometroVendaProjetado.present) {
+      map['odometro_venda_projetado'] = Variable<int>(
+        odometroVendaProjetado.value,
+      );
+    }
+    if (dataCriacao.present) {
+      map['data_criacao'] = Variable<DateTime>(dataCriacao.value);
+    }
+    if (dataAtualizacao.present) {
+      map['data_atualizacao'] = Variable<DateTime>(dataAtualizacao.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DepreciacoesVeiculoCompanion(')
+          ..write('id: $id, ')
+          ..write('veiculoId: $veiculoId, ')
+          ..write('metodoSelecionado: $metodoSelecionado, ')
+          ..write('valorAquisicaoCentavos: $valorAquisicaoCentavos, ')
+          ..write('valorAquisicaoEstimado: $valorAquisicaoEstimado, ')
+          ..write('odometroAquisicao: $odometroAquisicao, ')
+          ..write('valorReferenciaCentavos: $valorReferenciaCentavos, ')
+          ..write('valorReferenciaEstimado: $valorReferenciaEstimado, ')
+          ..write('fonteReferencia: $fonteReferencia, ')
+          ..write('dataReferencia: $dataReferencia, ')
+          ..write('odometroReferencia: $odometroReferencia, ')
+          ..write('valorVendaProjetadoCentavos: $valorVendaProjetadoCentavos, ')
+          ..write('valorVendaProjetadoEstimado: $valorVendaProjetadoEstimado, ')
+          ..write('odometroVendaProjetado: $odometroVendaProjetado, ')
+          ..write('dataCriacao: $dataCriacao, ')
+          ..write('dataAtualizacao: $dataAtualizacao')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -9604,6 +10691,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $CustosRecorrentesTable custosRecorrentes =
       $CustosRecorrentesTable(this);
+  late final $DepreciacoesVeiculoTable depreciacoesVeiculo =
+      $DepreciacoesVeiculoTable(this);
   late final JornadaDao jornadaDao = JornadaDao(this as AppDatabase);
   late final PausaDao pausaDao = PausaDao(this as AppDatabase);
   late final LeituraGanhosDao leituraGanhosDao = LeituraGanhosDao(
@@ -9628,6 +10717,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final CustoRecorrenteDao custoRecorrenteDao = CustoRecorrenteDao(
     this as AppDatabase,
   );
+  late final DepreciacaoVeiculoDao depreciacaoVeiculoDao =
+      DepreciacaoVeiculoDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -9649,6 +10740,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     itensManutencao,
     despesasVeiculo,
     custosRecorrentes,
+    depreciacoesVeiculo,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -10103,6 +11195,30 @@ final class $$VeiculosTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $DepreciacoesVeiculoTable,
+    List<DepreciacaoVeiculo>
+  >
+  _depreciacoesVeiculoRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.depreciacoesVeiculo,
+        aliasName: 'veiculos__id__depreciacoes_veiculo__veiculo_id',
+      );
+
+  $$DepreciacoesVeiculoTableProcessedTableManager get depreciacoesVeiculoRefs {
+    final manager = $$DepreciacoesVeiculoTableTableManager(
+      $_db,
+      $_db.depreciacoesVeiculo,
+    ).filter((f) => f.veiculoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _depreciacoesVeiculoRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$VeiculosTableFilterComposer
@@ -10295,6 +11411,31 @@ class $$VeiculosTableFilterComposer
           }) => $$CustosRecorrentesTableFilterComposer(
             $db: $db,
             $table: $db.custosRecorrentes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> depreciacoesVeiculoRefs(
+    Expression<bool> Function($$DepreciacoesVeiculoTableFilterComposer f) f,
+  ) {
+    final $$DepreciacoesVeiculoTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.depreciacoesVeiculo,
+      getReferencedColumn: (t) => t.veiculoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DepreciacoesVeiculoTableFilterComposer(
+            $db: $db,
+            $table: $db.depreciacoesVeiculo,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -10565,6 +11706,32 @@ class $$VeiculosTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> depreciacoesVeiculoRefs<T extends Object>(
+    Expression<T> Function($$DepreciacoesVeiculoTableAnnotationComposer a) f,
+  ) {
+    final $$DepreciacoesVeiculoTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.depreciacoesVeiculo,
+          getReferencedColumn: (t) => t.veiculoId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$DepreciacoesVeiculoTableAnnotationComposer(
+                $db: $db,
+                $table: $db.depreciacoesVeiculo,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$VeiculosTableTableManager
@@ -10586,6 +11753,7 @@ class $$VeiculosTableTableManager
             bool manutencoesRefs,
             bool despesasVeiculoRefs,
             bool custosRecorrentesRefs,
+            bool depreciacoesVeiculoRefs,
           })
         > {
   $$VeiculosTableTableManager(_$AppDatabase db, $VeiculosTable table)
@@ -10674,6 +11842,7 @@ class $$VeiculosTableTableManager
                 manutencoesRefs = false,
                 despesasVeiculoRefs = false,
                 custosRecorrentesRefs = false,
+                depreciacoesVeiculoRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -10683,6 +11852,7 @@ class $$VeiculosTableTableManager
                     if (manutencoesRefs) db.manutencoes,
                     if (despesasVeiculoRefs) db.despesasVeiculo,
                     if (custosRecorrentesRefs) db.custosRecorrentes,
+                    if (depreciacoesVeiculoRefs) db.depreciacoesVeiculo,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -10792,6 +11962,27 @@ class $$VeiculosTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (depreciacoesVeiculoRefs)
+                        await $_getPrefetchedData<
+                          Veiculo,
+                          $VeiculosTable,
+                          DepreciacaoVeiculo
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VeiculosTableReferences
+                              ._depreciacoesVeiculoRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VeiculosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).depreciacoesVeiculoRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.veiculoId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -10818,6 +12009,7 @@ typedef $$VeiculosTableProcessedTableManager =
         bool manutencoesRefs,
         bool despesasVeiculoRefs,
         bool custosRecorrentesRefs,
+        bool depreciacoesVeiculoRefs,
       })
     >;
 typedef $$ConfiguracoesTableCreateCompanionBuilder =
@@ -18452,6 +19644,585 @@ typedef $$CustosRecorrentesTableProcessedTableManager =
       CustoRecorrente,
       PrefetchHooks Function({bool veiculoId, bool plataformaId})
     >;
+typedef $$DepreciacoesVeiculoTableCreateCompanionBuilder =
+    DepreciacoesVeiculoCompanion Function({
+      Value<int> id,
+      required int veiculoId,
+      Value<MetodoDepreciacao?> metodoSelecionado,
+      Value<int?> valorAquisicaoCentavos,
+      Value<bool> valorAquisicaoEstimado,
+      Value<int?> odometroAquisicao,
+      Value<int?> valorReferenciaCentavos,
+      Value<bool> valorReferenciaEstimado,
+      Value<FonteReferenciaDepreciacao?> fonteReferencia,
+      Value<DateTime?> dataReferencia,
+      Value<int?> odometroReferencia,
+      Value<int?> valorVendaProjetadoCentavos,
+      Value<bool> valorVendaProjetadoEstimado,
+      Value<int?> odometroVendaProjetado,
+      Value<DateTime> dataCriacao,
+      Value<DateTime?> dataAtualizacao,
+    });
+typedef $$DepreciacoesVeiculoTableUpdateCompanionBuilder =
+    DepreciacoesVeiculoCompanion Function({
+      Value<int> id,
+      Value<int> veiculoId,
+      Value<MetodoDepreciacao?> metodoSelecionado,
+      Value<int?> valorAquisicaoCentavos,
+      Value<bool> valorAquisicaoEstimado,
+      Value<int?> odometroAquisicao,
+      Value<int?> valorReferenciaCentavos,
+      Value<bool> valorReferenciaEstimado,
+      Value<FonteReferenciaDepreciacao?> fonteReferencia,
+      Value<DateTime?> dataReferencia,
+      Value<int?> odometroReferencia,
+      Value<int?> valorVendaProjetadoCentavos,
+      Value<bool> valorVendaProjetadoEstimado,
+      Value<int?> odometroVendaProjetado,
+      Value<DateTime> dataCriacao,
+      Value<DateTime?> dataAtualizacao,
+    });
+
+final class $$DepreciacoesVeiculoTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $DepreciacoesVeiculoTable,
+          DepreciacaoVeiculo
+        > {
+  $$DepreciacoesVeiculoTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $VeiculosTable _veiculoIdTable(_$AppDatabase db) =>
+      db.veiculos.createAlias('depreciacoes_veiculo__veiculo_id__veiculos__id');
+
+  $$VeiculosTableProcessedTableManager get veiculoId {
+    final $_column = $_itemColumn<int>('veiculo_id')!;
+
+    final manager = $$VeiculosTableTableManager(
+      $_db,
+      $_db.veiculos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_veiculoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$DepreciacoesVeiculoTableFilterComposer
+    extends Composer<_$AppDatabase, $DepreciacoesVeiculoTable> {
+  $$DepreciacoesVeiculoTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<MetodoDepreciacao?, MetodoDepreciacao, String>
+  get metodoSelecionado => $composableBuilder(
+    column: $table.metodoSelecionado,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get valorAquisicaoCentavos => $composableBuilder(
+    column: $table.valorAquisicaoCentavos,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get valorAquisicaoEstimado => $composableBuilder(
+    column: $table.valorAquisicaoEstimado,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get odometroAquisicao => $composableBuilder(
+    column: $table.odometroAquisicao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get valorReferenciaCentavos => $composableBuilder(
+    column: $table.valorReferenciaCentavos,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get valorReferenciaEstimado => $composableBuilder(
+    column: $table.valorReferenciaEstimado,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    FonteReferenciaDepreciacao?,
+    FonteReferenciaDepreciacao,
+    String
+  >
+  get fonteReferencia => $composableBuilder(
+    column: $table.fonteReferencia,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataReferencia => $composableBuilder(
+    column: $table.dataReferencia,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get odometroReferencia => $composableBuilder(
+    column: $table.odometroReferencia,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get valorVendaProjetadoCentavos => $composableBuilder(
+    column: $table.valorVendaProjetadoCentavos,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get valorVendaProjetadoEstimado => $composableBuilder(
+    column: $table.valorVendaProjetadoEstimado,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get odometroVendaProjetado => $composableBuilder(
+    column: $table.odometroVendaProjetado,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VeiculosTableFilterComposer get veiculoId {
+    final $$VeiculosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableFilterComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DepreciacoesVeiculoTableOrderingComposer
+    extends Composer<_$AppDatabase, $DepreciacoesVeiculoTable> {
+  $$DepreciacoesVeiculoTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get metodoSelecionado => $composableBuilder(
+    column: $table.metodoSelecionado,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get valorAquisicaoCentavos => $composableBuilder(
+    column: $table.valorAquisicaoCentavos,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get valorAquisicaoEstimado => $composableBuilder(
+    column: $table.valorAquisicaoEstimado,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get odometroAquisicao => $composableBuilder(
+    column: $table.odometroAquisicao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get valorReferenciaCentavos => $composableBuilder(
+    column: $table.valorReferenciaCentavos,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get valorReferenciaEstimado => $composableBuilder(
+    column: $table.valorReferenciaEstimado,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fonteReferencia => $composableBuilder(
+    column: $table.fonteReferencia,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataReferencia => $composableBuilder(
+    column: $table.dataReferencia,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get odometroReferencia => $composableBuilder(
+    column: $table.odometroReferencia,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get valorVendaProjetadoCentavos => $composableBuilder(
+    column: $table.valorVendaProjetadoCentavos,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get valorVendaProjetadoEstimado => $composableBuilder(
+    column: $table.valorVendaProjetadoEstimado,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get odometroVendaProjetado => $composableBuilder(
+    column: $table.odometroVendaProjetado,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VeiculosTableOrderingComposer get veiculoId {
+    final $$VeiculosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableOrderingComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DepreciacoesVeiculoTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DepreciacoesVeiculoTable> {
+  $$DepreciacoesVeiculoTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<MetodoDepreciacao?, String>
+  get metodoSelecionado => $composableBuilder(
+    column: $table.metodoSelecionado,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get valorAquisicaoCentavos => $composableBuilder(
+    column: $table.valorAquisicaoCentavos,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get valorAquisicaoEstimado => $composableBuilder(
+    column: $table.valorAquisicaoEstimado,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get odometroAquisicao => $composableBuilder(
+    column: $table.odometroAquisicao,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get valorReferenciaCentavos => $composableBuilder(
+    column: $table.valorReferenciaCentavos,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get valorReferenciaEstimado => $composableBuilder(
+    column: $table.valorReferenciaEstimado,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<FonteReferenciaDepreciacao?, String>
+  get fonteReferencia => $composableBuilder(
+    column: $table.fonteReferencia,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataReferencia => $composableBuilder(
+    column: $table.dataReferencia,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get odometroReferencia => $composableBuilder(
+    column: $table.odometroReferencia,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get valorVendaProjetadoCentavos => $composableBuilder(
+    column: $table.valorVendaProjetadoCentavos,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get valorVendaProjetadoEstimado => $composableBuilder(
+    column: $table.valorVendaProjetadoEstimado,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get odometroVendaProjetado => $composableBuilder(
+    column: $table.odometroVendaProjetado,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataCriacao => $composableBuilder(
+    column: $table.dataCriacao,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dataAtualizacao => $composableBuilder(
+    column: $table.dataAtualizacao,
+    builder: (column) => column,
+  );
+
+  $$VeiculosTableAnnotationComposer get veiculoId {
+    final $$VeiculosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.veiculoId,
+      referencedTable: $db.veiculos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VeiculosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.veiculos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DepreciacoesVeiculoTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DepreciacoesVeiculoTable,
+          DepreciacaoVeiculo,
+          $$DepreciacoesVeiculoTableFilterComposer,
+          $$DepreciacoesVeiculoTableOrderingComposer,
+          $$DepreciacoesVeiculoTableAnnotationComposer,
+          $$DepreciacoesVeiculoTableCreateCompanionBuilder,
+          $$DepreciacoesVeiculoTableUpdateCompanionBuilder,
+          (DepreciacaoVeiculo, $$DepreciacoesVeiculoTableReferences),
+          DepreciacaoVeiculo,
+          PrefetchHooks Function({bool veiculoId})
+        > {
+  $$DepreciacoesVeiculoTableTableManager(
+    _$AppDatabase db,
+    $DepreciacoesVeiculoTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DepreciacoesVeiculoTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DepreciacoesVeiculoTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$DepreciacoesVeiculoTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> veiculoId = const Value.absent(),
+                Value<MetodoDepreciacao?> metodoSelecionado =
+                    const Value.absent(),
+                Value<int?> valorAquisicaoCentavos = const Value.absent(),
+                Value<bool> valorAquisicaoEstimado = const Value.absent(),
+                Value<int?> odometroAquisicao = const Value.absent(),
+                Value<int?> valorReferenciaCentavos = const Value.absent(),
+                Value<bool> valorReferenciaEstimado = const Value.absent(),
+                Value<FonteReferenciaDepreciacao?> fonteReferencia =
+                    const Value.absent(),
+                Value<DateTime?> dataReferencia = const Value.absent(),
+                Value<int?> odometroReferencia = const Value.absent(),
+                Value<int?> valorVendaProjetadoCentavos = const Value.absent(),
+                Value<bool> valorVendaProjetadoEstimado = const Value.absent(),
+                Value<int?> odometroVendaProjetado = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+                Value<DateTime?> dataAtualizacao = const Value.absent(),
+              }) => DepreciacoesVeiculoCompanion(
+                id: id,
+                veiculoId: veiculoId,
+                metodoSelecionado: metodoSelecionado,
+                valorAquisicaoCentavos: valorAquisicaoCentavos,
+                valorAquisicaoEstimado: valorAquisicaoEstimado,
+                odometroAquisicao: odometroAquisicao,
+                valorReferenciaCentavos: valorReferenciaCentavos,
+                valorReferenciaEstimado: valorReferenciaEstimado,
+                fonteReferencia: fonteReferencia,
+                dataReferencia: dataReferencia,
+                odometroReferencia: odometroReferencia,
+                valorVendaProjetadoCentavos: valorVendaProjetadoCentavos,
+                valorVendaProjetadoEstimado: valorVendaProjetadoEstimado,
+                odometroVendaProjetado: odometroVendaProjetado,
+                dataCriacao: dataCriacao,
+                dataAtualizacao: dataAtualizacao,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int veiculoId,
+                Value<MetodoDepreciacao?> metodoSelecionado =
+                    const Value.absent(),
+                Value<int?> valorAquisicaoCentavos = const Value.absent(),
+                Value<bool> valorAquisicaoEstimado = const Value.absent(),
+                Value<int?> odometroAquisicao = const Value.absent(),
+                Value<int?> valorReferenciaCentavos = const Value.absent(),
+                Value<bool> valorReferenciaEstimado = const Value.absent(),
+                Value<FonteReferenciaDepreciacao?> fonteReferencia =
+                    const Value.absent(),
+                Value<DateTime?> dataReferencia = const Value.absent(),
+                Value<int?> odometroReferencia = const Value.absent(),
+                Value<int?> valorVendaProjetadoCentavos = const Value.absent(),
+                Value<bool> valorVendaProjetadoEstimado = const Value.absent(),
+                Value<int?> odometroVendaProjetado = const Value.absent(),
+                Value<DateTime> dataCriacao = const Value.absent(),
+                Value<DateTime?> dataAtualizacao = const Value.absent(),
+              }) => DepreciacoesVeiculoCompanion.insert(
+                id: id,
+                veiculoId: veiculoId,
+                metodoSelecionado: metodoSelecionado,
+                valorAquisicaoCentavos: valorAquisicaoCentavos,
+                valorAquisicaoEstimado: valorAquisicaoEstimado,
+                odometroAquisicao: odometroAquisicao,
+                valorReferenciaCentavos: valorReferenciaCentavos,
+                valorReferenciaEstimado: valorReferenciaEstimado,
+                fonteReferencia: fonteReferencia,
+                dataReferencia: dataReferencia,
+                odometroReferencia: odometroReferencia,
+                valorVendaProjetadoCentavos: valorVendaProjetadoCentavos,
+                valorVendaProjetadoEstimado: valorVendaProjetadoEstimado,
+                odometroVendaProjetado: odometroVendaProjetado,
+                dataCriacao: dataCriacao,
+                dataAtualizacao: dataAtualizacao,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$DepreciacoesVeiculoTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({veiculoId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (veiculoId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.veiculoId,
+                                referencedTable:
+                                    $$DepreciacoesVeiculoTableReferences
+                                        ._veiculoIdTable(db),
+                                referencedColumn:
+                                    $$DepreciacoesVeiculoTableReferences
+                                        ._veiculoIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$DepreciacoesVeiculoTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DepreciacoesVeiculoTable,
+      DepreciacaoVeiculo,
+      $$DepreciacoesVeiculoTableFilterComposer,
+      $$DepreciacoesVeiculoTableOrderingComposer,
+      $$DepreciacoesVeiculoTableAnnotationComposer,
+      $$DepreciacoesVeiculoTableCreateCompanionBuilder,
+      $$DepreciacoesVeiculoTableUpdateCompanionBuilder,
+      (DepreciacaoVeiculo, $$DepreciacoesVeiculoTableReferences),
+      DepreciacaoVeiculo,
+      PrefetchHooks Function({bool veiculoId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -18495,4 +20266,6 @@ class $AppDatabaseManager {
       $$DespesasVeiculoTableTableManager(_db, _db.despesasVeiculo);
   $$CustosRecorrentesTableTableManager get custosRecorrentes =>
       $$CustosRecorrentesTableTableManager(_db, _db.custosRecorrentes);
+  $$DepreciacoesVeiculoTableTableManager get depreciacoesVeiculo =>
+      $$DepreciacoesVeiculoTableTableManager(_db, _db.depreciacoesVeiculo);
 }

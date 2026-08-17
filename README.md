@@ -30,6 +30,7 @@ a margem desejada.
 - Despesas factuais do veículo, atuais ou retroativas, com histórico e edição.
 - Custos recorrentes como referências de competência econômica, separados dos
   pagamentos efetivos.
+- Depreciação observada e projetada por veículo, calculada em R$/km.
 
 ## Arquitetura
 

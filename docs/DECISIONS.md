@@ -261,3 +261,15 @@ sem página intermediária.
 Motivo: os dois conceitos pertencem ao mesmo contexto econômico para o usuário,
 embora pagamento e competência não possam ser misturados. Uma tela única reduz
 etapas sem esconder a distinção nem alterar as fontes de verdade.
+
+## ADR-022 — Depreciação derivada por veículo
+
+Decisão: manter um único snapshot configurável por veículo, com cenários
+observado e projetado. Valores e odômetros factuais são persistidos, enquanto
+R$/km é calculado em apresentação. Os dois métodos podem coexistir e a escolha
+principal só é mantida quando o respectivo cálculo está disponível.
+
+Motivo: depreciação é perda econômica estimada, não saída recorrente de caixa.
+Separá-la de Despesas e Custos Recorrentes evita percentuais arbitrários e
+dupla contagem futura. A referência observada é deliberadamente estável até
+edição; integração automática com FIPE permanece evolução opcional.

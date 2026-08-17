@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/constants/enums/tipo_combustivel.dart';
+import '../../../../core/formatters/quilometragem_input_formatter.dart';
 import '../../data/abastecimento_service.dart';
 
 typedef RegistrarAbastecimentoResultado = ({
@@ -67,7 +68,7 @@ class _RegistrarAbastecimentoDialogState
   void initState() {
     super.initState();
     odometro = TextEditingController(
-      text: widget.odometroInicial?.toString() ?? '',
+      text: formatarQuilometragem(widget.odometroInicial),
     );
     cidade = TextEditingController(text: widget.cidadeInicial ?? '');
     combustivel = widget.tipoCombustivelInicial ?? TipoCombustivel.gasolina;
@@ -132,7 +133,7 @@ class _RegistrarAbastecimentoDialogState
     FocusManager.instance.primaryFocus?.unfocus();
     Navigator.pop<RegistrarAbastecimentoResultado>(context, (
       dataHora: dataHora,
-      odometro: int.parse(odometro.text.trim()),
+      odometro: parseQuilometragem(odometro.text)!,
       tipoCombustivel: combustivel,
       volumeMililitros: volumeMl!,
       valorTotalPagoCentavos: totalCentavos!,
@@ -220,11 +221,12 @@ class _RegistrarAbastecimentoDialogState
                   autofocus: true,
                   selectAllOnFocus: true,
                   keyboardType: TextInputType.number,
+                  inputFormatters: const [QuilometragemInputFormatter()],
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => focoVolume.requestFocus(),
                   decoration: const InputDecoration(labelText: 'Odômetro'),
                   validator: (texto) {
-                    final valor = int.tryParse(texto?.trim() ?? '');
+                    final valor = parseQuilometragem(texto);
                     if (valor == null) return 'Informe o odômetro.';
                     if (valor < 0) return 'O odômetro não pode ser negativo.';
                     return null;

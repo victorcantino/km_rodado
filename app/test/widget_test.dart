@@ -270,7 +270,7 @@ void main() {
 
     final campos = tester.widgetList<TextFormField>(find.byType(TextFormField));
 
-    expect(campos.elementAt(0).controller!.text, '152184');
+    expect(campos.elementAt(0).controller!.text, '152.184');
     expect(campos.elementAt(1).controller!.text, 'Curitiba');
   });
 
