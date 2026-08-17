@@ -31,7 +31,9 @@
 - Onboarding e ajuda contextual por feature, dispensáveis, com Próximo,
   Entendi, “não mostrar novamente” e reabertura sob demanda. Na DespesasPage,
   explicar separadamente que Nova despesa registra pagamento ocorrido e Novo
-  custo recorrente registra uma referência econômica periódica.
+  custo recorrente registra uma referência econômica periódica; explicar também
+  que recarga de carteira/tag pré-paga não é custo e que somente o consumo
+  efetivo deve ser registrado, evitando dupla contagem.
 
 ## Abastecimento
 
@@ -63,12 +65,15 @@
 
 - Reconciliação entre Custo Recorrente e pagamento real, separando competência
   econômica e fluxo de caixa sem dupla contagem.
-- Modelar aquisição/financiamento do veículo separando fluxo de caixa,
-  amortização e custo financeiro antes de integrar ao Motor Econômico.
-- Modelar depreciação do veículo separadamente do financiamento, apenas quando
-  preço de aquisição e referência de valor atual forem confiáveis; na ausência,
-  apresentar “Depreciação indisponível” sem inventar valores nem somar parcela
-  integral e depreciação sem metodologia explícita.
+- Avaliar acompanhamento detalhado de quantidade de parcelas/obrigações somente
+  se houver necessidade operacional real; não antecipar contrato, amortização,
+  juros, vencimentos, pagamentos ou saldo devedor.
+- Cálculo de depreciação do veículo: definir uma metodologia simples e
+  explicável a partir de valor e hodômetro na aquisição, valor de
+  mercado/referência atual ou residual, hodômetro atual e tempo de posse/uso
+  quando necessário. Derivar R$/km somente com dados suficientes; caso
+  contrário, apresentar “Depreciação indisponível”, sem inventar percentual ou
+  valor. Esta feature antecede o Motor Econômico.
 - Avaliar associação opcional de Despesa a Jornada somente quando houver regra
   econômica segura, sem atribuir retroativamente custos gerais ao trabalho.
 - Evoluir despesas factuais para obrigações, competência, parcelas,
@@ -102,6 +107,9 @@
 - Meta mensal de quilômetros e rateio planejado de custos fixos por essa meta.
 - Referência econômica pessoal por quilômetro e hora, margem desejada e valor
   mínimo econômico por Plataforma.
+- Implementar o Motor Econômico somente após amadurecer as fontes reais. Ele
+  deverá decidir explicitamente tipos incluídos, visões, rateios e prevenção de
+  dupla contagem; não antecipar flags de inclusão.
 
 ## Produto
 

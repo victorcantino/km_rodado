@@ -5,7 +5,7 @@
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
 - schema atual: **11**;
-- suíte automatizada: **194 testes aprovados** em 16/08/2026.
+- suíte automatizada: **196 testes aprovados** em 17/08/2026.
 
 ## Implementado
 
@@ -35,8 +35,10 @@
   dos antigos tipos IPVA/licenciamento/seguro;
 - Custos Recorrentes separados do fluxo de caixa, com competência mensal,
   anual ou personalizada, escopo veículo/atividade/Plataforma, valor exato ou
-  estimado e equivalente mensal derivado; Despesas e recorrências aparecem em
-  seções distintas da mesma tela, com criação e edição diretas;
+  estimado e equivalente mensal derivado; inclui referência simples de parcela
+  do veículo, sem controle financeiro detalhado; depreciação manual não é
+  oferecida e aguarda cálculo derivado próprio; Despesas e recorrências aparecem
+  em seções distintas da mesma tela, com criação e edição diretas;
 - Passes por faturamento ou tempo, validade derivada, repetição segura por
   Plataforma, cadastro retroativo, custos separados e Jornada opcional;
 - crédito promocional retroativo sem escolha de subtipo pelo motorista; valores
@@ -44,6 +46,8 @@
   uniforme por intervalos;
 - baseline protege contra dupla subtração de bônus creditado antes da Jornada,
   sem criar associação cronologicamente falsa;
+- a ação de ganho Particular na JornadaPage acompanha a disponibilidade de
+  Plataformas individuais ativas e não aparece quando nenhuma está disponível;
 - JornadaPage protegida pelos insets seguros inferiores do Android;
 - formulários operacionais navegam pelo teclado entre campos editáveis,
   ignorando botões, seletores e calendários, e encerram a sequência com Done;

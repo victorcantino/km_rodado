@@ -95,6 +95,8 @@ void main() {
     for (final label in const ['IPVA', 'Licenciamento', 'Seguro']) {
       expect(find.text(label), findsNothing);
     }
+    expect(find.text('Parcela do veículo'), findsNothing);
+    expect(find.text('Depreciação'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

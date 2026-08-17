@@ -192,6 +192,8 @@ void main() {
       'ipva',
       'licenciamento',
       'seguro',
+      'parcelaVeiculo',
+      'depreciacao',
       'telefoneProfissional',
       'contaPlataforma',
       'outro',
@@ -208,6 +210,14 @@ void main() {
       service.padraoPara(TipoCustoRecorrente.seguro).periodicidadeMeses,
       1,
     );
+    for (final tipo in const [
+      TipoCustoRecorrente.parcelaVeiculo,
+      TipoCustoRecorrente.depreciacao,
+    ]) {
+      final padrao = service.padraoPara(tipo);
+      expect(padrao.escopo, EscopoCustoRecorrente.veiculo);
+      expect(padrao.periodicidadeMeses, 1);
+    }
     expect(
       service.padraoPara(TipoCustoRecorrente.telefoneProfissional).escopo,
       EscopoCustoRecorrente.atividade,
@@ -243,10 +253,48 @@ void main() {
     );
   });
 
+  test(
+    'parcela não gera lançamentos e depreciação técnica não inventa valor',
+    () async {
+      await service.criar(
+        tipo: TipoCustoRecorrente.parcelaVeiculo,
+        descricao: 'Parcela do veículo',
+        escopo: EscopoCustoRecorrente.veiculo,
+        veiculoId: 1,
+        valorReferenciaCentavos: 121000,
+        periodicidadeMeses: 1,
+        quantidadeCiclosPrevista: 48,
+      );
+      await service.criar(
+        tipo: TipoCustoRecorrente.depreciacao,
+        descricao: 'Depreciação',
+        escopo: EscopoCustoRecorrente.veiculo,
+        veiculoId: 1,
+        periodicidadeMeses: 1,
+      );
+
+      final custos = await service.listar();
+      expect(custos, hasLength(2));
+      final depreciacao = custos.singleWhere(
+        (custo) => custo.tipo == TipoCustoRecorrente.depreciacao,
+      );
+      expect(depreciacao.valorReferenciaCentavos, isNull);
+      expect(
+        custos
+            .singleWhere(
+              (custo) => custo.tipo == TipoCustoRecorrente.parcelaVeiculo,
+            )
+            .quantidadeCiclosPrevista,
+        48,
+      );
+      expect(await database.select(database.despesasVeiculo).get(), isEmpty);
+    },
+  );
+
   test('edita, desativa e preserva em novo service', () async {
     final id = await service.criar(
-      tipo: TipoCustoRecorrente.seguro,
-      descricao: 'Seguro',
+      tipo: TipoCustoRecorrente.parcelaVeiculo,
+      descricao: 'Parcela do veículo',
       escopo: EscopoCustoRecorrente.veiculo,
       veiculoId: 1,
       valorReferenciaCentavos: 22000,
@@ -254,8 +302,8 @@ void main() {
     );
     await service.editar(
       id: id,
-      tipo: TipoCustoRecorrente.seguro,
-      descricao: '  Seguro encerrado ',
+      tipo: TipoCustoRecorrente.parcelaVeiculo,
+      descricao: '  Parcela encerrada ',
       escopo: EscopoCustoRecorrente.veiculo,
       veiculoId: 1,
       valorReferenciaCentavos: 22050,
@@ -269,7 +317,7 @@ void main() {
       CustoRecorrenteRepository(CustoRecorrenteDao(database)),
     );
     final custo = (await novoService.listar()).single;
-    expect(custo.descricao, 'Seguro encerrado');
+    expect(custo.descricao, 'Parcela encerrada');
     expect(custo.ativo, isFalse);
     expect(custo.periodicidadeMeses, 2);
     expect(custo.observacao, 'fim do contrato');
@@ -401,9 +449,13 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('tipo_custo_recorrente')));
       await tester.pumpAndSettle();
-      for (final tipo in TipoCustoRecorrente.values) {
+      for (final tipo in TipoCustoRecorrente.values.where(
+        (tipo) => tipo.disponivelEmNovoCadastro,
+      )) {
         expect(find.text(tipo.label), findsWidgets);
       }
+      expect(find.text('Parcela do veículo'), findsWidgets);
+      expect(find.text('Depreciação'), findsNothing);
       await tester.tap(find.text('Telefone profissional').last);
       await tester.pumpAndSettle();
       expect(find.text('Valor não informado'), findsOneWidget);
@@ -482,6 +534,40 @@ void main() {
     await tester.pumpAndSettle();
     expect(resultado?.ativo, isFalse);
     expect(resultado?.quantidadeCiclosPrevista, 24);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('depreciação técnica legada permanece legível', (tester) async {
+    await service.criar(
+      tipo: TipoCustoRecorrente.depreciacao,
+      descricao: 'Depreciação legada',
+      escopo: EscopoCustoRecorrente.veiculo,
+      veiculoId: 1,
+      periodicidadeMeses: 1,
+    );
+    final existente = (await service.listar()).single;
+    final veiculos = await database.select(database.veiculos).get();
+    final plataformas = await database.select(database.plataformas).get();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: EditarCustoRecorrenteDialog(
+            existente: existente,
+            veiculoIdInicial: 1,
+            veiculos: veiculos,
+            plataformas: plataformas,
+            padraoPara: service.padraoPara,
+            buscarSugestoes: (_) async => const [],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Depreciação'), findsOneWidget);
+    expect(find.text('Depreciação legada'), findsOneWidget);
+    expect(find.text('Valor não informado'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

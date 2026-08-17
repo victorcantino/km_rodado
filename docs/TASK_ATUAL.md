@@ -7,9 +7,12 @@ efetivamente pagas. Permite competência mensal, anual ou personalizada, padrão
 habitual de parcelas, valor exato/estimado/ausente, prazo previsto opcional,
 ativação e escopos veículo, atividade ou Plataforma.
 
-O equivalente mensal é derivado e nenhuma Despesa, parcela, obrigação ou
-vencimento é gerado. Financiamento e depreciação continuam fora. O schema evolui
-de 10 para 11 por migração aditiva e preservadora.
+O equivalente mensal é derivado e nenhuma Despesa, parcela materializada,
+obrigação ou vencimento é gerado. Parcela do veículo e depreciação são apenas
+conceitos distintos: a primeira permanece como referência periódica conhecida
+de caixa; a segunda deixou o cadastro normal e será calculada por feature
+própria, sem percentual ou valor inventado. O schema evolui de 10 para 11 por
+migração aditiva e preservadora.
 
 Na interface, Despesas pagas e Custos Recorrentes permanecem em seções
 conceitualmente separadas, mas compartilham a mesma `DespesasPage` e rolagem.

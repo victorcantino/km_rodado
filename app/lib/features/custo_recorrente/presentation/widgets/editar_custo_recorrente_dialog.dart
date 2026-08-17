@@ -241,7 +241,8 @@ class _EditarCustoRecorrenteDialogState
                 decoration: const InputDecoration(labelText: 'Tipo'),
                 items: [
                   for (final opcao in TipoCustoRecorrente.values)
-                    DropdownMenuItem(value: opcao, child: Text(opcao.label)),
+                    if (opcao.disponivelEmNovoCadastro || opcao == tipo)
+                      DropdownMenuItem(value: opcao, child: Text(opcao.label)),
                 ],
                 onChanged: (valor) {
                   if (valor != null) _alterarTipo(valor);

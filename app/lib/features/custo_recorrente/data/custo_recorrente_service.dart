@@ -29,7 +29,9 @@ class CustoRecorrenteService {
       escopo: EscopoCustoRecorrente.veiculo,
       periodicidadeMeses: 12,
     ),
-    TipoCustoRecorrente.seguro => (
+    TipoCustoRecorrente.seguro ||
+    TipoCustoRecorrente.parcelaVeiculo ||
+    TipoCustoRecorrente.depreciacao => (
       escopo: EscopoCustoRecorrente.veiculo,
       periodicidadeMeses: 1,
     ),
