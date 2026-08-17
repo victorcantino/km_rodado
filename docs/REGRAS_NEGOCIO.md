@@ -272,6 +272,26 @@ justificativa e inserção histórica arbitrária permanecem futuras.
   decidirá explicitamente como usar a depreciação derivada e evitar dupla
   contagem.
 
+## Depreciação do veículo
+
+- Pertence ao veículo e não é Despesa nem Custo Recorrente manual.
+- Observada: `(valor de aquisição - valor de referência) / (odômetro da
+  referência - odômetro da aquisição)`.
+- Projetada: `(valor de aquisição - valor esperado na venda) / (odômetro
+  esperado na venda - odômetro da aquisição)`.
+- Os dois cenários podem coexistir; somente um método calculável pode ser
+  selecionado como referência principal. R$/km é derivado e não persistido.
+- Valores monetários devem ser positivos, odômetros não negativos e o
+  odômetro final deve superar o da aquisição. Valor final igual ou superior ao
+  inicial não produz depreciação negativa: o resultado fica indisponível.
+- Dados incompletos podem ser salvos. Valores aproximados são identificados e
+  a referência observada registra fonte e data não futura.
+- O último odômetro operacional pode ser sugerido, mas não atualiza o snapshot
+  observado automaticamente. Não há consulta automática à FIPE nesta versão.
+- A configuração é 1:1 com o veículo. Diferentes pontos da interface podem
+  abrir o mesmo formulário, sem duplicar configuração; a tela de Despesas é
+  apenas um acesso conveniente para o veículo selecionado.
+
 ## Passes de plataforma
 
 - Passe é custo operacional factual de uma Plataforma, não faturamento

@@ -4,8 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:km_rodado/core/database/app_database.dart';
 import 'package:km_rodado/core/database/daos/custo_recorrente_dao.dart';
 import 'package:km_rodado/core/database/daos/despesa_veiculo_dao.dart';
+import 'package:km_rodado/core/database/daos/depreciacao_veiculo_dao.dart';
+import 'package:km_rodado/core/database/daos/abastecimento_dao.dart';
 import 'package:km_rodado/core/database/seeds/plataformas_seed.dart';
 import 'package:km_rodado/core/database/seeds/seed.dart';
+import 'package:km_rodado/core/constants/enums/metodo_depreciacao.dart';
 import 'package:km_rodado/features/custo_recorrente/data/custo_recorrente_repository.dart';
 import 'package:km_rodado/features/custo_recorrente/data/custo_recorrente_service.dart';
 import 'package:km_rodado/features/custo_recorrente/presentation/controllers/custo_recorrente_controller.dart';
@@ -13,6 +16,10 @@ import 'package:km_rodado/features/despesa_veiculo/data/despesa_veiculo_reposito
 import 'package:km_rodado/features/despesa_veiculo/data/despesa_veiculo_service.dart';
 import 'package:km_rodado/features/despesa_veiculo/presentation/controllers/despesa_veiculo_controller.dart';
 import 'package:km_rodado/features/despesa_veiculo/presentation/pages/despesas_page.dart';
+import 'package:km_rodado/features/abastecimento/data/abastecimento_repository.dart';
+import 'package:km_rodado/features/depreciacao_veiculo/data/depreciacao_veiculo_repository.dart';
+import 'package:km_rodado/features/depreciacao_veiculo/data/depreciacao_veiculo_service.dart';
+import 'package:km_rodado/features/depreciacao_veiculo/presentation/controllers/depreciacao_veiculo_controller.dart';
 
 void main() {
   testWidgets('tela única cria e atualiza as duas seções diretamente', (
@@ -36,8 +43,17 @@ void main() {
         CustoRecorrenteRepository(CustoRecorrenteDao(database)),
       ),
     );
+    final depreciacaoController = DepreciacaoVeiculoController(
+      DepreciacaoVeiculoService(
+        DepreciacaoVeiculoRepository(
+          DepreciacaoVeiculoDao(database),
+          AbastecimentoRepository(AbastecimentoDao(database)),
+        ),
+      ),
+    );
     addTearDown(despesaController.dispose);
     addTearDown(custoController.dispose);
+    addTearDown(depreciacaoController.dispose);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -45,6 +61,7 @@ void main() {
           veiculoId: 1,
           controller: despesaController,
           custoRecorrenteController: custoController,
+          depreciacaoController: depreciacaoController,
         ),
       ),
     );
@@ -54,10 +71,115 @@ void main() {
     expect(find.byKey(const ValueKey('despesas_scroll_unico')), findsOneWidget);
     expect(find.text('Despesas do veículo'), findsOneWidget);
     expect(find.text('Custos recorrentes'), findsOneWidget);
-    expect(find.byType(Divider), findsNWidgets(2));
+    expect(find.text('Depreciação do veículo'), findsOneWidget);
+    expect(find.text('Depreciação ainda não calculada'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('configurar_depreciacao')),
+      findsOneWidget,
+    );
+    expect(find.byType(Divider), findsNWidgets(3));
     expect(find.byType(ExpansionTile), findsNothing);
     expect(tester.takeException(), isNull);
 
+    await tester.tap(find.byKey(const ValueKey('configurar_depreciacao')));
+    await tester.pumpAndSettle();
+    expect(find.text('Depreciação do veículo'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('valor_aquisicao_depreciacao')),
+      findsOneWidget,
+    );
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await depreciacaoController.salvar(
+      veiculoId: 1,
+      metodoSelecionado: MetodoDepreciacao.observada,
+      valorAquisicaoCentavos: 5000000,
+      odometroAquisicao: 50000,
+      valorReferenciaCentavos: 4000000,
+      odometroReferencia: 100000,
+      valorVendaProjetadoCentavos: 3000000,
+      odometroVendaProjetado: 150000,
+    );
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('ver_calculo_depreciacao')),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Observada'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('ver_calculo_depreciacao')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('alterar_depreciacao')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.byKey(const ValueKey('ver_calculo_depreciacao')));
+    await tester.pumpAndSettle();
+    expect(find.text('Depreciação observada'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('valor_aquisicao_depreciacao')),
+      findsNothing,
+    );
+    await tester.tap(find.text('Fechar'));
+    await tester.pumpAndSettle();
+
+    Future<void> alterarMetodo(MetodoDepreciacao metodo) async {
+      await tester.tap(find.byKey(const ValueKey('alterar_depreciacao')));
+      await tester.pumpAndSettle();
+      expect(find.text('50.000'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.byType(SegmentedButton<MetodoDepreciacao>),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.drag(find.byType(ListView), const Offset(0, -120));
+      await tester.pumpAndSettle();
+      final label = metodo == MetodoDepreciacao.observada
+          ? 'Observada'
+          : 'Projetada';
+      await tester.tap(
+        find.descendant(
+          of: find.byType(SegmentedButton<MetodoDepreciacao>),
+          matching: find.text(label),
+        ),
+      );
+      await tester.scrollUntilVisible(
+        find.text('Salvar'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.drag(find.byType(ListView), const Offset(0, -300));
+      await tester.pumpAndSettle();
+      tester
+          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Salvar'))
+          .onPressed!();
+      await tester.pumpAndSettle();
+      expect(depreciacaoController.dados?.metodoSelecionado, metodo);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('alterar_depreciacao')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+    }
+
+    await alterarMetodo(MetodoDepreciacao.projetada);
+    expect(find.text('Projetada'), findsOneWidget);
+    await alterarMetodo(MetodoDepreciacao.observada);
+    expect(find.text('Observada'), findsOneWidget);
+    expect(
+      await database.select(database.depreciacoesVeiculo).get(),
+      hasLength(1),
+    );
+    expect(
+      (await database.select(database.depreciacoesVeiculo).getSingle())
+          .veiculoId,
+      1,
+    );
+    expect(tester.takeException(), isNull);
     await tester.tap(find.byTooltip('Novo custo recorrente'));
     await tester.pumpAndSettle();
     expect(find.text('Novo custo recorrente'), findsOneWidget);

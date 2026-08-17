@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/database/app_database.dart';
+import '../../../../core/formatters/quilometragem_input_formatter.dart';
 
 typedef EditarJornadaResultado = ({
   DateTime dataHoraInicio,
@@ -45,11 +46,11 @@ class _EditarJornadaDialogState extends State<EditarJornadaDialog> {
     dataHoraInicio = widget.jornada.dataHoraInicio;
     dataHoraFim = widget.jornada.dataHoraFim;
     odometroInicio = TextEditingController(
-      text: widget.jornada.odometroInicio.toString(),
+      text: formatarQuilometragem(widget.jornada.odometroInicio),
     );
     cidadeOrigem = TextEditingController(text: widget.jornada.cidadeOrigem);
     odometroFim = TextEditingController(
-      text: widget.jornada.odometroFim?.toString() ?? '',
+      text: formatarQuilometragem(widget.jornada.odometroFim),
     );
     cidadeDestino = TextEditingController(
       text: widget.jornada.cidadeDestino ?? '',
@@ -112,7 +113,7 @@ class _EditarJornadaDialogState extends State<EditarJornadaDialog> {
   }
 
   String? _validarOdometro(String? texto) {
-    final valor = int.tryParse(texto?.trim() ?? '');
+    final valor = parseQuilometragem(texto);
     if (valor == null) return 'Informe um número inteiro válido.';
     if (valor < 0) return 'O odômetro não pode ser negativo.';
     return null;
@@ -127,10 +128,10 @@ class _EditarJornadaDialogState extends State<EditarJornadaDialog> {
     if (!formKey.currentState!.validate()) return;
     Navigator.pop<EditarJornadaResultado>(context, (
       dataHoraInicio: dataHoraInicio,
-      odometroInicio: int.parse(odometroInicio.text.trim()),
+      odometroInicio: parseQuilometragem(odometroInicio.text)!,
       cidadeOrigem: cidadeOrigem.text.trim(),
       dataHoraFim: finalizada ? dataHoraFim : null,
-      odometroFim: finalizada ? int.parse(odometroFim.text.trim()) : null,
+      odometroFim: finalizada ? parseQuilometragem(odometroFim.text) : null,
       cidadeDestino: finalizada ? _opcional(cidadeDestino.text) : null,
       observacoes: _opcional(observacoes.text),
     ));
@@ -166,6 +167,7 @@ class _EditarJornadaDialogState extends State<EditarJornadaDialog> {
                   autofocus: true,
                   selectAllOnFocus: true,
                   keyboardType: TextInputType.number,
+                  inputFormatters: const [QuilometragemInputFormatter()],
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => focoCidadeOrigem.requestFocus(),
                   decoration: const InputDecoration(
@@ -202,6 +204,7 @@ class _EditarJornadaDialogState extends State<EditarJornadaDialog> {
                     focusNode: focoOdometroFim,
                     selectAllOnFocus: true,
                     keyboardType: TextInputType.number,
+                    inputFormatters: const [QuilometragemInputFormatter()],
                     textInputAction: TextInputAction.next,
                     onFieldSubmitted: (_) => focoCidadeDestino.requestFocus(),
                     decoration: const InputDecoration(

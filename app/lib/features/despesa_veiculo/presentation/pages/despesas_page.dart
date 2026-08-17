@@ -4,9 +4,12 @@ import 'package:intl/intl.dart';
 import '../../../../core/constants/enums/escopo_custo_recorrente.dart';
 import '../../../../core/constants/enums/tipo_custo_recorrente.dart';
 import '../../../../core/constants/enums/tipo_despesa_veiculo.dart';
+import '../../../../core/constants/enums/metodo_depreciacao.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../custo_recorrente/presentation/controllers/custo_recorrente_controller.dart';
 import '../../../custo_recorrente/presentation/widgets/editar_custo_recorrente_dialog.dart';
+import '../../../depreciacao_veiculo/presentation/controllers/depreciacao_veiculo_controller.dart';
+import '../../../depreciacao_veiculo/presentation/pages/depreciacao_veiculo_page.dart';
 import '../controllers/despesa_veiculo_controller.dart';
 import '../widgets/editar_despesa_veiculo_dialog.dart';
 
@@ -14,12 +17,14 @@ class DespesasPage extends StatefulWidget {
   final int veiculoId;
   final DespesaVeiculoController controller;
   final CustoRecorrenteController custoRecorrenteController;
+  final DepreciacaoVeiculoController depreciacaoController;
 
   const DespesasPage({
     super.key,
     required this.veiculoId,
     required this.controller,
     required this.custoRecorrenteController,
+    required this.depreciacaoController,
   });
 
   @override
@@ -32,6 +37,7 @@ class _DespesasPageState extends State<DespesasPage> {
     super.initState();
     widget.controller.carregar(widget.veiculoId);
     widget.custoRecorrenteController.carregar();
+    widget.depreciacaoController.carregar(widget.veiculoId);
   }
 
   Future<void> _abrirDespesa([DespesaVeiculo? existente]) async {
@@ -105,6 +111,19 @@ class _DespesasPageState extends State<DespesasPage> {
     );
   }
 
+  Future<void> _abrirDepreciacao() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => DepreciacaoVeiculoPage(
+          veiculoId: widget.veiculoId,
+          controller: widget.depreciacaoController,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    await widget.depreciacaoController.carregar(widget.veiculoId);
+  }
+
   String _escopoLabel(CustoRecorrente custo) {
     if (custo.escopo != EscopoCustoRecorrente.plataforma) {
       return custo.escopo.label;
@@ -156,6 +175,7 @@ class _DespesasPageState extends State<DespesasPage> {
         animation: Listenable.merge([
           widget.controller,
           widget.custoRecorrenteController,
+          widget.depreciacaoController,
         ]),
         builder: (context, _) {
           final custos = widget.custoRecorrenteController.historico;
@@ -212,12 +232,80 @@ class _DespesasPageState extends State<DespesasPage> {
                     ),
                 ],
               ],
+              const SizedBox(height: 24),
+              _TituloSecao(titulo: 'Depreciação do veículo'),
+              _DepreciacaoCard(
+                controller: widget.depreciacaoController,
+                onConfigurar: _abrirDepreciacao,
+              ),
             ],
           );
         },
       ),
     ),
   );
+}
+
+class _DepreciacaoCard extends StatelessWidget {
+  final DepreciacaoVeiculoController controller;
+  final VoidCallback onConfigurar;
+
+  const _DepreciacaoCard({
+    required this.controller,
+    required this.onConfigurar,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (controller.carregando && controller.dados == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    final resultado = controller.selecionada;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              resultado == null
+                  ? 'Depreciação ainda não calculada'
+                  : '${resultado.estimado ? 'Referência aproximada: ' : ''}'
+                        '${NumberFormat.currency(locale: 'pt_BR', symbol: r'R$').format(resultado.valorPorKm)}/km',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            if (resultado != null) Text(resultado.metodo.label),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                alignment: WrapAlignment.end,
+                children: [
+                  if (resultado != null)
+                    TextButton(
+                      key: const ValueKey('ver_calculo_depreciacao'),
+                      onPressed: () =>
+                          mostrarCalculoDepreciacao(context, resultado),
+                      child: const Text('Ver cálculo'),
+                    ),
+                  TextButton(
+                    key: ValueKey(
+                      resultado == null
+                          ? 'configurar_depreciacao'
+                          : 'alterar_depreciacao',
+                    ),
+                    onPressed: onConfigurar,
+                    child: Text(resultado == null ? 'Configurar' : 'Alterar'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _TituloSecao extends StatelessWidget {

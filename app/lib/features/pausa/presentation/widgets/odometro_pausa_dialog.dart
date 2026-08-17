@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/formatters/quilometragem_input_formatter.dart';
+
 class OdometroPausaDialog extends StatefulWidget {
   final String titulo;
   final int odometroMinimo;
@@ -21,7 +23,9 @@ class _OdometroPausaDialogState extends State<OdometroPausaDialog> {
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController(text: widget.odometroMinimo.toString());
+    controller = TextEditingController(
+      text: formatarQuilometragem(widget.odometroMinimo),
+    );
   }
 
   @override
@@ -40,12 +44,13 @@ class _OdometroPausaDialogState extends State<OdometroPausaDialog> {
           controller: controller,
           autofocus: true,
           keyboardType: TextInputType.number,
+          inputFormatters: const [QuilometragemInputFormatter()],
           textInputAction: TextInputAction.done,
           onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
           selectAllOnFocus: true,
           decoration: const InputDecoration(labelText: 'Odômetro atual'),
           validator: (texto) {
-            final valor = int.tryParse(texto?.trim() ?? '');
+            final valor = parseQuilometragem(texto);
             if (valor == null) return 'Informe um número inteiro válido.';
             if (valor < 0) return 'O odômetro não pode ser negativo.';
             if (valor < widget.odometroMinimo) {
@@ -63,7 +68,7 @@ class _OdometroPausaDialogState extends State<OdometroPausaDialog> {
         ElevatedButton(
           onPressed: () {
             if (formKey.currentState!.validate()) {
-              Navigator.pop(context, int.parse(controller.text.trim()));
+              Navigator.pop(context, parseQuilometragem(controller.text));
             }
           },
           child: const Text('Confirmar'),

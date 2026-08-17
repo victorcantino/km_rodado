@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/formatters/quilometragem_input_formatter.dart';
+
 typedef AbrirJornadaResultado = ({
   int odometro,
   String cidadeOrigem,
@@ -36,7 +38,7 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
   void initState() {
     super.initState();
     odometroController = TextEditingController(
-      text: widget.odometroInicial?.toString() ?? '',
+      text: formatarQuilometragem(widget.odometroInicial),
     );
     cidadeController = TextEditingController(
       text: widget.cidadeOrigemInicial ?? '',
@@ -108,6 +110,7 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
               controller: odometroController,
               autofocus: true,
               keyboardType: TextInputType.number,
+              inputFormatters: const [QuilometragemInputFormatter()],
               textInputAction: TextInputAction.next,
               selectAllOnFocus: true,
               decoration: const InputDecoration(labelText: 'Odômetro'),
@@ -118,7 +121,7 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
                   return 'Informe o odômetro.';
                 }
 
-                final odometro = int.tryParse(texto);
+                final odometro = parseQuilometragem(texto);
 
                 if (odometro == null) {
                   return 'Informe um número inteiro válido.';
@@ -178,7 +181,7 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
             }
 
             final resultado = (
-              odometro: int.parse(odometroController.text.trim()),
+              odometro: parseQuilometragem(odometroController.text)!,
               cidadeOrigem: cidadeController.text.trim(),
               dataHoraInicio: dataHoraInicio,
             );

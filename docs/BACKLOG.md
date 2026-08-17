@@ -68,12 +68,8 @@
 - Avaliar acompanhamento detalhado de quantidade de parcelas/obrigações somente
   se houver necessidade operacional real; não antecipar contrato, amortização,
   juros, vencimentos, pagamentos ou saldo devedor.
-- Cálculo de depreciação do veículo: definir uma metodologia simples e
-  explicável a partir de valor e hodômetro na aquisição, valor de
-  mercado/referência atual ou residual, hodômetro atual e tempo de posse/uso
-  quando necessário. Derivar R$/km somente com dados suficientes; caso
-  contrário, apresentar “Depreciação indisponível”, sem inventar percentual ou
-  valor. Esta feature antecede o Motor Econômico.
+- Integração opcional com FIPE e histórico de avaliações da depreciação, sem
+  substituir automaticamente o snapshot informado pelo usuário.
 - Avaliar associação opcional de Despesa a Jornada somente quando houver regra
   econômica segura, sem atribuir retroativamente custos gerais ao trabalho.
 - Evoluir despesas factuais para obrigações, competência, parcelas,

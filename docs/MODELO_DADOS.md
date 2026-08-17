@@ -139,6 +139,19 @@ pedágio, estacionamento, lavagem ou outra despesa.
 veículo exige `veiculoId`; atividade não recebe veículo nem Plataforma;
 Plataforma exige `plataformaId`. Valor ausente é desconhecido, nunca zero.
 
+### DepreciacoesVeiculo
+
+`id`, `veiculoId` → Veiculos (único), `metodoSelecionado?`,
+`valorAquisicaoCentavos?`, `valorAquisicaoEstimado`, `odometroAquisicao?`,
+`valorReferenciaCentavos?`, `valorReferenciaEstimado`, `fonteReferencia?`,
+`dataReferencia?`, `odometroReferencia?`, `valorVendaProjetadoCentavos?`,
+`valorVendaProjetadoEstimado`, `odometroVendaProjetado?`, `dataCriacao`,
+`dataAtualizacao?`.
+
+Guarda uma configuração parcial e um snapshot econômico por veículo. O valor
+em R$/km é sempre derivado, nunca persistido. A referência observada permanece
+fixa até edição explícita; o odômetro operacional atual é apenas sugestão.
+
 ## Relações principais
 
 ```text
@@ -152,6 +165,7 @@ Jornada? ──< BonusPromocao >── Plataforma
 Veiculo ──< Manutencao ──< ItemManutencao
 Veiculo ──< DespesaVeiculo
 Veiculo? ──< CustoRecorrente >── Plataforma?
+Veiculo ── DepreciacaoVeiculo (0..1)
 ```
 
 ## Dados derivados, não persistidos
@@ -167,9 +181,10 @@ Veiculo? ──< CustoRecorrente >── Plataforma?
 - custo conhecido/completo da Manutenção, próximo hodômetro e estados de
   recorrência por km/data.
 - equivalente mensal de cada Custo Recorrente.
+- depreciação observada/projetada em R$/km.
 
 ## Planejado, sem tabela atual
 
 Evento financeiro genérico, carteira de
 plataforma, alertas, clima, localização e sincronização não fazem parte do
-schema 11. Suas decisões e ideias permanecem no backlog e nas regras futuras.
+schema 12. Suas decisões e ideias permanecem no backlog e nas regras futuras.

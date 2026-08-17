@@ -19,6 +19,7 @@ app/lib/
 │   ├── abastecimento/
 │   ├── despesa_veiculo/
 │   ├── custo_recorrente/
+│   ├── depreciacao_veiculo/
 │   ├── ganho_individual/
 │   ├── jornada/
 │   ├── leitura_ganhos/
@@ -50,7 +51,7 @@ concreta, sem criar abstrações antecipadas.
 
 ## Banco e funcionamento offline
 
-O schema atual é 11. O banco é criado localmente e suas migrações preservam
+O schema atual é 12. O banco é criado localmente e suas migrações preservam
 instalações anteriores. Seeds idempotentes garantem os dados temporários de
 usuário/veículo e as plataformas padrão sem sobrescrever registros existentes.
 

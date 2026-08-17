@@ -13,6 +13,8 @@ import '../constants/enums/tipo_bonus_promocao.dart';
 import '../constants/enums/tipo_despesa_veiculo.dart';
 import '../constants/enums/tipo_custo_recorrente.dart';
 import '../constants/enums/escopo_custo_recorrente.dart';
+import '../constants/enums/fonte_referencia_depreciacao.dart';
+import '../constants/enums/metodo_depreciacao.dart';
 import 'tables/usuario.dart';
 import 'tables/veiculo.dart';
 import 'tables/configuracao.dart';
@@ -29,6 +31,7 @@ import 'tables/manutencao.dart';
 import 'tables/item_manutencao.dart';
 import 'tables/despesa_veiculo.dart';
 import 'tables/custo_recorrente.dart';
+import 'tables/depreciacao_veiculo.dart';
 
 import 'daos/jornada_dao.dart';
 import 'daos/leitura_ganhos_dao.dart';
@@ -40,6 +43,7 @@ import 'daos/bonus_promocao_dao.dart';
 import 'daos/manutencao_dao.dart';
 import 'daos/despesa_veiculo_dao.dart';
 import 'daos/custo_recorrente_dao.dart';
+import 'daos/depreciacao_veiculo_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -61,6 +65,7 @@ part 'app_database.g.dart';
     ItensManutencao,
     DespesasVeiculo,
     CustosRecorrentes,
+    DepreciacoesVeiculo,
   ],
   daos: [
     JornadaDao,
@@ -73,6 +78,7 @@ part 'app_database.g.dart';
     ManutencaoDao,
     DespesaVeiculoDao,
     CustoRecorrenteDao,
+    DepreciacaoVeiculoDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -81,7 +87,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -118,6 +124,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 11) {
         await migrator.createTable(custosRecorrentes);
+      }
+      if (from < 12) {
+        await migrator.createTable(depreciacoesVeiculo);
       }
     },
     beforeOpen: (details) async {

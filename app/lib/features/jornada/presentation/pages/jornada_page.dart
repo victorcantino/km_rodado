@@ -14,6 +14,7 @@ import '../../../../core/database/daos/bonus_promocao_dao.dart';
 import '../../../../core/database/daos/manutencao_dao.dart';
 import '../../../../core/database/daos/despesa_veiculo_dao.dart';
 import '../../../../core/database/daos/custo_recorrente_dao.dart';
+import '../../../../core/database/daos/depreciacao_veiculo_dao.dart';
 import '../../../../core/database/seeds/seed.dart';
 import '../../../../core/database/seeds/plataformas_seed.dart';
 import '../../../leitura_ganhos/data/leitura_ganhos_repository.dart';
@@ -54,6 +55,9 @@ import '../../../despesa_veiculo/presentation/pages/despesas_page.dart';
 import '../../../custo_recorrente/data/custo_recorrente_repository.dart';
 import '../../../custo_recorrente/data/custo_recorrente_service.dart';
 import '../../../custo_recorrente/presentation/controllers/custo_recorrente_controller.dart';
+import '../../../depreciacao_veiculo/data/depreciacao_veiculo_repository.dart';
+import '../../../depreciacao_veiculo/data/depreciacao_veiculo_service.dart';
+import '../../../depreciacao_veiculo/presentation/controllers/depreciacao_veiculo_controller.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
 import '../../data/resumo_jornada.dart';
@@ -334,17 +338,27 @@ class _JornadaPageState extends State<JornadaPage> {
         CustoRecorrenteRepository(CustoRecorrenteDao(database)),
       ),
     );
+    final depreciacaoController = DepreciacaoVeiculoController(
+      DepreciacaoVeiculoService(
+        DepreciacaoVeiculoRepository(
+          DepreciacaoVeiculoDao(database),
+          AbastecimentoRepository(AbastecimentoDao(database)),
+        ),
+      ),
+    );
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (_) => DespesasPage(
           veiculoId: controller?.jornadaAtual?.veiculoId ?? 1,
           controller: despesasController,
           custoRecorrenteController: custosController,
+          depreciacaoController: depreciacaoController,
         ),
       ),
     );
     despesasController.dispose();
     custosController.dispose();
+    depreciacaoController.dispose();
   }
 
   Future<void> _registrarGanhoIndividual([Plataforma? plataforma]) async {

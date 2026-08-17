@@ -4,8 +4,8 @@
 
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
-- schema atual: **11**;
-- suíte automatizada: **196 testes aprovados** em 17/08/2026.
+- schema atual: **12**;
+- suíte automatizada: **207 testes aprovados** em 17/08/2026.
 
 ## Implementado
 
@@ -36,9 +36,10 @@
 - Custos Recorrentes separados do fluxo de caixa, com competência mensal,
   anual ou personalizada, escopo veículo/atividade/Plataforma, valor exato ou
   estimado e equivalente mensal derivado; inclui referência simples de parcela
-  do veículo, sem controle financeiro detalhado; depreciação manual não é
-  oferecida e aguarda cálculo derivado próprio; Despesas e recorrências aparecem
+  do veículo, sem controle financeiro detalhado; Despesas e recorrências aparecem
   em seções distintas da mesma tela, com criação e edição diretas;
+- depreciação observada e projetada por veículo, com configuração parcial,
+  método principal opcional e R$/km derivado sem percentuais arbitrários;
 - Passes por faturamento ou tempo, validade derivada, repetição segura por
   Plataforma, cadastro retroativo, custos separados e Jornada opcional;
 - crédito promocional retroativo sem escolha de subtipo pelo motorista; valores
@@ -51,7 +52,7 @@
 - JornadaPage protegida pelos insets seguros inferiores do Android;
 - formulários operacionais navegam pelo teclado entre campos editáveis,
   ignorando botões, seletores e calendários, e encerram a sequência com Done;
-- migrações preservadoras até schema 11 e seeds idempotentes.
+- migrações preservadoras até schema 12 e seeds idempotentes.
 
 ## Em teste operacional
 
