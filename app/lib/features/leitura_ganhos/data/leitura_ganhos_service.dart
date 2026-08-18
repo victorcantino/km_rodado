@@ -74,16 +74,21 @@ class LeituraGanhosService {
     required int jornadaId,
     required List<ItemLeituraGanhosEntrada> itens,
   }) async {
-    await _validarJornadaAberta(jornadaId);
+    final jornada = await _validarJornadaAberta(jornadaId);
     await _validarItens(jornadaId, itens, usarLeituraInicial: false);
 
     if (await buscarLeituraInicial(jornadaId) != null) {
       throw Exception('Os ganhos iniciais desta Jornada já foram registrados.');
     }
 
-    final agora = _agora();
+    final instanteTecnico = _agora();
     return _repository.salvarLeituraUnica(
-      _criarLeitura(jornadaId, TipoLeituraGanhos.inicial, agora),
+      _criarLeitura(
+        jornadaId,
+        TipoLeituraGanhos.inicial,
+        jornada.dataHoraInicio,
+        dataCriacao: instanteTecnico,
+      ),
       TipoLeituraGanhos.inicial,
       (leituraId) => _criarItens(leituraId, itens),
     );

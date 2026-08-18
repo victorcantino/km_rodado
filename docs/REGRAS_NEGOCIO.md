@@ -89,8 +89,9 @@ justificativa e inserção histórica arbitrária permanecem futuras.
   inicial, mas não é subtraído da variação seguinte: o próprio baseline já o
   exclui da receita da Jornada. Crédito posterior entra no intervalo
   `(snapshot anterior, snapshot posterior]` correspondente.
-- Regressão de valor ou viagens, item ausente, Passe no intervalo ou bônus maior
-  que a variação torna a receita dependente de conferência.
+- Regressão de valor ou viagens, item ausente, Passe sem comportamento conhecido
+  no intervalo ou bônus maior que a variação torna a receita dependente de
+  conferência.
 - Não se infere reset nem efeito financeiro automaticamente.
 
 ### Ganhos individuais
@@ -118,11 +119,14 @@ justificativa e inserção histórica arbitrária permanecem futuras.
 - Zero viagens produz ticket médio indisponível (`—`).
 - Se qualquer receita necessária não for calculável, totais gerais, ticket
   médio geral, R$/h e R$/km não são apresentados como exatos.
-- Se a Leitura Inicial ocorrer depois do início operacional da Jornada, a
-  cobertura financeira inicial é parcial. Não se inventam ganhos do intervalo
-  ausente; receita, viagens, ticket médio, R$/h, R$/km e resultado operacional
-  gerais ficam indisponíveis como totais exatos, embora fatos conhecidos do
-  período observado possam continuar visíveis.
+- A Leitura Inicial é a declaração dos acumulados no início da Jornada. Sua
+  `dataHora` é sempre `Jornada.dataHoraInicio`, inclusive quando os ganhos
+  iniciais pendentes são informados posteriormente; `dataCriacao` registra o
+  instante técnico do salvamento.
+- Sem Leitura Inicial, os ganhos iniciais permanecem pendentes e os indicadores
+  que dependem desse baseline não são calculados. Não existe mecanismo de
+  cobertura financeira baseado na diferença entre horários.
+- Passe, Bônus/Promoção e Pausa não criam `LeituraGanhos`.
 
 ## Abastecimentos
 
@@ -319,10 +323,15 @@ justificativa e inserção histórica arbitrária permanecem futuras.
   aberta e o instante atual; cadastro retroativo fora desse intervalo mantém
   `jornadaId` nulo.
 - Passe é mostrado separadamente no resumo e não reduz ticket médio.
-- Passe de acumulada entre leituras inicial/final exige conferência da receita.
-  Não se calcula automaticamente `final - inicial + passe`.
-- Foi observado que a 99 pode reduzir o visível e a Uber pode gerar débito
-  interno, mas essas observações não viram hardcode por nome.
+- Na 99, o Passe reduz o acumulado visível. Para evitar dupla contagem, o valor
+  do Passe no intervalo é somado de volta à variação para derivar o faturamento
+  bruto e depois descontado uma única vez como custo operacional.
+- Na Uber, o Passe não reduz o acumulado principal da mesma forma. A variação
+  permanece como faturamento bruto e o Passe é descontado separadamente como
+  custo operacional.
+- Para outras Plataformas, Passe entre snapshots mantém a receita dependente de
+  conferência até existir comportamento real conhecido. Não há módulo ou fluxo
+  manual de Conciliação.
 - Há dois mecanismos conhecidos: por tempo e por limite de faturamento. Ofertas
   concretas, preços, durações e limites são dados observados variáveis, não
   tipos fixos nem valores hardcoded.

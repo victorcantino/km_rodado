@@ -109,15 +109,6 @@ class JornadaService {
     final snapshots = await leituraRepository.listarSnapshotsDaJornada(
       jornada.id,
     );
-    final leiturasIniciais =
-        snapshots
-            .map((snapshot) => snapshot.leitura)
-            .where((leitura) => leitura.tipo == TipoLeituraGanhos.inicial)
-            .toList()
-          ..sort((a, b) => a.dataHora.compareTo(b.dataHora));
-    final coberturaFinanceiraInicialCompleta =
-        leiturasIniciais.isNotEmpty &&
-        !leiturasIniciais.first.dataHora.isAfter(jornada.dataHoraInicio);
     final totaisIndividuais =
         await _ganhoIndividualRepository?.totalizarPorJornada(jornada.id) ??
         const [];
@@ -178,7 +169,6 @@ class JornadaService {
       ]..sort((a, b) => a.nome.compareTo(b.nome)),
       passes: passes,
       bonusPromocoes: bonusPromocoes,
-      coberturaFinanceiraInicialCompleta: coberturaFinanceiraInicialCompleta,
     );
   }
 
@@ -255,7 +245,7 @@ class JornadaService {
       final variacaoViagens =
           atual.item.quantidadeViagensAcumulada -
           anterior.item.quantidadeViagensAcumulada;
-      final possuiPasse = passes.any(
+      final passesDoIntervalo = passes.where(
         (item) =>
             item.passe.plataformaId == inicial.plataforma.id &&
             _pertenceAoIntervalo(
@@ -264,6 +254,16 @@ class JornadaService {
               leituraAtual.dataHora,
             ),
       );
+      final possuiPasse = passesDoIntervalo.isNotEmpty;
+      final nomePlataforma = inicial.plataforma.nome.trim().toLowerCase();
+      final passeComEfeitoConhecido =
+          !possuiPasse || nomePlataforma == '99' || nomePlataforma == 'uber';
+      final passesRefletidosNoAcumulado = nomePlataforma == '99'
+          ? passesDoIntervalo.fold<int>(
+              0,
+              (total, item) => total + item.passe.valorPagoCentavos,
+            )
+          : 0;
       final bonusDoIntervalo = bonusPromocoes
           .where(
             (item) =>
@@ -278,9 +278,13 @@ class JornadaService {
             0,
             (total, item) => total + item.bonusPromocao.valorCentavos,
           );
-      final receitaIntervalo = variacaoValor - bonusDoIntervalo;
-      if (possuiPasse ||
-          variacaoValor < 0 ||
+      final receitaIntervalo =
+          variacaoValor - bonusDoIntervalo + passesRefletidosNoAcumulado;
+      final regressaoValorInexplicada =
+          variacaoValor < 0 &&
+          !(nomePlataforma == '99' && passesRefletidosNoAcumulado > 0);
+      if (!passeComEfeitoConhecido ||
+          regressaoValorInexplicada ||
           variacaoViagens < 0 ||
           receitaIntervalo < 0) {
         calculavel = false;

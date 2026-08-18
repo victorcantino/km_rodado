@@ -1373,16 +1373,7 @@ class _ResumoJornadaConcluida extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                resumo.coberturaFinanceiraInicialCompleta
-                    ? 'Resultado financeiro incompleto'
-                    : 'Cobertura financeira parcial',
-              ),
-              if (!resumo.coberturaFinanceiraInicialCompleta)
-                const Text(
-                  'A leitura inicial ocorreu depois do início da Jornada. '
-                  'Os valores conhecidos cobrem somente o período observado.',
-                ),
+              Text('Resultado financeiro incompleto'),
               const Text('Ticket médio geral: —'),
             ],
           ),

@@ -86,7 +86,8 @@
 
 ## Plataforma e análises
 
-- Evoluir reconciliação de resets, Passes e outras movimentações conhecidas.
+- Evoluir a interpretação de resets, Passes e outras movimentações conhecidas
+  somente com evidência operacional, sem antecipar módulo de Conciliação.
 - Quando houver necessidade operacional real, generalizar condições de Passe
   para duração, limite de faturamento, quantidade máxima de usos/pedidos e
   combinações “o que ocorrer primeiro”. Não antecipar enum de uso nem engine
