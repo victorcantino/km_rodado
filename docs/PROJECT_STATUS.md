@@ -5,7 +5,7 @@
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
 - schema atual: **12**;
-- suíte automatizada: **207 testes aprovados** em 17/08/2026.
+- suíte automatizada: **211 testes aprovados** em 18/08/2026.
 
 ## Implementado
 
@@ -16,12 +16,14 @@
 - Pausas: início/fim, odômetros, duração derivada, título opcional, histórico e
   correção completa pelo lápis com coerência temporal e de odômetro;
 - Leituras de ganhos inicial, parcial e final, com fechamento atômico;
+- Leitura Inicial como declaração do baseline no início da Jornada, inclusive
+  quando registrada posteriormente, com instante técnico de criação preservado;
 - plataformas padrão configuráveis, ativas/inativas e classificadas como
   acumuladas ou individuais;
 - ganhos acumulados por snapshots e ganhos individuais/Particular em lote;
 - resumo derivado com receita, viagens, ticket médio, tempos, distâncias e
-  indicadores; regressões, passes ou baseline posterior ao início impedem
-  totais financeiros gerais exatos;
+  indicadores; regressões e fatos financeiros sem interpretação segura impedem
+  totais gerais exatos;
 - Abastecimentos atuais/retroativos, preço efetivo derivado, tanque cheio ou
   parcial e associação opcional à Jornada;
 - inteligência derivada de Abastecimentos com ciclos cheio a cheio, parciais
@@ -47,6 +49,8 @@
   uniforme por intervalos;
 - baseline protege contra dupla subtração de bônus creditado antes da Jornada,
   sem criar associação cronologicamente falsa;
+- Passes da 99 são recompostos quando já refletidos no acumulado; Passes da
+  Uber permanecem como custo separado da variação, sem dupla contagem;
 - a ação de ganho Particular na JornadaPage acompanha a disponibilidade de
   Plataformas individuais ativas e não aparece quando nenhuma está disponível;
 - JornadaPage protegida pelos insets seguros inferiores do Android;
@@ -65,6 +69,8 @@ entregas mais recentes; a interface segue funcional e provisória.
 - não há exclusão histórica nem auditoria/versionamento das correções;
 - resets e efeitos de Passes sobre snapshots não são inferidos; bônus conhecidos
   são reconciliados somente quando a matemática é segura;
+- não existe módulo de Conciliação; o termo descreve somente a interpretação
+  derivada de Passes e Bônus/Promoções nos acumulados;
 - não há custo/km, análise por posto, consolidação financeira geral,
   motor econômico, obrigações/vencimentos, notificações, GPS,
   nuvem ou importação do AppSheet; previsão por data é omitida sem histórico

@@ -75,6 +75,7 @@ void main() {
     expect(bonus.valorCentavos, 2000);
     expect(bonus.tipo, TipoBonusPromocao.promocao);
     expect(bonus.observacao, 'Meta semanal');
+    expect(await database.select(database.leiturasGanhos).get(), isEmpty);
   });
 
   test('controller persiste novo crédito com tipo técnico canônico', () async {

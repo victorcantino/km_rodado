@@ -76,6 +76,7 @@ void main() {
       expect(passe.validadeAte, DateTime(2027, 2, 9, 18));
       expect(passe.limiteFaturamentoCentavos, 20000);
       expect(passe.observacao, isNull);
+      expect(await database.select(database.leiturasGanhos).get(), isEmpty);
     },
   );
 

@@ -99,12 +99,15 @@ digitação.
 ## ADR-012 — Passes como custo factual separado
 
 Decisão: registrar passes por Plataforma com valor em centavos, instante
-operacional, criação técnica e Jornada opcional. Não ajustar automaticamente
-snapshots nem ticket médio. Um passe entre as leituras inicial e final torna a
-receita acumulada daquela plataforma dependente de conferência.
+operacional, criação técnica e Jornada opcional. Na 99, o Passe refletido no
+acumulado é recomposto para derivar faturamento bruto e descontado uma vez no
+resultado operacional. Na Uber, a variação do acumulado permanece como
+faturamento e o Passe é custo separado. Outras Plataformas permanecem em
+revisão quando houver Passe no intervalo.
 
-Motivo: o efeito observado varia entre plataformas. O custo é conhecido, mas a
-reconciliação da receita exige regras explícitas ainda não formalizadas.
+Motivo: o efeito observado varia entre plataformas. As duas regras factuais
+conhecidas evitam dupla contagem sem criar configuração genérica, tabela,
+página ou workflow de Conciliação.
 
 Os mecanismos suportados nesta etapa são `tempo` e `faturamento`; duração,
 validade, limite e preço caracterizam a oferta observada. Essa formalização
@@ -273,3 +276,16 @@ Motivo: depreciação é perda econômica estimada, não saída recorrente de ca
 Separá-la de Despesas e Custos Recorrentes evita percentuais arbitrários e
 dupla contagem futura. A referência observada é deliberadamente estável até
 edição; integração automática com FIPE permanece evolução opcional.
+
+## ADR-023 — Instante operacional do baseline financeiro
+
+Decisão: a Leitura Inicial declara os acumulados no início da Jornada. Sua
+`dataHora` é sempre `Jornada.dataHoraInicio`, tanto no diálogo automático quanto
+no registro posterior de ganhos iniciais pendentes; `dataCriacao` preserva o
+instante técnico do salvamento.
+
+Motivo: o usuário está declarando o baseline, não registrando uma observação
+temporal intermediária. Portanto, não existe cobertura financeira parcial
+inferida pela demora no preenchimento. Conciliação permanece apenas a
+interpretação derivada de Passes e Bônus/Promoções em relação aos snapshots,
+sem módulo, tabela ou workflow próprios.

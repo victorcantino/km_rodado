@@ -108,7 +108,7 @@ void main() {
     );
   });
 
-  test('abertura tardia não falsifica horário da Leitura Inicial', () async {
+  test('registro posterior declara baseline no início da Jornada', () async {
     final jornada = await abrirJornada();
     final uberId = await inserirPlataforma(
       'Uber',
@@ -124,9 +124,32 @@ void main() {
       jornada.dataHoraInicio,
       instanteLeitura.subtract(const Duration(hours: 1)),
     );
-    expect(leitura!.dataHora, instanteLeitura);
-    expect(leitura.dataHora.isAfter(jornada.dataHoraInicio), isTrue);
+    expect(leitura!.dataHora, jornada.dataHoraInicio);
+    expect(leitura.dataCriacao, instanteLeitura);
   });
+
+  test(
+    'fluxo automático usa início da Jornada como instante operacional',
+    () async {
+      final jornada = await abrirJornada();
+      final uberId = await inserirPlataforma(
+        'Uber',
+        TipoRegistroGanhos.acumulado,
+      );
+
+      final leituraId = await leituraService.salvarLeituraInicial(
+        jornadaId: jornada.id,
+        itens: [item(uberId, valor: 0, viagens: 0)],
+      );
+      final leitura = await leituraService.buscarLeitura(leituraId);
+      final itens = await leituraRepository.listarItens(leituraId);
+
+      expect(leitura!.dataHora, jornada.dataHoraInicio);
+      expect(leitura.dataCriacao, instanteLeitura);
+      expect(itens.single.valorAcumuladoCentavos, 0);
+      expect(itens.single.quantidadeViagensAcumulada, 0);
+    },
+  );
 
   test('cria leitura inicial sem Pausa e impede duplicidade', () async {
     final jornada = await abrirJornada();

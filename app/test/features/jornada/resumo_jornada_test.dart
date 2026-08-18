@@ -197,7 +197,6 @@ void main() {
 
     expect(resumo, isNotNull);
     expect(resumo!.duracaoTotal, const Duration(hours: 8, minutes: 6));
-    expect(resumo.coberturaFinanceiraInicialCompleta, isTrue);
     expect(resumo.tempoPausa, const Duration(hours: 1, minutes: 12));
     expect(resumo.tempoAtivo, const Duration(hours: 6, minutes: 54));
     expect(resumo.quilometrosTotal, 187);
@@ -216,42 +215,51 @@ void main() {
     expect(uber.ticketMedio, closeTo(15.309, 0.001));
   });
 
-  test(
-    'baseline posterior ao início deixa cobertura financeira parcial',
-    () async {
-      final jornadaId = await inserirJornada(
-        inicio: DateTime(2026, 8, 10, 8),
-        fim: DateTime(2026, 8, 10, 18),
-        odometroFim: 1200,
-      );
-      final uberId = await inserirPlataforma('Uber');
-      await inserirLeitura(
-        jornadaId,
-        TipoLeituraGanhos.inicial,
-        DateTime(2026, 8, 10, 8, 30),
-        {uberId: (5000, 5)},
-      );
-      await inserirLeitura(
-        jornadaId,
-        TipoLeituraGanhos.finalDaJornada,
-        DateTime(2026, 8, 10, 18),
-        {uberId: (15000, 15)},
-      );
+  test('timestamp legado posterior não bloqueia indicadores', () async {
+    final jornadaId = await inserirJornada(
+      inicio: DateTime(2026, 8, 10, 8),
+      fim: DateTime(2026, 8, 10, 18),
+      odometroFim: 1200,
+    );
+    final uberId = await inserirPlataforma('Uber');
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.inicial,
+      DateTime(2026, 8, 10, 8, 30),
+      {uberId: (5000, 5)},
+    );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.finalDaJornada,
+      DateTime(2026, 8, 10, 18),
+      {uberId: (15000, 15)},
+    );
 
-      final resumo = (await service.resumoUltimaJornada())!;
+    final resumo = (await service.resumoUltimaJornada())!;
 
-      expect(resumo.coberturaFinanceiraInicialCompleta, isFalse);
-      expect(resumo.financeiroCompleto, isFalse);
-      expect(resumo.receitaTotalCentavos, isNull);
-      expect(resumo.quantidadeTotalViagens, isNull);
-      expect(resumo.ticketMedioGeral, isNull);
-      expect(resumo.receitaPorHoraAtiva, isNull);
-      expect(resumo.receitaPorKmAtivo, isNull);
-      expect(resumo.resultadoOperacionalCentavos, isNull);
-      expect(resumo.resultadosPlataformas.single.receitaCentavos, 10000);
-      expect(resumo.resultadosPlataformas.single.quantidadeViagens, 10);
-    },
-  );
+    expect(resumo.financeiroCompleto, isTrue);
+    expect(resumo.receitaTotalCentavos, 10000);
+    expect(resumo.quantidadeTotalViagens, 10);
+    expect(resumo.ticketMedioGeral, 10);
+    expect(resumo.receitaPorHoraAtiva, 10);
+    expect(resumo.receitaPorKmAtivo, 0.5);
+    expect(resumo.resultadoOperacionalCentavos, 10000);
+    expect(resumo.resultadosPlataformas.single.receitaCentavos, 10000);
+    expect(resumo.resultadosPlataformas.single.quantidadeViagens, 10);
+  });
+
+  test('ausência de Leitura Inicial mantém resultado incompleto', () async {
+    await inserirJornada(
+      inicio: DateTime(2026, 8, 10, 8),
+      fim: DateTime(2026, 8, 10, 18),
+      odometroFim: 1200,
+    );
+
+    final resumo = (await service.resumoUltimaJornada())!;
+
+    expect(resumo.financeiroCompleto, isFalse);
+    expect(resumo.receitaTotalCentavos, isNull);
+  });
 
   test('sem Pausas aceita receita, viagens e quilômetros zero', () async {
     final jornadaId = await inserirJornada(
@@ -747,5 +755,79 @@ void main() {
     expect(resumo.passes, hasLength(1));
     expect(resumo.bonusPromocoesCentavos, 500);
     expect(resumo.resultadoOperacionalCentavos, isNull);
+  });
+
+  test('99 recompõe Passe refletido sem descontá-lo duas vezes', () async {
+    final jornadaId = await inserirJornada(
+      inicio: DateTime(2026, 8, 10, 8),
+      fim: DateTime(2026, 8, 10, 10),
+    );
+    final plataformaId = await inserirPlataforma('99');
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.inicial,
+      DateTime(2026, 8, 10, 8),
+      {plataformaId: (10000, 5)},
+    );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.finalDaJornada,
+      DateTime(2026, 8, 10, 10),
+      {plataformaId: (20000, 10)},
+    );
+    await database
+        .into(database.passesPlataforma)
+        .insert(
+          PassesPlataformaCompanion.insert(
+            plataformaId: plataformaId,
+            jornadaId: Value(jornadaId),
+            dataHora: DateTime(2026, 8, 10, 9),
+            valorPagoCentavos: 2000,
+          ),
+        );
+
+    final resultado =
+        (await service.resumoUltimaJornada())!.resultadosPlataformas.single;
+
+    expect(resultado.receitaCentavos, 12000);
+    expect(resultado.custoPassesCentavos, 2000);
+    expect(resultado.resultadoOperacionalCentavos, 10000);
+  });
+
+  test('Uber mantém Passe separado da variação do acumulado', () async {
+    final jornadaId = await inserirJornada(
+      inicio: DateTime(2026, 8, 10, 8),
+      fim: DateTime(2026, 8, 10, 10),
+    );
+    final plataformaId = await inserirPlataforma('Uber');
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.inicial,
+      DateTime(2026, 8, 10, 8),
+      {plataformaId: (10000, 5)},
+    );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.finalDaJornada,
+      DateTime(2026, 8, 10, 10),
+      {plataformaId: (22000, 10)},
+    );
+    await database
+        .into(database.passesPlataforma)
+        .insert(
+          PassesPlataformaCompanion.insert(
+            plataformaId: plataformaId,
+            jornadaId: Value(jornadaId),
+            dataHora: DateTime(2026, 8, 10, 9),
+            valorPagoCentavos: 2000,
+          ),
+        );
+
+    final resultado =
+        (await service.resumoUltimaJornada())!.resultadosPlataformas.single;
+
+    expect(resultado.receitaCentavos, 12000);
+    expect(resultado.custoPassesCentavos, 2000);
+    expect(resultado.resultadoOperacionalCentavos, 10000);
   });
 }
