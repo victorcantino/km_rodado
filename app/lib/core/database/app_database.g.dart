@@ -4496,6 +4496,18 @@ class $LancamentosGanhoIndividualTable extends LancamentosGanhoIndividual
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _dataHoraMeta = const VerificationMeta(
+    'dataHora',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataHora = GeneratedColumn<DateTime>(
+    'data_hora',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
   static const VerificationMeta _dataCriacaoMeta = const VerificationMeta(
     'dataCriacao',
   );
@@ -4516,6 +4528,7 @@ class $LancamentosGanhoIndividualTable extends LancamentosGanhoIndividual
     quantidadeViagens,
     valorTotalCentavos,
     observacao,
+    dataHora,
     dataCriacao,
   ];
   @override
@@ -4578,6 +4591,12 @@ class $LancamentosGanhoIndividualTable extends LancamentosGanhoIndividual
         observacao.isAcceptableOrUnknown(data['observacao']!, _observacaoMeta),
       );
     }
+    if (data.containsKey('data_hora')) {
+      context.handle(
+        _dataHoraMeta,
+        dataHora.isAcceptableOrUnknown(data['data_hora']!, _dataHoraMeta),
+      );
+    }
     if (data.containsKey('data_criacao')) {
       context.handle(
         _dataCriacaoMeta,
@@ -4623,6 +4642,10 @@ class $LancamentosGanhoIndividualTable extends LancamentosGanhoIndividual
         DriftSqlType.string,
         data['${effectivePrefix}observacao'],
       ),
+      dataHora: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_hora'],
+      )!,
       dataCriacao: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}data_criacao'],
@@ -4644,6 +4667,7 @@ class LancamentosGanhoIndividualData extends DataClass
   final int quantidadeViagens;
   final int valorTotalCentavos;
   final String? observacao;
+  final DateTime dataHora;
   final DateTime dataCriacao;
   const LancamentosGanhoIndividualData({
     required this.id,
@@ -4652,6 +4676,7 @@ class LancamentosGanhoIndividualData extends DataClass
     required this.quantidadeViagens,
     required this.valorTotalCentavos,
     this.observacao,
+    required this.dataHora,
     required this.dataCriacao,
   });
   @override
@@ -4667,6 +4692,7 @@ class LancamentosGanhoIndividualData extends DataClass
     if (!nullToAbsent || observacao != null) {
       map['observacao'] = Variable<String>(observacao);
     }
+    map['data_hora'] = Variable<DateTime>(dataHora);
     map['data_criacao'] = Variable<DateTime>(dataCriacao);
     return map;
   }
@@ -4683,6 +4709,7 @@ class LancamentosGanhoIndividualData extends DataClass
       observacao: observacao == null && nullToAbsent
           ? const Value.absent()
           : Value(observacao),
+      dataHora: Value(dataHora),
       dataCriacao: Value(dataCriacao),
     );
   }
@@ -4699,6 +4726,7 @@ class LancamentosGanhoIndividualData extends DataClass
       quantidadeViagens: serializer.fromJson<int>(json['quantidadeViagens']),
       valorTotalCentavos: serializer.fromJson<int>(json['valorTotalCentavos']),
       observacao: serializer.fromJson<String?>(json['observacao']),
+      dataHora: serializer.fromJson<DateTime>(json['dataHora']),
       dataCriacao: serializer.fromJson<DateTime>(json['dataCriacao']),
     );
   }
@@ -4712,6 +4740,7 @@ class LancamentosGanhoIndividualData extends DataClass
       'quantidadeViagens': serializer.toJson<int>(quantidadeViagens),
       'valorTotalCentavos': serializer.toJson<int>(valorTotalCentavos),
       'observacao': serializer.toJson<String?>(observacao),
+      'dataHora': serializer.toJson<DateTime>(dataHora),
       'dataCriacao': serializer.toJson<DateTime>(dataCriacao),
     };
   }
@@ -4723,6 +4752,7 @@ class LancamentosGanhoIndividualData extends DataClass
     int? quantidadeViagens,
     int? valorTotalCentavos,
     Value<String?> observacao = const Value.absent(),
+    DateTime? dataHora,
     DateTime? dataCriacao,
   }) => LancamentosGanhoIndividualData(
     id: id ?? this.id,
@@ -4731,6 +4761,7 @@ class LancamentosGanhoIndividualData extends DataClass
     quantidadeViagens: quantidadeViagens ?? this.quantidadeViagens,
     valorTotalCentavos: valorTotalCentavos ?? this.valorTotalCentavos,
     observacao: observacao.present ? observacao.value : this.observacao,
+    dataHora: dataHora ?? this.dataHora,
     dataCriacao: dataCriacao ?? this.dataCriacao,
   );
   LancamentosGanhoIndividualData copyWithCompanion(
@@ -4751,6 +4782,7 @@ class LancamentosGanhoIndividualData extends DataClass
       observacao: data.observacao.present
           ? data.observacao.value
           : this.observacao,
+      dataHora: data.dataHora.present ? data.dataHora.value : this.dataHora,
       dataCriacao: data.dataCriacao.present
           ? data.dataCriacao.value
           : this.dataCriacao,
@@ -4766,6 +4798,7 @@ class LancamentosGanhoIndividualData extends DataClass
           ..write('quantidadeViagens: $quantidadeViagens, ')
           ..write('valorTotalCentavos: $valorTotalCentavos, ')
           ..write('observacao: $observacao, ')
+          ..write('dataHora: $dataHora, ')
           ..write('dataCriacao: $dataCriacao')
           ..write(')'))
         .toString();
@@ -4779,6 +4812,7 @@ class LancamentosGanhoIndividualData extends DataClass
     quantidadeViagens,
     valorTotalCentavos,
     observacao,
+    dataHora,
     dataCriacao,
   );
   @override
@@ -4791,6 +4825,7 @@ class LancamentosGanhoIndividualData extends DataClass
           other.quantidadeViagens == this.quantidadeViagens &&
           other.valorTotalCentavos == this.valorTotalCentavos &&
           other.observacao == this.observacao &&
+          other.dataHora == this.dataHora &&
           other.dataCriacao == this.dataCriacao);
 }
 
@@ -4802,6 +4837,7 @@ class LancamentosGanhoIndividualCompanion
   final Value<int> quantidadeViagens;
   final Value<int> valorTotalCentavos;
   final Value<String?> observacao;
+  final Value<DateTime> dataHora;
   final Value<DateTime> dataCriacao;
   const LancamentosGanhoIndividualCompanion({
     this.id = const Value.absent(),
@@ -4810,6 +4846,7 @@ class LancamentosGanhoIndividualCompanion
     this.quantidadeViagens = const Value.absent(),
     this.valorTotalCentavos = const Value.absent(),
     this.observacao = const Value.absent(),
+    this.dataHora = const Value.absent(),
     this.dataCriacao = const Value.absent(),
   });
   LancamentosGanhoIndividualCompanion.insert({
@@ -4819,6 +4856,7 @@ class LancamentosGanhoIndividualCompanion
     required int quantidadeViagens,
     required int valorTotalCentavos,
     this.observacao = const Value.absent(),
+    this.dataHora = const Value.absent(),
     this.dataCriacao = const Value.absent(),
   }) : plataformaId = Value(plataformaId),
        quantidadeViagens = Value(quantidadeViagens),
@@ -4830,6 +4868,7 @@ class LancamentosGanhoIndividualCompanion
     Expression<int>? quantidadeViagens,
     Expression<int>? valorTotalCentavos,
     Expression<String>? observacao,
+    Expression<DateTime>? dataHora,
     Expression<DateTime>? dataCriacao,
   }) {
     return RawValuesInsertable({
@@ -4840,6 +4879,7 @@ class LancamentosGanhoIndividualCompanion
       if (valorTotalCentavos != null)
         'valor_total_centavos': valorTotalCentavos,
       if (observacao != null) 'observacao': observacao,
+      if (dataHora != null) 'data_hora': dataHora,
       if (dataCriacao != null) 'data_criacao': dataCriacao,
     });
   }
@@ -4851,6 +4891,7 @@ class LancamentosGanhoIndividualCompanion
     Value<int>? quantidadeViagens,
     Value<int>? valorTotalCentavos,
     Value<String?>? observacao,
+    Value<DateTime>? dataHora,
     Value<DateTime>? dataCriacao,
   }) {
     return LancamentosGanhoIndividualCompanion(
@@ -4860,6 +4901,7 @@ class LancamentosGanhoIndividualCompanion
       quantidadeViagens: quantidadeViagens ?? this.quantidadeViagens,
       valorTotalCentavos: valorTotalCentavos ?? this.valorTotalCentavos,
       observacao: observacao ?? this.observacao,
+      dataHora: dataHora ?? this.dataHora,
       dataCriacao: dataCriacao ?? this.dataCriacao,
     );
   }
@@ -4885,6 +4927,9 @@ class LancamentosGanhoIndividualCompanion
     if (observacao.present) {
       map['observacao'] = Variable<String>(observacao.value);
     }
+    if (dataHora.present) {
+      map['data_hora'] = Variable<DateTime>(dataHora.value);
+    }
     if (dataCriacao.present) {
       map['data_criacao'] = Variable<DateTime>(dataCriacao.value);
     }
@@ -4900,6 +4945,7 @@ class LancamentosGanhoIndividualCompanion
           ..write('quantidadeViagens: $quantidadeViagens, ')
           ..write('valorTotalCentavos: $valorTotalCentavos, ')
           ..write('observacao: $observacao, ')
+          ..write('dataHora: $dataHora, ')
           ..write('dataCriacao: $dataCriacao')
           ..write(')'))
         .toString();
@@ -15672,6 +15718,7 @@ typedef $$LancamentosGanhoIndividualTableCreateCompanionBuilder =
       required int quantidadeViagens,
       required int valorTotalCentavos,
       Value<String?> observacao,
+      Value<DateTime> dataHora,
       Value<DateTime> dataCriacao,
     });
 typedef $$LancamentosGanhoIndividualTableUpdateCompanionBuilder =
@@ -15682,6 +15729,7 @@ typedef $$LancamentosGanhoIndividualTableUpdateCompanionBuilder =
       Value<int> quantidadeViagens,
       Value<int> valorTotalCentavos,
       Value<String?> observacao,
+      Value<DateTime> dataHora,
       Value<DateTime> dataCriacao,
     });
 
@@ -15761,6 +15809,11 @@ class $$LancamentosGanhoIndividualTableFilterComposer
 
   ColumnFilters<String> get observacao => $composableBuilder(
     column: $table.observacao,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -15845,6 +15898,11 @@ class $$LancamentosGanhoIndividualTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get dataHora => $composableBuilder(
+    column: $table.dataHora,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get dataCriacao => $composableBuilder(
     column: $table.dataCriacao,
     builder: (column) => ColumnOrderings(column),
@@ -15923,6 +15981,9 @@ class $$LancamentosGanhoIndividualTableAnnotationComposer
     column: $table.observacao,
     builder: (column) => column,
   );
+
+  GeneratedColumn<DateTime> get dataHora =>
+      $composableBuilder(column: $table.dataHora, builder: (column) => column);
 
   GeneratedColumn<DateTime> get dataCriacao => $composableBuilder(
     column: $table.dataCriacao,
@@ -16024,6 +16085,7 @@ class $$LancamentosGanhoIndividualTableTableManager
                 Value<int> quantidadeViagens = const Value.absent(),
                 Value<int> valorTotalCentavos = const Value.absent(),
                 Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataHora = const Value.absent(),
                 Value<DateTime> dataCriacao = const Value.absent(),
               }) => LancamentosGanhoIndividualCompanion(
                 id: id,
@@ -16032,6 +16094,7 @@ class $$LancamentosGanhoIndividualTableTableManager
                 quantidadeViagens: quantidadeViagens,
                 valorTotalCentavos: valorTotalCentavos,
                 observacao: observacao,
+                dataHora: dataHora,
                 dataCriacao: dataCriacao,
               ),
           createCompanionCallback:
@@ -16042,6 +16105,7 @@ class $$LancamentosGanhoIndividualTableTableManager
                 required int quantidadeViagens,
                 required int valorTotalCentavos,
                 Value<String?> observacao = const Value.absent(),
+                Value<DateTime> dataHora = const Value.absent(),
                 Value<DateTime> dataCriacao = const Value.absent(),
               }) => LancamentosGanhoIndividualCompanion.insert(
                 id: id,
@@ -16050,6 +16114,7 @@ class $$LancamentosGanhoIndividualTableTableManager
                 quantidadeViagens: quantidadeViagens,
                 valorTotalCentavos: valorTotalCentavos,
                 observacao: observacao,
+                dataHora: dataHora,
                 dataCriacao: dataCriacao,
               ),
           withReferenceMapper: (p0) => p0

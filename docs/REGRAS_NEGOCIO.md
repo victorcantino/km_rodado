@@ -24,8 +24,9 @@
 - A edição da Jornada aberta ou da última finalizada deve manter Pausas,
   Leituras, Abastecimentos, Passes e Bônus vinculados dentro do intervalo.
   Esses fatos não são movidos ou reescritos automaticamente.
-- `LancamentoGanhoIndividual.dataCriacao` é instante técnico e não limita o
-  intervalo da Jornada. O lançamento é apenas preservado pelo `jornadaId`.
+- `LancamentoGanhoIndividual.dataHora` é instante operacional e deve permanecer
+  no intervalo da Jornada vinculada. `dataCriacao` continua técnico e não
+  limita o intervalo.
 - Leituras já persistidas preservam horário, tipo, vínculo com Pausa e valores.
   A Leitura Final criada no fechamento usa o fim operacional escolhido em
   `dataHora`; `dataCriacao` registra quando foi lançada no aplicativo.
@@ -100,6 +101,9 @@ justificativa e inserção histórica arbitrária permanecem futuras.
   atual; o schema permite Jornada nula para evolução histórica.
 - Quantidade deve ser pelo menos 1 e valor total pode ser zero.
 - Um lançamento pode agrupar viagens; não se inferem valores unitários.
+- `dataHora` representa quando o ganho ocorreu; `dataCriacao`, quando foi
+  persistido. No cadastro normal o horário operacional começa em agora, pode
+  ser corrigido retroativamente e não pode estar no futuro.
 - Totais são `SUM(valorTotalCentavos)` e `SUM(quantidadeViagens)`.
 - Particular usa este mecanismo e continua aparecendo com as demais fontes.
 - Na `JornadaPage`, a ação de ganho Particular/individual só aparece quando há
@@ -109,6 +113,24 @@ justificativa e inserção histórica arbitrária permanecem futuras.
 ## Resumo da Jornada
 
 - O resumo é derivado e não persiste indicadores.
+- Durante Jornada aberta, o resumo intraday acumula da Leitura Inicial até a
+  última Leitura salva. O horário exibido é o checkpoint financeiro; valores
+  não avançam continuamente com o relógio.
+- Tempo total, tempo em Pausa, tempo ativo, distância e indicadores combinados
+  usam a mesma referência temporal. Pausas são recortadas no checkpoint,
+  inclusive quando ainda estão abertas.
+- A distância intraday usa o odômetro inicial da Pausa vinculada à última
+  Leitura Parcial. No baseline é zero; sem odômetro temporalmente seguro fica
+  indisponível, assim como R$/km.
+- Passes e Bônus/Promoções posteriores ao checkpoint não entram. As regras
+  distintas de 99 e Uber são as mesmas do resumo final.
+- Ganhos individuais entram no recorte intraday quando
+  `Jornada.dataHoraInicio <= dataHora <= checkpoint`. O motorista registra os
+  acumulados das Plataformas como aparecem nos visores; Particular é agregado
+  como fato operacional próprio, sem criar `LeituraGanhos`. Resultado
+  operacional não significa lucro econômico.
+- Leituras intermediárias permanecem intactas e seus intervalos continuam
+  deriváveis para análises futuras por faixa horária.
 - Tempo ativo é duração total menos Pausas concluídas.
 - Distância ativa é distância total menos deslocamento em Pausas.
 - Pausa histórica sem odômetros deixa indicadores dependentes de distância

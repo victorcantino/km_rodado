@@ -9,6 +9,7 @@ class DespesaVeiculoRepository {
   Future<int> inserir(DespesasVeiculoCompanion despesa) =>
       _dao.inserir(despesa);
   Future<bool> atualizar(DespesaVeiculo despesa) => _dao.atualizar(despesa);
+  Future<int> excluir(int id) => _dao.excluir(id);
   Future<DespesaVeiculo?> buscarPorId(int id) => _dao.buscarPorId(id);
   Future<bool> veiculoExiste(int id) => _dao.veiculoExiste(id);
   Future<List<DespesaVeiculo>> listarPorVeiculo(int veiculoId) =>

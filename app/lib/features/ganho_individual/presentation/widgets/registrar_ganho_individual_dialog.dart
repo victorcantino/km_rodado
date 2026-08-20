@@ -9,6 +9,7 @@ typedef RegistrarGanhoIndividualResultado = ({
   int quantidadeViagens,
   int valorTotalCentavos,
   String? observacao,
+  DateTime dataHora,
 });
 
 class RegistrarGanhoIndividualDialog extends StatefulWidget {
@@ -30,7 +31,33 @@ class _RegistrarGanhoIndividualDialogState
   final focoQuantidade = FocusNode();
   final focoObservacao = FocusNode();
   String observacao = '';
+  late DateTime dataHora = DateTime.now();
   late int plataformaId = widget.plataformas.first.id;
+
+  @override
+  void initState() {
+    super.initState();
+    focoValor.addListener(_selecionarValorAoReceberFoco);
+    focoQuantidade.addListener(_selecionarQuantidadeAoReceberFoco);
+  }
+
+  void _selecionarValorAoReceberFoco() {
+    if (focoValor.hasFocus) {
+      valor.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: valor.text.length,
+      );
+    }
+  }
+
+  void _selecionarQuantidadeAoReceberFoco() {
+    if (focoQuantidade.hasFocus) {
+      quantidade.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: quantidade.text.length,
+      );
+    }
+  }
 
   int? get centavos {
     final digitos = valor.text.replaceAll(RegExp(r'\D'), '');
@@ -51,11 +78,38 @@ class _RegistrarGanhoIndividualDialogState
       quantidadeViagens: int.parse(quantidade.text),
       valorTotalCentavos: centavos!,
       observacao: observacao.trim().isEmpty ? null : observacao.trim(),
+      dataHora: dataHora,
     ));
+  }
+
+  Future<void> alterarDataHora() async {
+    final data = await showDatePicker(
+      context: context,
+      initialDate: dataHora,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (data == null || !mounted) return;
+    final hora = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(dataHora),
+    );
+    if (hora == null || !mounted) return;
+    setState(() {
+      dataHora = DateTime(
+        data.year,
+        data.month,
+        data.day,
+        hora.hour,
+        hora.minute,
+      );
+    });
   }
 
   @override
   void dispose() {
+    focoValor.removeListener(_selecionarValorAoReceberFoco);
+    focoQuantidade.removeListener(_selecionarQuantidadeAoReceberFoco);
     valor.dispose();
     quantidade.dispose();
     focoValor.dispose();
@@ -65,106 +119,118 @@ class _RegistrarGanhoIndividualDialogState
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Registrar ganho individual'),
-    content: Form(
-      key: formKey,
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (widget.plataformas.length > 1)
-              DropdownButtonFormField<int>(
-                initialValue: plataformaId,
-                decoration: const InputDecoration(labelText: 'Plataforma'),
-                items: [
-                  for (final plataforma in widget.plataformas)
-                    DropdownMenuItem(
-                      value: plataforma.id,
-                      child: Text(plataforma.nome),
-                    ),
-                ],
-                onChanged: (id) => plataformaId = id!,
-              )
-            else
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.plataformas.single.nome,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-            TextFormField(
-              key: const ValueKey('valor_individual'),
-              controller: valor,
-              focusNode: focoValor,
-              autofocus: true,
-              keyboardType: TextInputType.number,
-              textInputAction: TextInputAction.next,
-              onFieldSubmitted: (_) => focoQuantidade.requestFocus(),
-              inputFormatters: const [_CentavosFormatter()],
-              decoration: const InputDecoration(
-                labelText: 'Valor total',
-                prefixText: r'R$ ',
-              ),
-              validator: (_) =>
-                  centavos == null ? 'Informe o valor total.' : null,
-            ),
-            Row(
-              children: [
-                IconButton(
-                  key: const ValueKey('menos_individual'),
-                  onPressed: () => alterarQuantidade(-1),
-                  icon: const Icon(Icons.remove),
-                ),
-                Expanded(
-                  child: TextFormField(
-                    key: const ValueKey('quantidade_individual'),
-                    controller: quantidade,
-                    focusNode: focoQuantidade,
-                    keyboardType: TextInputType.number,
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (_) => focoObservacao.requestFocus(),
-                    textAlign: TextAlign.center,
-                    decoration: const InputDecoration(labelText: 'Viagens'),
-                    validator: (texto) {
-                      final numero = int.tryParse(texto ?? '');
-                      return numero == null || numero < 1
-                          ? 'Informe ao menos 1 viagem.'
-                          : null;
-                    },
+  Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    return AlertDialog(
+      title: const Text('Registrar ganho individual'),
+      content: Form(
+        key: formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.plataformas.length > 1)
+                DropdownButtonFormField<int>(
+                  initialValue: plataformaId,
+                  decoration: const InputDecoration(labelText: 'Plataforma'),
+                  items: [
+                    for (final plataforma in widget.plataformas)
+                      DropdownMenuItem(
+                        value: plataforma.id,
+                        child: Text(plataforma.nome),
+                      ),
+                  ],
+                  onChanged: (id) => plataformaId = id!,
+                )
+              else
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.plataformas.single.nome,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
-                IconButton(
-                  key: const ValueKey('mais_individual'),
-                  onPressed: () => alterarQuantidade(1),
-                  icon: const Icon(Icons.add),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  key: const ValueKey('data_hora_ganho_individual'),
+                  onPressed: alterarDataHora,
+                  icon: const Icon(Icons.schedule),
+                  label: Text(DateFormat.yMd(locale).add_Hm().format(dataHora)),
                 ),
-              ],
-            ),
-            TextFormField(
-              key: const ValueKey('observacao_individual'),
-              initialValue: observacao,
-              focusNode: focoObservacao,
-              textInputAction: TextInputAction.done,
-              onFieldSubmitted: (_) => focoObservacao.unfocus(),
-              decoration: const InputDecoration(
-                labelText: 'Observação (opcional)',
               ),
-              onChanged: (texto) => observacao = texto,
-            ),
-          ],
+              TextFormField(
+                key: const ValueKey('valor_individual'),
+                controller: valor,
+                focusNode: focoValor,
+                autofocus: true,
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) => focoQuantidade.requestFocus(),
+                inputFormatters: const [_CentavosFormatter()],
+                decoration: const InputDecoration(
+                  labelText: 'Valor total',
+                  prefixText: r'R$ ',
+                ),
+                validator: (_) =>
+                    centavos == null ? 'Informe o valor total.' : null,
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    key: const ValueKey('menos_individual'),
+                    onPressed: () => alterarQuantidade(-1),
+                    icon: const Icon(Icons.remove),
+                  ),
+                  Expanded(
+                    child: TextFormField(
+                      key: const ValueKey('quantidade_individual'),
+                      controller: quantidade,
+                      focusNode: focoQuantidade,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => focoObservacao.requestFocus(),
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration(labelText: 'Viagens'),
+                      validator: (texto) {
+                        final numero = int.tryParse(texto ?? '');
+                        return numero == null || numero < 1
+                            ? 'Informe ao menos 1 viagem.'
+                            : null;
+                      },
+                    ),
+                  ),
+                  IconButton(
+                    key: const ValueKey('mais_individual'),
+                    onPressed: () => alterarQuantidade(1),
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
+              ),
+              TextFormField(
+                key: const ValueKey('observacao_individual'),
+                initialValue: observacao,
+                focusNode: focoObservacao,
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) => focoObservacao.unfocus(),
+                decoration: const InputDecoration(
+                  labelText: 'Observação (opcional)',
+                ),
+                onChanged: (texto) => observacao = texto,
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
-      ),
-      ElevatedButton(onPressed: salvar, child: const Text('Registrar')),
-    ],
-  );
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(onPressed: salvar, child: const Text('Registrar')),
+      ],
+    );
+  }
 }
 
 String _formatarCentavos(int centavos) {

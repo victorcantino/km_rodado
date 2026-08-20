@@ -48,6 +48,10 @@ class _OdometroPausaDialogState extends State<OdometroPausaDialog> {
           textInputAction: TextInputAction.done,
           onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
           selectAllOnFocus: true,
+          onTap: () => controller.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: controller.text.length,
+          ),
           decoration: const InputDecoration(labelText: 'Odômetro atual'),
           validator: (texto) {
             final valor = parseQuilometragem(texto);

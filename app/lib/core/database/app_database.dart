@@ -87,7 +87,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -128,11 +128,41 @@ class AppDatabase extends _$AppDatabase {
       if (from < 12) {
         await migrator.createTable(depreciacoesVeiculo);
       }
+      if (from >= 4 && from < 13) {
+        await _migrarSchema12Para13(migrator);
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },
   );
+
+  Future<void> _migrarSchema12Para13(Migrator migrator) async {
+    final tabelaExistente = await customSelect(
+      "SELECT 1 FROM sqlite_master "
+      "WHERE type = 'table' AND name = 'lancamentos_ganho_individual'",
+    ).getSingleOrNull();
+    if (tabelaExistente == null) {
+      await migrator.createTable(lancamentosGanhoIndividual);
+      return;
+    }
+    await customStatement('''
+      ALTER TABLE lancamentos_ganho_individual
+      RENAME TO lancamentos_ganho_individual_schema_12
+    ''');
+    await migrator.createTable(lancamentosGanhoIndividual);
+    await customStatement('''
+      INSERT INTO lancamentos_ganho_individual (
+        id, plataforma_id, jornada_id, quantidade_viagens,
+        valor_total_centavos, observacao, data_hora, data_criacao
+      )
+      SELECT
+        id, plataforma_id, jornada_id, quantidade_viagens,
+        valor_total_centavos, observacao, data_criacao, data_criacao
+      FROM lancamentos_ganho_individual_schema_12
+    ''');
+    await customStatement('DROP TABLE lancamentos_ganho_individual_schema_12');
+  }
 
   Future<void> _migrarSchema5Para6(Migrator migrator) async {
     await customStatement(

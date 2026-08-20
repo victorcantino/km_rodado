@@ -56,4 +56,9 @@ class DespesaVeiculoController extends ChangeNotifier {
     }
     await carregar(veiculoId);
   }
+
+  Future<void> excluir({required int id, required int veiculoId}) async {
+    await _service.excluir(id);
+    await carregar(veiculoId);
+  }
 }

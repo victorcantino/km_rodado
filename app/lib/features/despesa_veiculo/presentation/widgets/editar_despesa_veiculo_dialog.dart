@@ -16,11 +16,13 @@ typedef EditarDespesaVeiculoResultado = ({
 class EditarDespesaVeiculoDialog extends StatefulWidget {
   final DespesaVeiculo? existente;
   final Future<List<String>> Function(TipoDespesaVeiculo tipo) buscarSugestoes;
+  final VoidCallback? onExcluir;
 
   const EditarDespesaVeiculoDialog({
     super.key,
     this.existente,
     required this.buscarSugestoes,
+    this.onExcluir,
   });
 
   @override
@@ -228,6 +230,8 @@ class _EditarDespesaVeiculoDialogState
       ),
     ),
     actions: [
+      if (widget.existente != null && widget.onExcluir != null)
+        TextButton(onPressed: widget.onExcluir, child: const Text('Excluir')),
       TextButton(
         onPressed: () => Navigator.pop(context),
         child: const Text('Cancelar'),

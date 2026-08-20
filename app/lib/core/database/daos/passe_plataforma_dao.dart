@@ -18,6 +18,10 @@ class PassePlataformaDao extends DatabaseAccessor<AppDatabase>
 
   Future<int> inserir(PassesPlataformaCompanion passe) =>
       into(passesPlataforma).insert(passe);
+  Future<bool> atualizar(PassesPlataformaData passe) =>
+      update(passesPlataforma).replace(passe);
+  Future<int> excluir(int id) =>
+      (delete(passesPlataforma)..where((p) => p.id.equals(id))).go();
 
   Future<Plataforma?> buscarPlataforma(int id) =>
       (select(plataformas)..where((p) => p.id.equals(id))).getSingleOrNull();
@@ -38,6 +42,27 @@ class PassePlataformaDao extends DatabaseAccessor<AppDatabase>
         plataformas.id.equalsExp(passesPlataforma.plataformaId),
       ),
     ])..where(passesPlataforma.jornadaId.equals(jornadaId));
+    return (await consulta.get())
+        .map(
+          (linha) => (
+            passe: linha.readTable(passesPlataforma),
+            plataforma: linha.readTable(plataformas),
+          ),
+        )
+        .toList();
+  }
+
+  Future<List<PasseComPlataforma>> listarTodos() async {
+    final consulta =
+        select(passesPlataforma).join([
+          innerJoin(
+            plataformas,
+            plataformas.id.equalsExp(passesPlataforma.plataformaId),
+          ),
+        ])..orderBy([
+          OrderingTerm.desc(passesPlataforma.dataHora),
+          OrderingTerm.desc(passesPlataforma.id),
+        ]);
     return (await consulta.get())
         .map(
           (linha) => (

@@ -19,11 +19,15 @@ typedef RegistrarPasseResultado = ({
 class RegistrarPasseDialog extends StatefulWidget {
   final List<Plataforma> plataformas;
   final Map<int, ConfiguracaoPasseRepetivel> ultimosRepetiveis;
+  final PassesPlataformaData? existente;
+  final VoidCallback? onExcluir;
 
   const RegistrarPasseDialog({
     super.key,
     required this.plataformas,
     this.ultimosRepetiveis = const {},
+    this.existente,
+    this.onExcluir,
   });
 
   @override
@@ -43,6 +47,28 @@ class _RegistrarPasseDialogState extends State<RegistrarPasseDialog> {
   int duracaoHoras = 24;
   DateTime dataHora = DateTime.now();
   bool mostrarUltimo = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final existente = widget.existente;
+    if (existente != null) {
+      plataformaId = existente.plataformaId;
+      dataHora = existente.dataHora;
+      tipo = existente.modalidade == TipoPasse.tempo.name
+          ? TipoPasse.tempo
+          : TipoPasse.faturamento;
+      duracaoHoras = existente.validadeAte == null
+          ? 24
+          : existente.validadeAte!.difference(existente.dataHora).inHours;
+      valor.text = _formatarCentavos(existente.valorPagoCentavos);
+      limite.text = existente.limiteFaturamentoCentavos == null
+          ? ''
+          : _formatarCentavos(existente.limiteFaturamentoCentavos!);
+      observacao = existente.observacao ?? '';
+      mostrarUltimo = false;
+    }
+  }
 
   ConfiguracaoPasseRepetivel? get ultimo =>
       widget.ultimosRepetiveis[plataformaId];
@@ -139,7 +165,9 @@ class _RegistrarPasseDialogState extends State<RegistrarPasseDialog> {
     );
     final configuracao = ultimo;
     return AlertDialog(
-      title: const Text('Registrar passe'),
+      title: Text(
+        widget.existente == null ? 'Registrar passe' : 'Editar passe',
+      ),
       content: Form(
         key: formKey,
         child: SingleChildScrollView(
@@ -297,6 +325,8 @@ class _RegistrarPasseDialogState extends State<RegistrarPasseDialog> {
         ),
       ),
       actions: [
+        if (widget.existente != null && widget.onExcluir != null)
+          TextButton(onPressed: widget.onExcluir, child: const Text('Excluir')),
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancelar'),

@@ -168,8 +168,12 @@ operacional tolera lançamentos tardios somente quando os fatos podem ser
 reconstruídos de forma cronologicamente coerente.
 
 Somente instantes operacionais semanticamente confiáveis limitam a Jornada.
-`LancamentoGanhoIndividual.dataCriacao` registra o cadastro técnico, não o
-momento da viagem, e por isso nunca é usado como fronteira temporal.
+`LancamentoGanhoIndividual.dataHora` registra o momento operacional do ganho;
+`dataCriacao` registra o cadastro técnico. O Intraday usa `dataHora`, enquanto
+`dataCriacao` nunca desloca o fato na linha do tempo.
+
+Na migração 12 → 13, lançamentos legados recebem `dataHora = dataCriacao` como
+aproximação técnica preservadora, não como reconstrução histórica exata.
 
 ## ADR-016 — Inteligência de abastecimento conservadora e derivada
 
@@ -289,3 +293,15 @@ temporal intermediária. Portanto, não existe cobertura financeira parcial
 inferida pela demora no preenchimento. Conciliação permanece apenas a
 interpretação derivada de Passes e Bônus/Promoções em relação aos snapshots,
 sem módulo, tabela ou workflow próprios.
+
+## ADR-024 — Resumo intraday referenciado pelo último checkpoint
+
+Decisão: durante a Jornada aberta, apresentar indicadores acumulados desde a
+Leitura Inicial até a última Leitura salva. Todas as métricas combinadas usam
+esse mesmo instante. Pausas são intersectadas com o período e a distância só é
+derivada quando a Leitura possui referência segura de odômetro na Pausa.
+
+Motivo: faturamento de um snapshot não pode ser combinado com tempo ou
+odômetro posteriores. Os snapshots permanecem fatos independentes, permitindo
+derivar intervalos futuramente. Ganhos individuais entram por seu `dataHora`
+operacional até o checkpoint, sem virar snapshot e sem agregado persistido.

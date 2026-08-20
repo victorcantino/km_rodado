@@ -5,6 +5,8 @@ import 'package:drift/drift.dart' hide Column, isNull;
 import 'package:drift/native.dart';
 
 import 'package:km_rodado/core/constants/enums/status_jornada.dart';
+import 'package:km_rodado/core/constants/enums/tipo_leitura_ganhos.dart';
+import 'package:km_rodado/core/constants/enums/tipo_registro_ganhos.dart';
 import 'package:km_rodado/core/database/app_database.dart';
 import 'package:km_rodado/core/database/seeds/seed.dart';
 import 'package:km_rodado/features/jornada/presentation/pages/jornada_page.dart';
@@ -14,6 +16,78 @@ import 'package:km_rodado/features/jornada/presentation/widgets/editar_jornada_d
 import 'package:km_rodado/features/pausa/presentation/widgets/odometro_pausa_dialog.dart';
 
 void main() {
+  testWidgets('Jornada aberta mostra resumo intraday do último checkpoint', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+    await garantirDadosTemporarios(database);
+    final jornadaId = await database
+        .into(database.jornadas)
+        .insert(
+          JornadasCompanion.insert(
+            usuarioId: 1,
+            veiculoId: 1,
+            dataHoraInicio: DateTime(2026, 8, 18, 7),
+            odometroInicio: 1000,
+            cidadeOrigem: 'Curitiba',
+            status: StatusJornada.aberta,
+          ),
+        );
+    final uberId = await database
+        .into(database.plataformas)
+        .insert(
+          PlataformasCompanion.insert(
+            nome: 'Uber',
+            tipoRegistroGanhos: TipoRegistroGanhos.acumulado,
+          ),
+        );
+    final inicialId = await database
+        .into(database.leiturasGanhos)
+        .insert(
+          LeiturasGanhosCompanion.insert(
+            jornadaId: jornadaId,
+            dataHora: DateTime(2026, 8, 18, 7),
+            tipo: TipoLeituraGanhos.inicial,
+          ),
+        );
+    await database
+        .into(database.leiturasGanhoPlataforma)
+        .insert(
+          LeiturasGanhoPlataformaCompanion.insert(
+            leituraGanhosId: inicialId,
+            plataformaId: uberId,
+            valorAcumuladoCentavos: 0,
+            quantidadeViagensAcumulada: 0,
+          ),
+        );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('pt', 'BR'),
+        supportedLocales: const [Locale('pt', 'BR')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        home: JornadaPage(databaseFactory: () => database),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('resumo_intraday')),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('resumo_intraday')), findsOneWidget);
+    expect(find.text('Jornada iniciada às 07:00'), findsOneWidget);
+    expect(find.text('Aguardando primeira atualização.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await database.close();
+  });
+
   testWidgets('JornadaPage respeita área segura inferior em viewport pequena', (
     tester,
   ) async {

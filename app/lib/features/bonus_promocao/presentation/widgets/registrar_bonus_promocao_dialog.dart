@@ -13,8 +13,15 @@ typedef RegistrarBonusPromocaoResultado = ({
 
 class RegistrarBonusPromocaoDialog extends StatefulWidget {
   final List<Plataforma> plataformas;
+  final BonusPromocao? existente;
+  final VoidCallback? onExcluir;
 
-  const RegistrarBonusPromocaoDialog({super.key, required this.plataformas});
+  const RegistrarBonusPromocaoDialog({
+    super.key,
+    required this.plataformas,
+    this.existente,
+    this.onExcluir,
+  });
 
   @override
   State<RegistrarBonusPromocaoDialog> createState() =>
@@ -30,6 +37,18 @@ class _RegistrarBonusPromocaoDialogState
   final focoObservacao = FocusNode();
   late int plataformaId = widget.plataformas.first.id;
   DateTime dataHora = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    final existente = widget.existente;
+    if (existente != null) {
+      plataformaId = existente.plataformaId;
+      dataHora = existente.dataHora;
+      valor.text = _formatarCentavos(existente.valorCentavos);
+      observacao.text = existente.observacao ?? '';
+    }
+  }
 
   int? get valorCentavos {
     final digitos = valor.text.replaceAll(RegExp(r'\D'), '');
@@ -85,7 +104,11 @@ class _RegistrarBonusPromocaoDialogState
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context).toLanguageTag();
     return AlertDialog(
-      title: const Text('Registrar bônus/promoção'),
+      title: Text(
+        widget.existente == null
+            ? 'Registrar bônus/promoção'
+            : 'Editar bônus/promoção',
+      ),
       content: Form(
         key: formKey,
         child: SingleChildScrollView(
@@ -145,6 +168,8 @@ class _RegistrarBonusPromocaoDialogState
         ),
       ),
       actions: [
+        if (widget.existente != null && widget.onExcluir != null)
+          TextButton(onPressed: widget.onExcluir, child: const Text('Excluir')),
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancelar'),

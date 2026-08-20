@@ -95,6 +95,108 @@ class JornadaService {
     return ultimoFato ?? fatos.last.odometro;
   }
 
+  Future<ResumoIntradayJornada?> resumoJornadaAberta() async {
+    final jornada = await _repository.buscarJornadaAberta();
+    final leituraRepository = _leituraGanhosRepository;
+    if (jornada == null || leituraRepository == null) return null;
+
+    final snapshots = await leituraRepository.listarSnapshotsDaJornada(
+      jornada.id,
+    );
+    final leituras = snapshots.map((item) => item.leitura).toSet().toList()
+      ..sort((a, b) {
+        final data = a.dataHora.compareTo(b.dataHora);
+        return data != 0 ? data : a.id.compareTo(b.id);
+      });
+    final indiceInicial = leituras.indexWhere(
+      (leitura) => leitura.tipo == TipoLeituraGanhos.inicial,
+    );
+    if (indiceInicial < 0) return null;
+    final referencia = leituras.last;
+    final dataHoraReferencia = referencia.dataHora;
+    final pausas = await _pausaRepository.listarPorJornada(jornada.id);
+    final passesDaJornada =
+        await _passePlataformaRepository?.listarPorJornada(jornada.id) ??
+        const [];
+    final bonusDaJornada =
+        await _bonusPromocaoRepository?.listarPorJornada(jornada.id) ??
+        const [];
+    final passes = passesDaJornada
+        .where(
+          (item) =>
+              !item.passe.dataHora.isBefore(jornada.dataHoraInicio) &&
+              !item.passe.dataHora.isAfter(dataHoraReferencia),
+        )
+        .toList();
+    final bonusPromocoes = bonusDaJornada
+        .where(
+          (item) =>
+              !item.bonusPromocao.dataHora.isBefore(jornada.dataHoraInicio) &&
+              !item.bonusPromocao.dataHora.isAfter(dataHoraReferencia),
+        )
+        .toList();
+    final totaisIndividuais =
+        await _ganhoIndividualRepository?.totalizarPorJornadaNoIntervalo(
+          jornada.id,
+          jornada.dataHoraInicio,
+          dataHoraReferencia,
+        ) ??
+        const [];
+    final duracaoTotal = _duracaoNaoNegativa(
+      dataHoraReferencia.difference(jornada.dataHoraInicio),
+    );
+    final tempoPausa = pausas.fold<Duration>(Duration.zero, (total, pausa) {
+      final inicio = pausa.inicio.isBefore(jornada.dataHoraInicio)
+          ? jornada.dataHoraInicio
+          : pausa.inicio;
+      final fimReal = pausa.fim ?? dataHoraReferencia;
+      final fim = fimReal.isAfter(dataHoraReferencia)
+          ? dataHoraReferencia
+          : fimReal;
+      return fim.isAfter(inicio) ? total + fim.difference(inicio) : total;
+    });
+    final tempoAtivo = _duracaoNaoNegativa(duracaoTotal - tempoPausa);
+    int? quilometros;
+    if (referencia.tipo == TipoLeituraGanhos.inicial) {
+      quilometros = 0;
+    } else if (referencia.pausaId != null) {
+      final pausa = pausas
+          .where((item) => item.id == referencia.pausaId)
+          .firstOrNull;
+      final odometro = pausa?.odometroInicio;
+      if (odometro != null && odometro >= jornada.odometroInicio) {
+        quilometros = odometro - jornada.odometroInicio;
+      }
+    }
+
+    return ResumoIntradayJornada(
+      jornada: jornada,
+      dataHoraReferencia: dataHoraReferencia,
+      possuiCheckpointReal: referencia.tipo != TipoLeituraGanhos.inicial,
+      duracaoTotal: duracaoTotal,
+      tempoPausa: tempoPausa,
+      tempoAtivo: tempoAtivo,
+      quilometros: quilometros,
+      resultadosPlataformas: [
+        ..._calcularResultadosPlataformas(
+          snapshots,
+          passes,
+          bonusPromocoes,
+          usarUltimaLeitura: true,
+        ),
+        for (final total in totaisIndividuais)
+          ResultadoPlataformaJornada(
+            plataformaId: total.plataforma.id,
+            nome: total.plataforma.nome,
+            receitaCentavos: total.valorTotalCentavos,
+            quantidadeViagens: total.quantidadeViagens,
+          ),
+      ]..sort((a, b) => a.nome.compareTo(b.nome)),
+      passes: passes,
+      bonusPromocoes: bonusPromocoes,
+    );
+  }
+
   Future<ResumoJornada?> resumoUltimaJornada() async {
     final jornada = await _repository.buscarUltimaJornadaFinalizada();
     final leituraRepository = _leituraGanhosRepository;
@@ -175,8 +277,9 @@ class JornadaService {
   List<ResultadoPlataformaJornada> _calcularResultadosPlataformas(
     List<SnapshotPlataforma> snapshots,
     List<PasseComPlataforma> passes,
-    List<BonusPromocaoComPlataforma> bonusPromocoes,
-  ) {
+    List<BonusPromocaoComPlataforma> bonusPromocoes, {
+    bool usarUltimaLeitura = false,
+  }) {
     final leituras = <int, LeiturasGanho>{};
     for (final snapshot in snapshots) {
       leituras[snapshot.leitura.id] = snapshot.leitura;
@@ -189,9 +292,11 @@ class JornadaService {
     final indiceInicial = ordenadas.indexWhere(
       (leitura) => leitura.tipo == TipoLeituraGanhos.inicial,
     );
-    final indiceFinal = ordenadas.lastIndexWhere(
-      (leitura) => leitura.tipo == TipoLeituraGanhos.finalDaJornada,
-    );
+    final indiceFinal = usarUltimaLeitura
+        ? ordenadas.length - 1
+        : ordenadas.lastIndexWhere(
+            (leitura) => leitura.tipo == TipoLeituraGanhos.finalDaJornada,
+          );
     if (indiceInicial < 0 || indiceFinal < indiceInicial) return const [];
 
     final sequencia = ordenadas.sublist(indiceInicial, indiceFinal + 1);
@@ -660,8 +765,16 @@ class JornadaService {
         'Existe um Bônus/Promoção fora do novo intervalo da Jornada.',
       );
     }
-    // Ganhos individuais são preservados pelo jornadaId, mas dataCriacao é
-    // técnica e deliberadamente não limita o intervalo operacional.
+    final ganhosIndividuais =
+        await _ganhoIndividualRepository?.listarPorJornada(proposta.id) ??
+        const [];
+    for (final ganho in ganhosIndividuais) {
+      _validarInstanteInterno(
+        ganho.dataHora,
+        proposta,
+        'Existe um Ganho Individual fora do novo intervalo da Jornada.',
+      );
+    }
   }
 
   void _validarInstanteInterno(

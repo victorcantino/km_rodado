@@ -17,6 +17,8 @@ class DespesaVeiculoDao extends DatabaseAccessor<AppDatabase>
 
   Future<bool> atualizar(DespesaVeiculo despesa) =>
       update(despesasVeiculo).replace(despesa);
+  Future<int> excluir(int id) =>
+      (delete(despesasVeiculo)..where((d) => d.id.equals(id))).go();
 
   Future<DespesaVeiculo?> buscarPorId(int id) => (select(
     despesasVeiculo,

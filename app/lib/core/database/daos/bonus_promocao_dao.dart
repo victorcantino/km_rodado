@@ -18,6 +18,10 @@ class BonusPromocaoDao extends DatabaseAccessor<AppDatabase>
 
   Future<int> inserir(BonusPromocoesCompanion bonusPromocao) =>
       into(bonusPromocoes).insert(bonusPromocao);
+  Future<bool> atualizar(BonusPromocao bonus) =>
+      update(bonusPromocoes).replace(bonus);
+  Future<int> excluir(int id) =>
+      (delete(bonusPromocoes)..where((b) => b.id.equals(id))).go();
 
   Future<Plataforma?> buscarPlataforma(int id) =>
       (select(plataformas)..where((p) => p.id.equals(id))).getSingleOrNull();
@@ -46,6 +50,27 @@ class BonusPromocaoDao extends DatabaseAccessor<AppDatabase>
             OrderingTerm.asc(bonusPromocoes.dataHora),
             OrderingTerm.asc(bonusPromocoes.id),
           ]);
+    return (await consulta.get())
+        .map(
+          (linha) => (
+            bonusPromocao: linha.readTable(bonusPromocoes),
+            plataforma: linha.readTable(plataformas),
+          ),
+        )
+        .toList();
+  }
+
+  Future<List<BonusPromocaoComPlataforma>> listarTodos() async {
+    final consulta =
+        select(bonusPromocoes).join([
+          innerJoin(
+            plataformas,
+            plataformas.id.equalsExp(bonusPromocoes.plataformaId),
+          ),
+        ])..orderBy([
+          OrderingTerm.desc(bonusPromocoes.dataHora),
+          OrderingTerm.desc(bonusPromocoes.id),
+        ]);
     return (await consulta.get())
         .map(
           (linha) => (

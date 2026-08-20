@@ -1,6 +1,6 @@
 # Modelo de dados — KM Rodado
 
-O schema Drift atual é **11**. Esta seção separa o que existe no SQLite do que é
+O schema Drift atual é **13**. Esta seção separa o que existe no SQLite do que é
 derivado ou apenas planejado.
 
 ## Tabelas persistidas
@@ -58,10 +58,13 @@ O par leitura/plataforma é único; valor e quantidade não podem ser negativos.
 ### LancamentosGanhoIndividual
 
 `id`, `plataformaId` → Plataformas, `jornadaId?` → Jornadas,
-`quantidadeViagens`, `valorTotalCentavos`, `observacao?`, `dataCriacao`.
+`quantidadeViagens`, `valorTotalCentavos`, `observacao?`, `dataHora`,
+`dataCriacao`.
 
 Quantidade é pelo menos 1. Um lançamento pode agrupar viagens sem inferir
-valores unitários.
+valores unitários. `dataHora` é o instante operacional; `dataCriacao` é o
+instante técnico. Na migração 12 → 13, o dado legado usa `dataCriacao` como
+aproximação preservadora para `dataHora`.
 
 ### Abastecimentos
 
@@ -187,4 +190,4 @@ Veiculo ── DepreciacaoVeiculo (0..1)
 
 Evento financeiro genérico, carteira de
 plataforma, alertas, clima, localização e sincronização não fazem parte do
-schema 12. Suas decisões e ideias permanecem no backlog e nas regras futuras.
+schema 13. Suas decisões e ideias permanecem no backlog e nas regras futuras.

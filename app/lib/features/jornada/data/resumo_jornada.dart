@@ -33,6 +33,89 @@ class ResultadoPlataformaJornada {
   }
 }
 
+class ResumoIntradayJornada {
+  final Jornada jornada;
+  final DateTime dataHoraReferencia;
+  final bool possuiCheckpointReal;
+  final Duration duracaoTotal;
+  final Duration tempoPausa;
+  final Duration tempoAtivo;
+  final int? quilometros;
+  final List<ResultadoPlataformaJornada> resultadosPlataformas;
+  final List<PasseComPlataforma> passes;
+  final List<BonusPromocaoComPlataforma> bonusPromocoes;
+
+  const ResumoIntradayJornada({
+    required this.jornada,
+    required this.dataHoraReferencia,
+    required this.possuiCheckpointReal,
+    required this.duracaoTotal,
+    required this.tempoPausa,
+    required this.tempoAtivo,
+    required this.quilometros,
+    required this.resultadosPlataformas,
+    this.passes = const [],
+    this.bonusPromocoes = const [],
+  });
+
+  bool get financeiroCompleto =>
+      resultadosPlataformas.isNotEmpty &&
+      resultadosPlataformas.every((resultado) => resultado.calculavel);
+
+  int? get receitaTotalCentavos => financeiroCompleto
+      ? resultadosPlataformas.fold<int>(
+          0,
+          (total, resultado) => total + resultado.receitaCentavos!,
+        )
+      : null;
+
+  int? get quantidadeTotalViagens => financeiroCompleto
+      ? resultadosPlataformas.fold<int>(
+          0,
+          (total, resultado) => total + resultado.quantidadeViagens!,
+        )
+      : null;
+
+  int get custoPassesCentavos => passes.fold<int>(
+    0,
+    (total, item) => total + item.passe.valorPagoCentavos,
+  );
+
+  int get bonusPromocoesCentavos => bonusPromocoes.fold<int>(
+    0,
+    (total, item) => total + item.bonusPromocao.valorCentavos,
+  );
+
+  int? get resultadoOperacionalCentavos => financeiroCompleto
+      ? resultadosPlataformas.fold<int>(
+          0,
+          (total, resultado) => total + resultado.resultadoOperacionalCentavos!,
+        )
+      : null;
+
+  double? get ticketMedio {
+    final receita = receitaTotalCentavos;
+    final viagens = quantidadeTotalViagens;
+    if (receita == null || viagens == null || viagens <= 0) return null;
+    return receita / 100 / viagens;
+  }
+
+  double? get receitaPorHoraAtiva {
+    final receita = receitaTotalCentavos;
+    if (receita == null || tempoAtivo <= Duration.zero) return null;
+    return receita /
+        100 /
+        (tempoAtivo.inMilliseconds / Duration.millisecondsPerHour);
+  }
+
+  double? get receitaPorKm {
+    final receita = receitaTotalCentavos;
+    final distancia = quilometros;
+    if (receita == null || distancia == null || distancia <= 0) return null;
+    return receita / 100 / distancia;
+  }
+}
+
 class ResumoJornada {
   final Jornada jornada;
   final Duration duracaoTotal;

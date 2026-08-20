@@ -28,6 +28,10 @@ class PassePlataformaService {
       _repository.listarPlataformasAtivas();
   Future<List<PasseComPlataforma>> listarPorJornada(int jornadaId) =>
       _repository.listarPorJornada(jornadaId);
+  Future<List<PasseComPlataforma>> listarTodos() => _repository.listarTodos();
+  Future<bool> atualizar(PassesPlataformaData passe) =>
+      _repository.atualizar(passe);
+  Future<int> excluir(int id) => _repository.excluir(id);
 
   Future<ConfiguracaoPasseRepetivel?> buscarUltimoRepetivel(
     int plataformaId,

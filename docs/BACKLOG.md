@@ -19,11 +19,17 @@
 ## Experiência de uso
 
 - Evolução visual móvel/operacional após estabilizar os fluxos.
+- Refinar futuramente os FABs de Passes/Bônus para ícones verticais com
+  Tooltip/Semantics.
+- Melhorar “Ver todos” para uma consulta dedicada ou paginação, evitando
+  expandir listas indefinidamente.
+- Padronizar futuramente os seletores compactos de data/hora entre os fluxos.
 - Revisar autofocus e redução de toques nos demais inputs após uso em campo.
 - Reorganizar futuramente a JornadaPage em seções recolhíveis com resumo curto
   quando fechadas, como Faturamento, Custos, Pausas, Abastecimentos,
   Plataformas e Manutenção. Indicadores serão escolhidos com a maturidade das
   features, sem sanfona nesta etapa.
+- Histórico de Jornadas com resumo e futura linha do tempo da Jornada encerrada.
 - DespesasPage com seções recolhíveis independentes para Despesas do veículo e
   Custos recorrentes. Ambas podem ficar abertas ou fechadas sem obrigar o
   fechamento da outra; o objetivo é reduzir altura quando houver muitos dados.
@@ -60,6 +66,8 @@
   a semântica mista de `Km Duração` e `Validade`.
 - Análises por oficina/fornecedor e custo econômico por km quando houver base
   suficiente, sem atribuir automaticamente o custo a uma Jornada.
+- Indicadores visuais de ciclo de manutenção por km/tempo, sem antecipar barras
+  ou limiares arbitrários.
 
 ## Custos e obrigações
 
@@ -86,6 +94,15 @@
 
 ## Plataforma e análises
 
+- Análise histórica de produtividade por faixa horária a partir dos intervalos
+  entre Leituras de Ganhos: faturamento/hora, resultado/hora, viagens/hora e
+  R$/km, sem persistir agregados horários.
+- Planejamento Mensal com mês, dias planejados de trabalho, meta mensal de km,
+  km médios necessários por dia e futura meta de resultado/lucro por km.
+- Contexto opcional de calendário para o Planejamento Mensal: feriados
+  nacionais, estaduais e municipais, shows, esportes, festivais e eventos
+  locais. Informar apenas possível alteração de demanda e trânsito; o núcleo
+  deve continuar offline e não presumir aumento de faturamento.
 - Evoluir a interpretação de resets, Passes e outras movimentações conhecidas
   somente com evidência operacional, sem antecipar módulo de Conciliação.
 - Quando houver necessidade operacional real, generalizar condições de Passe
@@ -107,8 +124,20 @@
 - Implementar o Motor Econômico somente após amadurecer as fontes reais. Ele
   deverá decidir explicitamente tipos incluídos, visões, rateios e prevenção de
   dupla contagem; não antecipar flags de inclusão.
+- Cobrir e classificar os custos disponíveis para preparar o Motor Econômico,
+  sem ainda implementar seus rateios ou decisões de inclusão.
 
 ## Produto
+
+- Página futura de Resumo/Linha do tempo da Jornada encerrada, projetada a
+  partir dos fatos especializados.
+- Indicadores visuais de ciclo de manutenção por km/tempo, sem barras
+  arbitrárias antes de haver histórico suficiente.
+- Definir cobertura e completude do Motor Econômico antes de incluir fontes ou
+  rateios no resultado operacional.
+- InDrive: visor bruto, carteira líquida e reconciliação posterior ainda a
+  definir; manter pendente de observação adicional e não implementar o fluxo
+  completo nesta fase.
 
 - Avaliar estratégia gratuito/premium; inteligência econômica é candidata
   natural à camada paga, sem decisão comercial fechada nesta fase.

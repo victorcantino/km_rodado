@@ -15,6 +15,7 @@ import 'package:km_rodado/core/database/daos/bonus_promocao_dao.dart';
 import 'package:km_rodado/core/database/seeds/seed.dart';
 import 'package:km_rodado/features/jornada/data/jornada_repository.dart';
 import 'package:km_rodado/features/ganho_individual/data/ganho_individual_repository.dart';
+import 'package:km_rodado/features/ganho_individual/data/ganho_individual_service.dart';
 import 'package:km_rodado/features/jornada/data/jornada_service.dart';
 import 'package:km_rodado/features/leitura_ganhos/data/leitura_ganhos_repository.dart';
 import 'package:km_rodado/features/pausa/data/pausa_repository.dart';
@@ -113,13 +114,15 @@ void main() {
     int jornadaId,
     TipoLeituraGanhos tipo,
     DateTime dataHora,
-    Map<int, (int, int)> valores,
-  ) async {
+    Map<int, (int, int)> valores, {
+    int? pausaId,
+  }) async {
     final leituraId = await database
         .into(database.leiturasGanhos)
         .insert(
           LeiturasGanhosCompanion.insert(
             jornadaId: jornadaId,
+            pausaId: Value(pausaId),
             dataHora: dataHora,
             tipo: tipo,
           ),
@@ -214,6 +217,342 @@ void main() {
     expect(uber.quantidadeViagens, 11);
     expect(uber.ticketMedio, closeTo(15.309, 0.001));
   });
+
+  test(
+    'intraday acumula desde o início na referência do último checkpoint',
+    () async {
+      final jornadaId = await database
+          .into(database.jornadas)
+          .insert(
+            JornadasCompanion.insert(
+              usuarioId: 1,
+              veiculoId: 1,
+              dataHoraInicio: DateTime(2026, 8, 10, 7),
+              odometroInicio: 1000,
+              cidadeOrigem: 'Curitiba',
+              status: StatusJornada.aberta,
+            ),
+          );
+      final uberId = await inserirPlataforma('Uber');
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.inicial,
+        DateTime(2026, 8, 10, 7),
+        {uberId: (0, 0)},
+      );
+      final pausa1 = await database
+          .into(database.pausas)
+          .insert(
+            PausasCompanion.insert(
+              jornadaId: jornadaId,
+              inicio: DateTime(2026, 8, 10, 9),
+              fim: Value(DateTime(2026, 8, 10, 9, 30)),
+              odometroInicio: const Value(1030),
+              odometroFim: const Value(1030),
+            ),
+          );
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.parcial,
+        DateTime(2026, 8, 10, 12),
+        {uberId: (5000, 4)},
+        pausaId: pausa1,
+      );
+      final pausaAberta = await database
+          .into(database.pausas)
+          .insert(
+            PausasCompanion.insert(
+              jornadaId: jornadaId,
+              inicio: DateTime(2026, 8, 10, 13, 30),
+              odometroInicio: const Value(1080),
+            ),
+          );
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.parcial,
+        DateTime(2026, 8, 10, 14),
+        {uberId: (8000, 7)},
+        pausaId: pausaAberta,
+      );
+      await database
+          .into(database.pausas)
+          .insert(
+            PausasCompanion.insert(
+              jornadaId: jornadaId,
+              inicio: DateTime(2026, 8, 10, 15),
+              fim: Value(DateTime(2026, 8, 10, 16)),
+            ),
+          );
+
+      final resumo = (await service.resumoJornadaAberta())!;
+      final snapshots = await leituraRepository.listarSnapshotsDaJornada(
+        jornadaId,
+      );
+
+      expect(resumo.dataHoraReferencia, DateTime(2026, 8, 10, 14));
+      expect(resumo.duracaoTotal, const Duration(hours: 7));
+      expect(resumo.tempoPausa, const Duration(hours: 1));
+      expect(resumo.tempoAtivo, const Duration(hours: 6));
+      expect(resumo.quilometros, 80);
+      expect(resumo.receitaTotalCentavos, 8000);
+      expect(resumo.quantidadeTotalViagens, 7);
+      expect(resumo.ticketMedio, closeTo(11.428, 0.001));
+      expect(resumo.receitaPorHoraAtiva, closeTo(13.333, 0.001));
+      expect(resumo.receitaPorKm, 1);
+      expect(snapshots.map((item) => item.leitura.id).toSet(), hasLength(3));
+      expect(
+        snapshots.last.item.valorAcumuladoCentavos -
+            snapshots[1].item.valorAcumuladoCentavos,
+        3000,
+      );
+    },
+  );
+
+  test('intraday inicial aceita baseline zerado e distância zero', () async {
+    final jornadaId = await database
+        .into(database.jornadas)
+        .insert(
+          JornadasCompanion.insert(
+            usuarioId: 1,
+            veiculoId: 1,
+            dataHoraInicio: DateTime(2026, 8, 10, 7),
+            odometroInicio: 1000,
+            cidadeOrigem: 'Curitiba',
+            status: StatusJornada.aberta,
+          ),
+        );
+    final plataformaId = await inserirPlataforma('Uber');
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.inicial,
+      DateTime(2026, 8, 10, 7),
+      {plataformaId: (0, 0)},
+    );
+
+    final resumo = (await service.resumoJornadaAberta())!;
+
+    expect(resumo.duracaoTotal, Duration.zero);
+    expect(resumo.tempoPausa, Duration.zero);
+    expect(resumo.tempoAtivo, Duration.zero);
+    expect(resumo.quilometros, 0);
+    expect(resumo.receitaTotalCentavos, 0);
+    expect(resumo.quantidadeTotalViagens, 0);
+    expect(resumo.ticketMedio, isNull);
+    expect(resumo.receitaPorHoraAtiva, isNull);
+    expect(resumo.receitaPorKm, isNull);
+  });
+
+  test('intraday preserva finanças sem odômetro seguro', () async {
+    final jornadaId = await database
+        .into(database.jornadas)
+        .insert(
+          JornadasCompanion.insert(
+            usuarioId: 1,
+            veiculoId: 1,
+            dataHoraInicio: DateTime(2026, 8, 10, 7),
+            odometroInicio: 1000,
+            cidadeOrigem: 'Curitiba',
+            status: StatusJornada.aberta,
+          ),
+        );
+    final plataformaId = await inserirPlataforma('Uber');
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.inicial,
+      DateTime(2026, 8, 10, 7),
+      {plataformaId: (0, 0)},
+    );
+    final pausaId = await database
+        .into(database.pausas)
+        .insert(
+          PausasCompanion.insert(
+            jornadaId: jornadaId,
+            inicio: DateTime(2026, 8, 10, 12),
+          ),
+        );
+    await inserirLeitura(
+      jornadaId,
+      TipoLeituraGanhos.parcial,
+      DateTime(2026, 8, 10, 12),
+      {plataformaId: (5000, 4)},
+      pausaId: pausaId,
+    );
+
+    final resumo = (await service.resumoJornadaAberta())!;
+
+    expect(resumo.receitaTotalCentavos, 5000);
+    expect(resumo.quantidadeTotalViagens, 4);
+    expect(resumo.quilometros, isNull);
+    expect(resumo.receitaPorKm, isNull);
+  });
+
+  test(
+    'intraday filtra fatos posteriores e reconcilia 99, Uber e bônus',
+    () async {
+      final jornadaId = await database
+          .into(database.jornadas)
+          .insert(
+            JornadasCompanion.insert(
+              usuarioId: 1,
+              veiculoId: 1,
+              dataHoraInicio: DateTime(2026, 8, 10, 7),
+              odometroInicio: 1000,
+              cidadeOrigem: 'Curitiba',
+              status: StatusJornada.aberta,
+            ),
+          );
+      final noventaNoveId = await inserirPlataforma('99');
+      final uberId = await inserirPlataforma('Uber');
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.inicial,
+        DateTime(2026, 8, 10, 7),
+        {noventaNoveId: (0, 0), uberId: (0, 0)},
+      );
+      final pausaId = await database
+          .into(database.pausas)
+          .insert(
+            PausasCompanion.insert(
+              jornadaId: jornadaId,
+              inicio: DateTime(2026, 8, 10, 12),
+              odometroInicio: const Value(1050),
+            ),
+          );
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.parcial,
+        DateTime(2026, 8, 10, 12),
+        {noventaNoveId: (5000, 5), uberId: (5000, 5)},
+        pausaId: pausaId,
+      );
+      for (final plataformaId in [noventaNoveId, uberId]) {
+        await database
+            .into(database.passesPlataforma)
+            .insert(
+              PassesPlataformaCompanion.insert(
+                plataformaId: plataformaId,
+                jornadaId: Value(jornadaId),
+                dataHora: DateTime(2026, 8, 10, 10),
+                valorPagoCentavos: 2000,
+              ),
+            );
+      }
+      await inserirBonus(jornadaId, uberId, DateTime(2026, 8, 10, 11), 1000);
+      await inserirBonus(jornadaId, uberId, DateTime(2026, 8, 10, 13), 9000);
+
+      final resumo = (await service.resumoJornadaAberta())!;
+      final noventaNove = resumo.resultadosPlataformas.singleWhere(
+        (item) => item.nome == '99',
+      );
+      final uber = resumo.resultadosPlataformas.singleWhere(
+        (item) => item.nome == 'Uber',
+      );
+
+      expect(noventaNove.receitaCentavos, 7000);
+      expect(noventaNove.resultadoOperacionalCentavos, 5000);
+      expect(uber.receitaCentavos, 4000);
+      expect(uber.bonusPromocoesCentavos, 1000);
+      expect(uber.resultadoOperacionalCentavos, 3000);
+      expect(resumo.bonusPromocoes, hasLength(1));
+      expect(resumo.resultadoOperacionalCentavos, 8000);
+    },
+  );
+
+  test(
+    'intraday inclui ganho individual pelo horário operacional até checkpoint',
+    () async {
+      final jornadaId = await database
+          .into(database.jornadas)
+          .insert(
+            JornadasCompanion.insert(
+              usuarioId: 1,
+              veiculoId: 1,
+              dataHoraInicio: DateTime(2026, 8, 10, 7),
+              odometroInicio: 1000,
+              cidadeOrigem: 'Curitiba',
+              status: StatusJornada.aberta,
+            ),
+          );
+      final uberId = await inserirPlataforma('Uber');
+      final particularId = await database
+          .into(database.plataformas)
+          .insert(
+            PlataformasCompanion.insert(
+              nome: 'Particular',
+              tipoRegistroGanhos: TipoRegistroGanhos.individual,
+            ),
+          );
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.inicial,
+        DateTime(2026, 8, 10, 7),
+        {uberId: (0, 0)},
+      );
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.parcial,
+        DateTime(2026, 8, 10, 11, 40),
+        {uberId: (5000, 5)},
+      );
+      await database
+          .into(database.lancamentosGanhoIndividual)
+          .insert(
+            LancamentosGanhoIndividualCompanion.insert(
+              plataformaId: particularId,
+              jornadaId: Value(jornadaId),
+              quantidadeViagens: 2,
+              valorTotalCentavos: 3000,
+              dataHora: Value(DateTime(2026, 8, 10, 10, 25)),
+              dataCriacao: Value(DateTime(2026, 8, 10, 14)),
+            ),
+          );
+      final posteriorId = await database
+          .into(database.lancamentosGanhoIndividual)
+          .insert(
+            LancamentosGanhoIndividualCompanion.insert(
+              plataformaId: particularId,
+              jornadaId: Value(jornadaId),
+              quantidadeViagens: 1,
+              valorTotalCentavos: 9000,
+              dataHora: Value(DateTime(2026, 8, 10, 12)),
+            ),
+          );
+
+      final resumo = (await service.resumoJornadaAberta())!;
+
+      expect(resumo.receitaTotalCentavos, 8000);
+      expect(resumo.quantidadeTotalViagens, 7);
+      expect(resumo.ticketMedio, closeTo(11.428, 0.001));
+      final particular = resumo.resultadosPlataformas.singleWhere(
+        (item) => item.nome == 'Particular',
+      );
+      expect(particular.receitaCentavos, 3000);
+      expect(particular.quantidadeViagens, 2);
+
+      final ganhoService = GanhoIndividualService(
+        ganhoIndividualRepository,
+        jornadaRepository,
+        agora: () => DateTime(2026, 8, 10, 15),
+      );
+      await ganhoService.editarDataHora(
+        lancamentoId: posteriorId,
+        dataHora: DateTime(2026, 8, 10, 11),
+      );
+      final aposEdicao = (await service.resumoJornadaAberta())!;
+      expect(aposEdicao.receitaTotalCentavos, 17000);
+      expect(aposEdicao.quantidadeTotalViagens, 8);
+
+      await inserirLeitura(
+        jornadaId,
+        TipoLeituraGanhos.parcial,
+        DateTime(2026, 8, 10, 14),
+        {uberId: (7000, 7)},
+      );
+      final posterior = (await service.resumoJornadaAberta())!;
+      expect(posterior.receitaTotalCentavos, 19000);
+      expect(posterior.quantidadeTotalViagens, 10);
+    },
+  );
 
   test('timestamp legado posterior não bloqueia indicadores', () async {
     final jornadaId = await inserirJornada(

@@ -40,13 +40,56 @@ class GanhoIndividualDao extends DatabaseAccessor<AppDatabase>
   Future<int> inserir(LancamentosGanhoIndividualCompanion lancamento) =>
       into(lancamentosGanhoIndividual).insert(lancamento);
 
+  Future<LancamentosGanhoIndividualData?> buscarPorId(int id) => (select(
+    lancamentosGanhoIndividual,
+  )..where((l) => l.id.equals(id))).getSingleOrNull();
+
+  Future<bool> atualizar(LancamentosGanhoIndividualData lancamento) =>
+      update(lancamentosGanhoIndividual).replace(lancamento);
+
   Future<List<LancamentosGanhoIndividualData>> listarPorJornada(
     int jornadaId,
   ) =>
       (select(lancamentosGanhoIndividual)
             ..where((l) => l.jornadaId.equals(jornadaId))
-            ..orderBy([(l) => OrderingTerm.asc(l.dataCriacao)]))
+            ..orderBy([(l) => OrderingTerm.asc(l.dataHora)]))
           .get();
+
+  Future<List<TotalGanhoIndividual>> totalizarPorJornadaNoIntervalo(
+    int jornadaId,
+    DateTime inicio,
+    DateTime fim,
+  ) async {
+    final valor = lancamentosGanhoIndividual.valorTotalCentavos.sum();
+    final viagens = lancamentosGanhoIndividual.quantidadeViagens.sum();
+    final consulta =
+        select(plataformas).join([
+            innerJoin(
+              lancamentosGanhoIndividual,
+              lancamentosGanhoIndividual.plataformaId.equalsExp(plataformas.id),
+            ),
+          ])
+          ..where(
+            lancamentosGanhoIndividual.jornadaId.equals(jornadaId) &
+                lancamentosGanhoIndividual.dataHora.isBiggerOrEqualValue(
+                  inicio,
+                ) &
+                lancamentosGanhoIndividual.dataHora.isSmallerOrEqualValue(fim),
+          )
+          ..addColumns([valor, viagens])
+          ..groupBy([plataformas.id])
+          ..orderBy([OrderingTerm.asc(plataformas.ordem)]);
+
+    return (await consulta.get())
+        .map(
+          (linha) => (
+            plataforma: linha.readTable(plataformas),
+            valorTotalCentavos: linha.read(valor) ?? 0,
+            quantidadeViagens: linha.read(viagens) ?? 0,
+          ),
+        )
+        .toList();
+  }
 
   Future<List<TotalGanhoIndividual>> totalizarPorJornada(int jornadaId) async {
     final valor = lancamentosGanhoIndividual.valorTotalCentavos.sum();
