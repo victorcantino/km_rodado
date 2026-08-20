@@ -1,6 +1,18 @@
-# Tarefa atual — Resumo intraday da Jornada
+# Tarefa atual — Cobertura dos custos
 
 ## Estado
+
+Implementada a primeira visualização derivada de Cobertura dos custos na página
+de Despesas. O diagnóstico cobre combustível, manutenção, depreciação, seguro,
+IPVA, licenciamento, telefone profissional, outros custos recorrentes e parcela
+do veículo separada como obrigação de caixa. Estados: Informado, Estimado e
+Não informado. Não há percentual de confiança, persistência redundante,
+Motor Econômico ou Planejamento Mensal.
+
+O resumo intraday da Jornada permanece implementado conforme o histórico desta
+branch.
+
+## Resumo intraday — estado preservado
 
 Durante a Jornada aberta, a `JornadaPage` apresenta um resumo acumulado desde a
 Leitura Inicial até o último checkpoint salvo. Tempo total, Pausas, tempo

@@ -170,25 +170,39 @@ class _PassesBonusPageState extends State<PassesBonusPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Passes e bônus')),
       floatingActionButton: SafeArea(
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            FloatingActionButton.extended(
-              heroTag: 'novo_passe',
-              onPressed: widget.passeController.plataformas.isEmpty
-                  ? null
-                  : _registrarPasse,
-              icon: const Icon(Icons.confirmation_number_outlined),
-              label: const Text('Novo passe'),
+            Tooltip(
+              message: 'Novo passe',
+              child: Semantics(
+                label: 'Novo passe',
+                button: true,
+                child: FloatingActionButton(
+                  heroTag: 'novo_passe',
+                  onPressed: widget.passeController.plataformas.isEmpty
+                      ? null
+                      : _registrarPasse,
+                  child: const Icon(Icons.confirmation_number_outlined),
+                ),
+              ),
             ),
-            const SizedBox(width: 12),
-            FloatingActionButton.extended(
-              heroTag: 'novo_bonus',
-              onPressed: widget.bonusController.plataformas.isEmpty
-                  ? null
-                  : _registrarBonus,
-              icon: const Icon(Icons.redeem_outlined),
-              label: const Text('Novo bônus'),
+            const SizedBox(height: 12),
+            Tooltip(
+              message: 'Novo bônus',
+              child: Semantics(
+                label: 'Novo bônus',
+                button: true,
+                child: FloatingActionButton(
+                  heroTag: 'novo_bonus',
+                  onPressed: widget.bonusController.plataformas.isEmpty
+                      ? null
+                      : _registrarBonus,
+                  child: const Icon(Icons.redeem_outlined),
+                ),
+              ),
             ),
           ],
         ),

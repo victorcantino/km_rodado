@@ -12,12 +12,18 @@ import '../../../depreciacao_veiculo/presentation/controllers/depreciacao_veicul
 import '../../../depreciacao_veiculo/presentation/pages/depreciacao_veiculo_page.dart';
 import '../controllers/despesa_veiculo_controller.dart';
 import '../widgets/editar_despesa_veiculo_dialog.dart';
+import '../../../abastecimento/presentation/controllers/abastecimento_controller.dart';
+import '../../../manutencao/presentation/controllers/manutencao_controller.dart';
+import '../../../cobertura_custos/data/cobertura_custos.dart';
+import '../../../cobertura_custos/presentation/cobertura_custos_card.dart';
 
 class DespesasPage extends StatefulWidget {
   final int veiculoId;
   final DespesaVeiculoController controller;
   final CustoRecorrenteController custoRecorrenteController;
   final DepreciacaoVeiculoController depreciacaoController;
+  final AbastecimentoController? abastecimentoController;
+  final ManutencaoController? manutencaoController;
 
   const DespesasPage({
     super.key,
@@ -25,6 +31,8 @@ class DespesasPage extends StatefulWidget {
     required this.controller,
     required this.custoRecorrenteController,
     required this.depreciacaoController,
+    this.abastecimentoController,
+    this.manutencaoController,
   });
 
   @override
@@ -32,12 +40,15 @@ class DespesasPage extends StatefulWidget {
 }
 
 class _DespesasPageState extends State<DespesasPage> {
+  bool mostrarTodasDespesas = false;
+  bool mostrarTodosCustos = false;
   @override
   void initState() {
     super.initState();
     widget.controller.carregar(widget.veiculoId);
     widget.custoRecorrenteController.carregar();
     widget.depreciacaoController.carregar(widget.veiculoId);
+    widget.manutencaoController?.carregar(widget.veiculoId);
   }
 
   Future<void> _abrirDespesa([DespesaVeiculo? existente]) async {
@@ -185,68 +196,107 @@ class _DespesasPageState extends State<DespesasPage> {
           widget.controller,
           widget.custoRecorrenteController,
           widget.depreciacaoController,
+          if (widget.abastecimentoController != null)
+            widget.abastecimentoController!,
+          if (widget.manutencaoController != null) widget.manutencaoController!,
         ]),
         builder: (context, _) {
           final custos = widget.custoRecorrenteController.historico;
-          final ativos = custos.where((custo) => custo.ativo);
-          final inativos = custos.where((custo) => !custo.ativo);
+          final cobertura = const CoberturaCustosService().avaliar(
+            possuiAbastecimento: widget.abastecimentoController?.ultimo != null,
+            possuiManutencao:
+                widget.manutencaoController?.historico.isNotEmpty == true,
+            depreciacao: widget.depreciacaoController.selecionada,
+            custos: custos,
+          );
+          final despesas = mostrarTodasDespesas
+              ? widget.controller.historico
+              : widget.controller.historico.take(3).toList();
+          final ativos = custos.where((custo) => custo.ativo).toList();
+          final inativos = custos.where((custo) => !custo.ativo).toList();
+          final custosVisiveis = mostrarTodosCustos
+              ? [...ativos, ...inativos]
+              : [...ativos, ...inativos].take(3).toList();
           return ListView(
             key: const ValueKey('despesas_scroll_unico'),
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 152),
             children: [
               _TituloSecao(titulo: 'Despesas do veículo'),
-              if (widget.controller.carregando &&
-                  widget.controller.historico.isEmpty)
-                const Center(child: CircularProgressIndicator())
-              else if (widget.controller.historico.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text('Nenhuma despesa registrada.'),
-                )
-              else
-                for (final despesa in widget.controller.historico)
-                  _DespesaCard(
-                    despesa: despesa,
-                    onEditar: () => _abrirDespesa(despesa),
-                  ),
+              Card(
+                child: Column(
+                  children: [
+                    if (widget.controller.carregando &&
+                        widget.controller.historico.isEmpty)
+                      const Center(child: CircularProgressIndicator())
+                    else if (widget.controller.historico.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Text('Nenhuma despesa registrada.'),
+                      )
+                    else
+                      for (final despesa in despesas)
+                        _DespesaCard(
+                          despesa: despesa,
+                          onEditar: () => _abrirDespesa(despesa),
+                        ),
+                    if (!mostrarTodasDespesas &&
+                        widget.controller.historico.length > 3)
+                      TextButton(
+                        onPressed: () =>
+                            setState(() => mostrarTodasDespesas = true),
+                        child: const Text('Ver todos'),
+                      ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 24),
               _TituloSecao(titulo: 'Custos recorrentes'),
-              if (widget.custoRecorrenteController.carregando && custos.isEmpty)
-                const Center(child: CircularProgressIndicator())
-              else if (custos.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text('Nenhum custo recorrente cadastrado.'),
-                )
-              else ...[
-                for (final custo in ativos)
-                  _CustoRecorrenteCard(
-                    custo: custo,
-                    escopoLabel: _escopoLabel(custo),
-                    onEditar: () => _abrirCustoRecorrente(custo),
-                  ),
-                if (inativos.isNotEmpty) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12, bottom: 4),
-                    child: Text(
-                      'Inativos',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ),
-                  for (final custo in inativos)
-                    _CustoRecorrenteCard(
-                      custo: custo,
-                      escopoLabel: _escopoLabel(custo),
-                      onEditar: () => _abrirCustoRecorrente(custo),
-                    ),
-                ],
-              ],
+              Card(
+                child: Column(
+                  children: [
+                    if (widget.custoRecorrenteController.carregando &&
+                        custos.isEmpty)
+                      const Center(child: CircularProgressIndicator())
+                    else if (custos.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Text('Nenhum custo recorrente cadastrado.'),
+                      )
+                    else ...[
+                      for (final custo in custosVisiveis)
+                        _CustoRecorrenteCard(
+                          custo: custo,
+                          escopoLabel: _escopoLabel(custo),
+                          onEditar: () => _abrirCustoRecorrente(custo),
+                        ),
+                      if (mostrarTodosCustos && inativos.isNotEmpty) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12, bottom: 4),
+                          child: Text(
+                            'Inativos',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                      ],
+                    ],
+                    if (!mostrarTodosCustos && custos.length > 3)
+                      TextButton(
+                        onPressed: () =>
+                            setState(() => mostrarTodosCustos = true),
+                        child: const Text('Ver todos'),
+                      ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 24),
               _TituloSecao(titulo: 'Depreciação do veículo'),
               _DepreciacaoCard(
                 controller: widget.depreciacaoController,
                 onConfigurar: _abrirDepreciacao,
               ),
+              const SizedBox(height: 24),
+              _TituloSecao(titulo: 'Cobertura dos custos'),
+              CoberturaCustosCard(cobertura: cobertura),
             ],
           );
         },

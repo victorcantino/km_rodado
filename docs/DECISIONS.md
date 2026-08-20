@@ -305,3 +305,10 @@ Motivo: faturamento de um snapshot não pode ser combinado com tempo ou
 odômetro posteriores. Os snapshots permanecem fatos independentes, permitindo
 derivar intervalos futuramente. Ganhos individuais entram por seu `dataHora`
 operacional até o checkpoint, sem virar snapshot e sem agregado persistido.
+# ADR — Cobertura dos custos como diagnóstico
+
+Decisão: derivar uma visualização de completude dos custos estruturais a partir
+dos registros atuais, sem persistir status, percentual ou confiança. O domínio
+classifica cada item como Informado, Estimado ou Não informado. Parcela do
+veículo é obrigação de caixa separada; multa não entra no checklist estrutural.
+Esta decisão prepara o Motor Econômico sem implementá-lo.

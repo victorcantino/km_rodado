@@ -69,18 +69,54 @@ void main() {
 
     expect(find.byKey(const ValueKey('despesas_safe_area')), findsOneWidget);
     expect(find.byKey(const ValueKey('despesas_scroll_unico')), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('Despesas do veículo')).dy,
+      lessThan(tester.getTopLeft(find.text('Custos recorrentes')).dy),
+    );
+    expect(
+      tester.getTopLeft(find.text('Custos recorrentes')).dy,
+      lessThan(tester.getTopLeft(find.text('Depreciação do veículo')).dy),
+    );
+    expect(
+      tester.getTopLeft(find.text('Depreciação do veículo')).dy,
+      lessThan(tester.getTopLeft(find.text('Cobertura dos custos').first).dy),
+    );
+    await tester.scrollUntilVisible(
+      find.text('Despesas do veículo'),
+      400,
+      scrollable: find.byType(Scrollable).last,
+    );
     expect(find.text('Despesas do veículo'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Custos recorrentes'),
+      400,
+      scrollable: find.byType(Scrollable).last,
+    );
     expect(find.text('Custos recorrentes'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Depreciação do veículo'),
+      400,
+      scrollable: find.byType(Scrollable).last,
+    );
     expect(find.text('Depreciação do veículo'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('configurar_depreciacao')),
+      400,
+      scrollable: find.byType(Scrollable).last,
+    );
     expect(find.text('Depreciação ainda não calculada'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('configurar_depreciacao')),
       findsOneWidget,
     );
-    expect(find.byType(Divider), findsNWidgets(3));
+    expect(find.byType(Divider), findsNWidgets(4));
     expect(find.byType(ExpansionTile), findsNothing);
     expect(tester.takeException(), isNull);
 
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('configurar_depreciacao')),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('configurar_depreciacao')));
     await tester.pumpAndSettle();
     expect(find.text('Depreciação do veículo'), findsOneWidget);
@@ -192,6 +228,8 @@ void main() {
       hasLength(1),
     );
     expect(find.text('IPVA'), findsWidgets);
+    await tester.drag(find.byType(Scrollable), const Offset(0, 1000));
+    await tester.pumpAndSettle();
     expect(find.text('Nenhuma despesa registrada.'), findsOneWidget);
     expect(tester.takeException(), isNull);
 

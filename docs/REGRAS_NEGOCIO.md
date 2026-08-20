@@ -1,5 +1,16 @@
 # Regras de negócio — KM Rodado
 
+## Cobertura dos custos
+
+Cobertura dos custos é um diagnóstico derivado da completude dos dados atuais,
+não é o Motor Econômico e não calcula percentual de confiança. Cada componente
+é classificado como Informado, Estimado ou Não informado; lacunas não bloqueiam
+o uso nem inventam valores. Depreciação e Custos Recorrentes respeitam seus
+indicadores de estimativa existentes. A parcela do veículo aparece separada
+como obrigação/necessidade de caixa, enquanto multas não compõem a cobertura
+estrutural futura por km. Passes, Bônus e custos de plataforma ficam fora
+deste checklist. Motor Econômico e Planejamento Mensal continuam futuros.
+
 ## Jornada
 
 - Uma Jornada representa o período de trabalho ativo do motorista.
