@@ -204,7 +204,17 @@ void main() {
 
     await tester.tap(despesas);
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Despesas do veículo'),
+      400,
+      scrollable: find.byType(Scrollable).last,
+    );
     expect(find.text('Despesas do veículo'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Custos recorrentes'),
+      400,
+      scrollable: find.byType(Scrollable).last,
+    );
     expect(find.text('Custos recorrentes'), findsOneWidget);
     expect(find.byKey(const ValueKey('despesas_scroll_unico')), findsOneWidget);
     expect(find.byTooltip('Novo custo recorrente'), findsOneWidget);

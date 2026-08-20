@@ -65,6 +65,9 @@
 - formulários operacionais navegam pelo teclado entre campos editáveis,
   ignorando botões, seletores e calendários, e encerram a sequência com Done;
 - migrações preservadoras até schema 13 e seeds idempotentes.
+- Cobertura dos custos como diagnóstico derivado na página de Despesas, com
+  estados Informado, Estimado e Não informado; parcela do veículo separada
+  como obrigação de caixa e multa fora da cobertura estrutural.
 
 ## Em teste operacional
 
@@ -91,6 +94,8 @@ entregas mais recentes; a interface segue funcional e provisória.
   fluxo de cadastro.
 - FABs e “Ver todos” da página de Passes/Bônus ainda são uma primeira versão
   operacional; refinamentos visuais permanecem no backlog.
+- Cobertura dos custos ainda não calcula custo econômico por km nem percentual
+  de confiança; essas decisões pertencem ao futuro Motor Econômico.
 
 ## Próxima frente
 

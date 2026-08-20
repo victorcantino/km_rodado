@@ -71,6 +71,9 @@
 
 ## Custos e obrigações
 
+- Expandir a cobertura dos custos conforme novas fontes forem definidas, sem
+  transformá-la em Motor Econômico nem criar percentuais de confiança.
+
 - Reconciliação entre Custo Recorrente e pagamento real, separando competência
   econômica e fluxo de caixa sem dupla contagem.
 - Avaliar acompanhamento detalhado de quantidade de parcelas/obrigações somente

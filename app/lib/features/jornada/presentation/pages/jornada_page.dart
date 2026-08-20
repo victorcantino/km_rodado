@@ -270,6 +270,8 @@ class _JornadaPageState extends State<JornadaPage> {
   }
 
   Future<void> _abrirDespesas() async {
+    final abastecimentoController = this.abastecimentoController;
+    if (abastecimentoController == null) return;
     final despesasController = DespesaVeiculoController(
       DespesaVeiculoService(
         DespesaVeiculoRepository(DespesaVeiculoDao(database)),
@@ -288,6 +290,12 @@ class _JornadaPageState extends State<JornadaPage> {
         ),
       ),
     );
+    final manutencaoController = ManutencaoController(
+      ManutencaoService(
+        ManutencaoRepository(ManutencaoDao(database)),
+        AbastecimentoRepository(AbastecimentoDao(database)),
+      ),
+    );
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (_) => DespesasPage(
@@ -295,12 +303,15 @@ class _JornadaPageState extends State<JornadaPage> {
           controller: despesasController,
           custoRecorrenteController: custosController,
           depreciacaoController: depreciacaoController,
+          abastecimentoController: abastecimentoController,
+          manutencaoController: manutencaoController,
         ),
       ),
     );
     despesasController.dispose();
     custosController.dispose();
     depreciacaoController.dispose();
+    manutencaoController.dispose();
   }
 
   Future<void> _registrarGanhoIndividual([Plataforma? plataforma]) async {
