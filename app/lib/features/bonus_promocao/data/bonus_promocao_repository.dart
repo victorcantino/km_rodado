@@ -13,4 +13,7 @@ class BonusPromocaoRepository {
       _dao.listarPlataformasAtivas();
   Future<List<BonusPromocaoComPlataforma>> listarPorJornada(int jornadaId) =>
       _dao.listarPorJornada(jornadaId);
+  Future<List<BonusPromocaoComPlataforma>> listarTodos() => _dao.listarTodos();
+  Future<bool> atualizar(BonusPromocao bonus) => _dao.atualizar(bonus);
+  Future<int> excluir(int id) => _dao.excluir(id);
 }

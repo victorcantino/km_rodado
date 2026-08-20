@@ -1,20 +1,24 @@
-# Tarefa atual — Baseline inicial e conciliação simples
+# Tarefa atual — Resumo intraday da Jornada
 
 ## Estado
 
-Toda Leitura Inicial declara os acumulados do início da Jornada:
-`LeituraGanhos.dataHora` recebe `Jornada.dataHoraInicio` e `dataCriacao` mantém
-o instante técnico do salvamento. Isso vale tanto no fluxo automático quanto
-no registro posterior de ganhos iniciais pendentes.
+Durante a Jornada aberta, a `JornadaPage` apresenta um resumo acumulado desde a
+Leitura Inicial até o último checkpoint salvo. Tempo total, Pausas, tempo
+ativo, distância segura e métricas financeiras compartilham a mesma referência
+temporal. Passes e Bônus/Promoções são recortados no checkpoint e reconciliados
+pelas regras atuais de 99 e Uber.
 
-Sem Leitura Inicial, o estado permanece “Ganhos iniciais pendentes”. Não existe
-conceito operacional de cobertura financeira parcial nem bloqueio por diferença
-entre timestamps. Passe, Bônus/Promoção e Pausa não criam snapshots. A
-interpretação simples de Passes recompõe o custo já
-refletido no acumulado da 99 e mantém o Passe da Uber separado da variação. Não
-houve mudança de schema nem implementação de módulo de Conciliação.
+O resumo é derivado e preserva todas as Leituras intermediárias. Ganhos
+individuais possuem `dataHora` operacional e entram quando pertencem ao período
+entre o início da Jornada e o checkpoint, sem virar `LeituraGanhos`. Sem Leitura
+Inicial permanece o estado “Ganhos iniciais pendentes”.
+
+O schema evoluiu de 12 para 13. Registros individuais legados preservam os
+dados e recebem `dataHora = dataCriacao` como aproximação técnica. Passes e
+Bônus/Promoções possuem consulta compartilhada, cadastro separado, edição e
+exclusão dentro da edição, sem módulo de Conciliação.
 
 ## Validação
 
-Implementação concluída, análise estática limpa e 211 testes automatizados
-aprovados. Schema permanece 12; aguardando validação operacional no Android.
+Implementação em validação automatizada. Schema 13; aguardando validação
+operacional no Android e validação final no ambiente local do usuário.

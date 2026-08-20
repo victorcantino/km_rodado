@@ -28,6 +28,7 @@ class GanhoIndividualService {
     required int quantidadeViagens,
     required int valorTotalCentavos,
     String? observacao,
+    DateTime? dataHora,
   }) async {
     if (quantidadeViagens < 1) {
       throw Exception('A quantidade de viagens deve ser pelo menos 1.');
@@ -39,6 +40,9 @@ class GanhoIndividualService {
     if (jornada == null) {
       throw Exception('É necessária uma Jornada aberta para registrar.');
     }
+    final agora = _agora();
+    final instanteOperacional = dataHora ?? agora;
+    _validarDataHora(instanteOperacional, jornada, agora);
     final plataforma = await _repository.buscarPlataforma(plataformaId);
     if (plataforma == null ||
         plataforma.tipoRegistroGanhos != TipoRegistroGanhos.individual) {
@@ -55,8 +59,40 @@ class GanhoIndividualService {
         quantidadeViagens: quantidadeViagens,
         valorTotalCentavos: valorTotalCentavos,
         observacao: Value(texto == null || texto.isEmpty ? null : texto),
-        dataCriacao: Value(_agora()),
+        dataHora: Value(instanteOperacional),
+        dataCriacao: Value(agora),
       ),
     );
+  }
+
+  Future<bool> editarDataHora({
+    required int lancamentoId,
+    required DateTime dataHora,
+  }) async {
+    final lancamento = await _repository.buscarPorId(lancamentoId);
+    if (lancamento == null) throw Exception('O lançamento não foi encontrado.');
+    final jornadaId = lancamento.jornadaId;
+    if (jornadaId == null) {
+      if (dataHora.isAfter(_agora())) {
+        throw Exception('A data e hora não podem estar no futuro.');
+      }
+    } else {
+      final jornada = await _jornadaRepository.buscarPorId(jornadaId);
+      if (jornada == null) throw Exception('A Jornada não foi encontrada.');
+      _validarDataHora(dataHora, jornada, _agora());
+    }
+    return _repository.atualizar(lancamento.copyWith(dataHora: dataHora));
+  }
+
+  void _validarDataHora(DateTime dataHora, Jornada jornada, DateTime agora) {
+    if (dataHora.isAfter(agora)) {
+      throw Exception('A data e hora não podem estar no futuro.');
+    }
+    if (dataHora.isBefore(jornada.dataHoraInicio)) {
+      throw Exception('A data e hora não podem ser anteriores à Jornada.');
+    }
+    if (jornada.dataHoraFim != null && dataHora.isAfter(jornada.dataHoraFim!)) {
+      throw Exception('A data e hora não podem ser posteriores à Jornada.');
+    }
   }
 }

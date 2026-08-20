@@ -4,8 +4,9 @@
 
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
-- schema atual: **12**;
-- suíte automatizada: **211 testes aprovados** em 18/08/2026.
+- schema atual: **13**;
+- suíte automatizada: **219 testes aprovados** na última validação disponível;
+  a validação final desta revisão depende do ambiente Flutter local.
 
 ## Implementado
 
@@ -24,6 +25,9 @@
 - resumo derivado com receita, viagens, ticket médio, tempos, distâncias e
   indicadores; regressões e fatos financeiros sem interpretação segura impedem
   totais gerais exatos;
+- resumo intraday da Jornada aberta, acumulado até a última Leitura salva, com
+  tempo total, Pausas, tempo ativo, distância segura, composição financeira e
+  resultados por Plataforma na mesma referência temporal;
 - Abastecimentos atuais/retroativos, preço efetivo derivado, tanque cheio ou
   parcial e associação opcional à Jornada;
 - inteligência derivada de Abastecimentos com ciclos cheio a cheio, parciais
@@ -51,12 +55,16 @@
   sem criar associação cronologicamente falsa;
 - Passes da 99 são recompostos quando já refletidos no acumulado; Passes da
   Uber permanecem como custo separado da variação, sem dupla contagem;
+- Passes e Bônus/Promoções têm página compartilhada, seções independentes,
+  histórico por data/hora decrescente, cadastro e edição com exclusão;
 - a ação de ganho Particular na JornadaPage acompanha a disponibilidade de
   Plataformas individuais ativas e não aparece quando nenhuma está disponível;
+- ganhos individuais possuem horário operacional próprio e participam do
+  Intraday acumulado até o checkpoint, sem snapshots artificiais;
 - JornadaPage protegida pelos insets seguros inferiores do Android;
 - formulários operacionais navegam pelo teclado entre campos editáveis,
   ignorando botões, seletores e calendários, e encerram a sequência com Done;
-- migrações preservadoras até schema 12 e seeds idempotentes.
+- migrações preservadoras até schema 13 e seeds idempotentes.
 
 ## Em teste operacional
 
@@ -81,8 +89,13 @@ entregas mais recentes; a interface segue funcional e provisória.
 - Passes suportam operacionalmente tempo e faturamento; carteira pré-paga e
   condições compostas por tempo/uso permanecem documentadas, sem schema ou
   fluxo de cadastro.
+- FABs e “Ver todos” da página de Passes/Bônus ainda são uma primeira versão
+  operacional; refinamentos visuais permanecem no backlog.
 
 ## Próxima frente
 
 A próxima frente será priorizada após validação operacional desta entrega. O
 `BACKLOG.md` permanece como referência.
+
+O pacote atual aguarda teste manual Android, especialmente o baseline sem
+checkpoint, os lançamentos Particular retroativos e a página Passes e bônus.

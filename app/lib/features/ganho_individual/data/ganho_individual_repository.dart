@@ -11,9 +11,18 @@ class GanhoIndividualRepository {
       _dao.listarPlataformasIndividuaisAtivas();
   Future<int> inserir(LancamentosGanhoIndividualCompanion lancamento) =>
       _dao.inserir(lancamento);
+  Future<LancamentosGanhoIndividualData?> buscarPorId(int id) =>
+      _dao.buscarPorId(id);
+  Future<bool> atualizar(LancamentosGanhoIndividualData lancamento) =>
+      _dao.atualizar(lancamento);
   Future<List<LancamentosGanhoIndividualData>> listarPorJornada(
     int jornadaId,
   ) => _dao.listarPorJornada(jornadaId);
   Future<List<TotalGanhoIndividual>> totalizarPorJornada(int jornadaId) =>
       _dao.totalizarPorJornada(jornadaId);
+  Future<List<TotalGanhoIndividual>> totalizarPorJornadaNoIntervalo(
+    int jornadaId,
+    DateTime inicio,
+    DateTime fim,
+  ) => _dao.totalizarPorJornadaNoIntervalo(jornadaId, inicio, fim);
 }

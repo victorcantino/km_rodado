@@ -13,13 +13,18 @@ transformar registros reais em uma referência econômica pessoal de quanto o
 motorista precisa receber por quilômetro e por hora para cobrir custos e atingir
 a margem desejada.
 
+Estado atual: schema Drift 13, com validação automatizada e teste operacional
+em Android em andamento.
+
 ## Funcionalidades atuais
 
 - abertura e fechamento de Jornada, odômetros e localização textual;
 - Pausas com duração e deslocamento derivados;
 - Leituras de ganhos inicial, parcial e final;
+- resumo intraday acumulado da Jornada aberta até a última Leitura salva;
 - plataformas configuráveis com captura acumulada ou individual;
 - ganhos individuais, incluindo Particular e lançamentos em lote;
+- Passes e Bônus/Promoções em página compartilhada, com históricos separados;
 - resumo analítico derivado, com conferência de snapshots inconsistentes;
 - Abastecimentos atuais ou retroativos;
 - Passes de plataforma como custos separados do faturamento;
@@ -31,6 +36,13 @@ a margem desejada.
 - Custos recorrentes como referências de competência econômica, separados dos
   pagamentos efetivos.
 - Depreciação observada e projetada por veículo, calculada em R$/km.
+
+## Próximos passos
+
+Refinar a experiência móvel, ampliar o histórico e a linha do tempo de Jornadas,
+melhorar indicadores de manutenção e preparar a cobertura de custos para o
+futuro Motor Econômico. Planejamento Mensal e InDrive continuam pendentes de
+definição e observação operacional.
 
 ## Arquitetura
 

@@ -274,6 +274,7 @@ void main() {
             jornadaId: Value(id),
             quantidadeViagens: 1,
             valorTotalCentavos: 4000,
+            dataHora: Value(DateTime(2026, 8, 15, 17)),
             dataCriacao: Value(DateTime(2026, 8, 15, 21)),
           ),
         );

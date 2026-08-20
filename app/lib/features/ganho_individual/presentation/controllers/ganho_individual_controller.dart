@@ -32,6 +32,7 @@ class GanhoIndividualController extends ChangeNotifier {
     required int quantidadeViagens,
     required int valorTotalCentavos,
     String? observacao,
+    DateTime? dataHora,
   }) async {
     carregando = true;
     notifyListeners();
@@ -41,6 +42,7 @@ class GanhoIndividualController extends ChangeNotifier {
         quantidadeViagens: quantidadeViagens,
         valorTotalCentavos: valorTotalCentavos,
         observacao: observacao,
+        dataHora: dataHora,
       );
       totais = await _service.totalizarPorJornada(jornadaId);
     } finally {

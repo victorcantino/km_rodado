@@ -82,6 +82,8 @@ class DespesaVeiculoService {
     );
   }
 
+  Future<int> excluir(int id) => _repository.excluir(id);
+
   Future<String> _validar({
     required int veiculoId,
     required TipoDespesaVeiculo? tipo,

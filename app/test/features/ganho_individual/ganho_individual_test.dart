@@ -85,6 +85,61 @@ void main() {
     expect(total.valorTotalCentavos, 16500);
   });
 
+  test(
+    'preserva horário operacional, permite edição e rejeita futuro',
+    () async {
+      final jornadaId = await abrirJornada();
+      final particular = await plataforma(
+        'Fonte individual',
+        TipoRegistroGanhos.individual,
+      );
+      final agora = DateTime(2026, 8, 12, 14);
+      final serviceComRelogio = GanhoIndividualService(
+        repository,
+        jornadaRepository,
+        agora: () => agora,
+      );
+      final retroativo = DateTime(2026, 8, 12, 10, 25);
+      final leiturasAntes = await database
+          .select(database.leiturasGanhos)
+          .get();
+
+      final id = await serviceComRelogio.registrar(
+        plataformaId: particular,
+        quantidadeViagens: 1,
+        valorTotalCentavos: 3000,
+        dataHora: retroativo,
+      );
+      var registro = (await repository.listarPorJornada(jornadaId)).single;
+      expect(registro.dataHora, retroativo);
+      expect(registro.dataCriacao, agora);
+      expect(
+        await database.select(database.leiturasGanhos).get(),
+        leiturasAntes,
+      );
+
+      final editado = DateTime(2026, 8, 12, 11);
+      expect(
+        await serviceComRelogio.editarDataHora(
+          lancamentoId: id,
+          dataHora: editado,
+        ),
+        isTrue,
+      );
+      registro = (await repository.listarPorJornada(jornadaId)).single;
+      expect(registro.dataHora, editado);
+      expect(registro.dataCriacao, agora);
+
+      await expectLater(
+        serviceComRelogio.editarDataHora(
+          lancamentoId: id,
+          dataHora: agora.add(const Duration(minutes: 1)),
+        ),
+        throwsException,
+      );
+    },
+  );
+
   test('valida quantidade, valor, tipo e Jornada aberta', () async {
     final individual = await plataforma(
       'Individual',

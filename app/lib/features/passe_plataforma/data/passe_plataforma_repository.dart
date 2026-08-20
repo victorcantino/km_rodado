@@ -11,6 +11,9 @@ class PassePlataformaRepository {
       _dao.listarPlataformasAtivas();
   Future<List<PasseComPlataforma>> listarPorJornada(int jornadaId) =>
       _dao.listarPorJornada(jornadaId);
+  Future<List<PasseComPlataforma>> listarTodos() => _dao.listarTodos();
+  Future<bool> atualizar(PassesPlataformaData passe) => _dao.atualizar(passe);
+  Future<int> excluir(int id) => _dao.excluir(id);
   Future<PassesPlataformaData?> buscarUltimoPorPlataforma(int plataformaId) =>
       _dao.buscarUltimoPorPlataforma(plataformaId);
 }

@@ -45,6 +45,15 @@ class _DespesasPageState extends State<DespesasPage> {
       context: context,
       builder: (_) => EditarDespesaVeiculoDialog(
         existente: existente,
+        onExcluir: existente == null
+            ? null
+            : () async {
+                Navigator.pop(context);
+                await widget.controller.excluir(
+                  id: existente.id,
+                  veiculoId: widget.veiculoId,
+                );
+              },
         buscarSugestoes: (tipo) =>
             widget.controller.sugestoes(widget.veiculoId, tipo),
       ),

@@ -16,6 +16,8 @@ class LancamentosGanhoIndividual extends Table {
 
   TextColumn get observacao => text().nullable()();
 
+  DateTimeColumn get dataHora => dateTime().withDefault(currentDateAndTime)();
+
   DateTimeColumn get dataCriacao =>
       dateTime().withDefault(currentDateAndTime)();
 

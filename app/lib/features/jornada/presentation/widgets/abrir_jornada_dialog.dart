@@ -113,6 +113,10 @@ class _AbrirJornadaDialogState extends State<AbrirJornadaDialog> {
               inputFormatters: const [QuilometragemInputFormatter()],
               textInputAction: TextInputAction.next,
               selectAllOnFocus: true,
+              onTap: () => odometroController.selection = TextSelection(
+                baseOffset: 0,
+                extentOffset: odometroController.text.length,
+              ),
               decoration: const InputDecoration(labelText: 'Odômetro'),
               validator: (valor) {
                 final texto = valor?.trim() ?? '';

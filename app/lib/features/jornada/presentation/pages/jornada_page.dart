@@ -39,11 +39,10 @@ import '../../../pausa/presentation/widgets/editar_pausa_dialog.dart';
 import '../../../passe_plataforma/data/passe_plataforma_repository.dart';
 import '../../../passe_plataforma/data/passe_plataforma_service.dart';
 import '../../../passe_plataforma/presentation/controllers/passe_plataforma_controller.dart';
-import '../../../passe_plataforma/presentation/widgets/registrar_passe_dialog.dart';
+import '../../../passe_plataforma/presentation/pages/passes_bonus_page.dart';
 import '../../../bonus_promocao/data/bonus_promocao_repository.dart';
 import '../../../bonus_promocao/data/bonus_promocao_service.dart';
 import '../../../bonus_promocao/presentation/controllers/bonus_promocao_controller.dart';
-import '../../../bonus_promocao/presentation/widgets/registrar_bonus_promocao_dialog.dart';
 import '../../../manutencao/data/manutencao_repository.dart';
 import '../../../manutencao/data/manutencao_service.dart';
 import '../../../manutencao/presentation/controllers/manutencao_controller.dart';
@@ -188,72 +187,15 @@ class _JornadaPageState extends State<JornadaPage> {
     await novoBonusPromocaoController.carregar();
   }
 
-  Future<void> _registrarBonusPromocao() async {
-    final bonusController = bonusPromocaoController;
-    if (bonusController == null || bonusController.plataformas.isEmpty) return;
-    final resultado = await showDialog<RegistrarBonusPromocaoResultado>(
-      context: context,
-      builder: (_) => RegistrarBonusPromocaoDialog(
-        plataformas: bonusController.plataformas,
+  Future<void> _abrirPassesEBonus() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => PassesBonusPage(
+          passeController: passePlataformaController!,
+          bonusController: bonusPromocaoController!,
+        ),
       ),
     );
-    if (!mounted || resultado == null) return;
-    try {
-      await bonusController.registrar(
-        plataformaId: resultado.plataformaId,
-        dataHora: resultado.dataHora,
-        valorCentavos: resultado.valorCentavos,
-        observacao: resultado.observacao,
-      );
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bônus/promoção registrado.')),
-      );
-    } catch (error, stackTrace) {
-      if (!mounted) return;
-      _apresentarErro(
-        operacao: 'registrar o bônus/promoção',
-        error: error,
-        stackTrace: stackTrace,
-        mensagemPadrao: 'Não foi possível registrar o bônus/promoção.',
-      );
-    }
-  }
-
-  Future<void> _registrarPasse() async {
-    final passeController = passePlataformaController;
-    if (passeController == null || passeController.plataformas.isEmpty) return;
-    final resultado = await showDialog<RegistrarPasseResultado>(
-      context: context,
-      builder: (_) => RegistrarPasseDialog(
-        plataformas: passeController.plataformas,
-        ultimosRepetiveis: passeController.ultimosRepetiveis,
-      ),
-    );
-    if (!mounted || resultado == null) return;
-    try {
-      await passeController.registrar(
-        plataformaId: resultado.plataformaId,
-        dataHora: resultado.dataHora,
-        valorPagoCentavos: resultado.valorPagoCentavos,
-        tipo: resultado.tipo,
-        duracaoHoras: resultado.duracaoHoras,
-        limiteFaturamentoCentavos: resultado.limiteFaturamentoCentavos,
-        observacao: resultado.observacao,
-      );
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Passe registrado.')));
-    } catch (error, stackTrace) {
-      if (!mounted) return;
-      _apresentarErro(
-        operacao: 'registrar o passe',
-        error: error,
-        stackTrace: stackTrace,
-        mensagemPadrao: 'Não foi possível registrar o passe.',
-      );
-    }
   }
 
   Future<void> _registrarAbastecimento() async {
@@ -381,7 +323,9 @@ class _JornadaPageState extends State<JornadaPage> {
         quantidadeViagens: resultado.quantidadeViagens,
         valorTotalCentavos: resultado.valorTotalCentavos,
         observacao: resultado.observacao,
+        dataHora: resultado.dataHora,
       );
+      await controller?.carregarResumoIntraday();
     } catch (error, stackTrace) {
       if (!mounted) return;
       _apresentarErro(
@@ -571,6 +515,7 @@ class _JornadaPageState extends State<JornadaPage> {
         jornadaId: jornadaId,
         itens: resultado,
       );
+      await controller?.carregarResumoIntraday();
     } catch (error, stackTrace) {
       if (mounted) {
         _apresentarErro(
@@ -607,6 +552,7 @@ class _JornadaPageState extends State<JornadaPage> {
         pausaId: pausa.id,
         itens: resultado,
       );
+      await controller?.carregarResumoIntraday();
     } catch (error, stackTrace) {
       if (!mounted) {
         return;
@@ -930,6 +876,24 @@ class _JornadaPageState extends State<JornadaPage> {
           ),
           const SizedBox(height: 12),
           Tooltip(
+            message: 'Passes e bônus',
+            excludeFromSemantics: true,
+            child: Semantics(
+              label: 'Passes e bônus',
+              button: true,
+              child: FloatingActionButton(
+                heroTag: 'passes_bonus',
+                onPressed:
+                    passePlataformaController.plataformas.isEmpty &&
+                        bonusPromocaoController.plataformas.isEmpty
+                    ? null
+                    : _abrirPassesEBonus,
+                child: const Icon(Icons.confirmation_number_outlined),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Tooltip(
             message: 'Abastecimento',
             excludeFromSemantics: true,
             child: Semantics(
@@ -1013,11 +977,20 @@ class _JornadaPageState extends State<JornadaPage> {
 
                   const SizedBox(height: 16),
 
-                  Text('Início: $inicioFormatado'),
-
-                  Text('Odômetro inicial: $odometroFormatado km'),
-
-                  Text('Cidade de origem: ${jornada.cidadeOrigem}'),
+                  _LinhaTabulada(
+                    rotulo: 'Status',
+                    valor: jornada.status.name.toUpperCase(),
+                    destaque: true,
+                  ),
+                  _LinhaTabulada(rotulo: 'Início', valor: inicioFormatado),
+                  _LinhaTabulada(
+                    rotulo: 'Odômetro inicial',
+                    valor: '$odometroFormatado km',
+                  ),
+                  _LinhaTabulada(
+                    rotulo: 'Cidade de origem',
+                    valor: jornada.cidadeOrigem,
+                  ),
 
                   if (abastecimentoController.inteligencia?.possuiDados ==
                       true) ...[
@@ -1042,23 +1015,6 @@ class _JornadaPageState extends State<JornadaPage> {
                     ),
                     const SizedBox(height: 8),
                   ],
-                  if (passePlataformaController.plataformas.isNotEmpty) ...[
-                    OutlinedButton.icon(
-                      onPressed: _registrarPasse,
-                      icon: const Icon(Icons.confirmation_number_outlined),
-                      label: const Text('Passe'),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                  if (bonusPromocaoController.plataformas.isNotEmpty) ...[
-                    OutlinedButton.icon(
-                      onPressed: _registrarBonusPromocao,
-                      icon: const Icon(Icons.redeem_outlined),
-                      label: const Text('Bônus/promoção'),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-
                   if (!inicialConcluida) ...[
                     Text(
                       'Ganhos iniciais pendentes',
@@ -1068,6 +1024,15 @@ class _JornadaPageState extends State<JornadaPage> {
                     ElevatedButton(
                       onPressed: () => _registrarLeituraInicial(jornada.id),
                       child: const Text('Registrar ganhos iniciais'),
+                    ),
+                  ],
+
+                  if (controller.resumoIntraday != null) ...[
+                    const SizedBox(height: 24),
+                    _ResumoIntradayCard(
+                      resumo: controller.resumoIntraday!,
+                      locale: locale,
+                      formatarDuracao: _formatarDuracao,
                     ),
                   ],
 
@@ -1317,6 +1282,218 @@ class ResumoInteligenciaAbastecimentoCard extends StatelessWidget {
               const Text(
                 'Há ciclo com abastecimento parcial; o consumo físico é '
                 'válido, mas não pertence exclusivamente a um único posto.',
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LinhaTabulada extends StatelessWidget {
+  final String rotulo;
+  final String valor;
+  final bool destaque;
+  final bool alternarZebra;
+
+  const _LinhaTabulada({
+    required this.rotulo,
+    required this.valor,
+    this.destaque = false,
+    this.alternarZebra = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: alternarZebra
+          ? Theme.of(context).colorScheme.surfaceContainerHighest.withAlpha(90)
+          : null,
+      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(
+              rotulo,
+              style: destaque
+                  ? const TextStyle(fontWeight: FontWeight.w700)
+                  : null,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              valor,
+              textAlign: TextAlign.right,
+              style: destaque
+                  ? const TextStyle(fontWeight: FontWeight.w700)
+                  : null,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ResumoIntradayCard extends StatelessWidget {
+  final ResumoIntradayJornada resumo;
+  final String locale;
+  final String Function(Duration, NumberFormat) formatarDuracao;
+
+  const _ResumoIntradayCard({
+    required this.resumo,
+    required this.locale,
+    required this.formatarDuracao,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final moeda = NumberFormat.currency(
+      locale: locale,
+      symbol: r'R$',
+      decimalDigits: 2,
+    );
+    final numeros = NumberFormat.decimalPattern(locale);
+    final hora = DateFormat.Hm(locale).format(resumo.dataHoraReferencia);
+    String dinheiro(int? centavos) =>
+        centavos == null ? '—' : moeda.format(centavos / 100);
+    String decimal(double? valor) => valor == null ? '—' : moeda.format(valor);
+
+    final titulo = resumo.possuiCheckpointReal
+        ? 'Jornada até $hora'
+        : 'Jornada iniciada às $hora';
+    return Card(
+      key: const ValueKey('resumo_intraday'),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(titulo, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'Tempo ativo',
+              valor: formatarDuracao(resumo.tempoAtivo, numeros),
+              destaque: true,
+            ),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'Distância',
+              valor: resumo.quilometros == null
+                  ? '—'
+                  : '${numeros.format(resumo.quilometros)} km',
+              destaque: true,
+            ),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'Faturamento',
+              valor: dinheiro(resumo.receitaTotalCentavos),
+              destaque: true,
+            ),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'R\$/hora ativa',
+              valor: decimal(resumo.receitaPorHoraAtiva),
+              destaque: true,
+            ),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'R\$/km',
+              valor: decimal(resumo.receitaPorKm),
+              destaque: true,
+            ),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'Tempo da Jornada',
+              valor: formatarDuracao(resumo.duracaoTotal, numeros),
+            ),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'Em pausa',
+              valor: formatarDuracao(resumo.tempoPausa, numeros),
+            ),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'Viagens',
+              valor: resumo.quantidadeTotalViagens == null
+                  ? '—'
+                  : numeros.format(resumo.quantidadeTotalViagens),
+            ),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'Ticket médio',
+              valor: decimal(resumo.ticketMedio),
+            ),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'Passes',
+              valor: dinheiro(resumo.custoPassesCentavos),
+            ),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'Bônus/promoções',
+              valor: dinheiro(resumo.bonusPromocoesCentavos),
+            ),
+            _LinhaTabulada(
+              alternarZebra: true,
+              rotulo: 'Resultado operacional',
+              valor: dinheiro(resumo.resultadoOperacionalCentavos),
+            ),
+            if (resumo.resultadosPlataformas.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(
+                'Por plataforma',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              for (final resultado in resumo.resultadosPlataformas) ...[
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 2),
+                  child: Text(
+                    resultado.nome,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                _LinhaTabulada(
+                  alternarZebra: true,
+                  rotulo: 'Faturamento',
+                  valor: dinheiro(resultado.receitaCentavos),
+                ),
+                _LinhaTabulada(
+                  alternarZebra: true,
+                  rotulo: 'Viagens',
+                  valor: resultado.quantidadeViagens == null
+                      ? '—'
+                      : numeros.format(resultado.quantidadeViagens),
+                ),
+                _LinhaTabulada(
+                  alternarZebra: true,
+                  rotulo: 'Ticket médio',
+                  valor: decimal(resultado.ticketMedio),
+                ),
+                _LinhaTabulada(
+                  alternarZebra: true,
+                  rotulo: 'Passes',
+                  valor: dinheiro(resultado.custoPassesCentavos),
+                ),
+                _LinhaTabulada(
+                  alternarZebra: true,
+                  rotulo: 'Bônus',
+                  valor: dinheiro(resultado.bonusPromocoesCentavos),
+                ),
+                _LinhaTabulada(
+                  alternarZebra: true,
+                  rotulo: 'Resultado operacional',
+                  valor: dinheiro(resultado.resultadoOperacionalCentavos),
+                ),
+              ],
+            ],
+            if (!resumo.possuiCheckpointReal)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text('Aguardando primeira atualização.'),
               ),
           ],
         ),

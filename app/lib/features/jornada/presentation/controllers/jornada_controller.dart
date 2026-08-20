@@ -12,6 +12,7 @@ class JornadaController extends ChangeNotifier {
   Jornada? jornadaAtual;
   Jornada? ultimaJornadaFinalizada;
   ResumoJornada? resumoUltimaJornada;
+  ResumoIntradayJornada? resumoIntraday;
 
   bool carregando = false;
 
@@ -26,6 +27,7 @@ class JornadaController extends ChangeNotifier {
 
     try {
       jornadaAtual = await _service.jornadaAberta();
+      resumoIntraday = await _service.resumoJornadaAberta();
       ultimaJornadaFinalizada = await _service.ultimaJornadaFinalizada();
       resumoUltimaJornada = await _service.resumoUltimaJornada();
     } finally {
@@ -54,10 +56,16 @@ class JornadaController extends ChangeNotifier {
       );
 
       jornadaAtual = await _service.jornadaAberta();
+      resumoIntraday = await _service.resumoJornadaAberta();
     } finally {
       carregando = false;
       notifyListeners();
     }
+  }
+
+  Future<void> carregarResumoIntraday() async {
+    resumoIntraday = await _service.resumoJornadaAberta();
+    notifyListeners();
   }
 
   Future<void> editarJornada({
@@ -84,6 +92,7 @@ class JornadaController extends ChangeNotifier {
         observacoes: observacoes,
       );
       jornadaAtual = await _service.jornadaAberta();
+      resumoIntraday = await _service.resumoJornadaAberta();
       ultimaJornadaFinalizada = await _service.ultimaJornadaFinalizada();
       resumoUltimaJornada = await _service.resumoUltimaJornada();
     } finally {
@@ -108,6 +117,7 @@ class JornadaController extends ChangeNotifier {
       );
 
       jornadaAtual = await _service.jornadaAberta();
+      resumoIntraday = await _service.resumoJornadaAberta();
       ultimaJornadaFinalizada = await _service.ultimaJornadaFinalizada();
       resumoUltimaJornada = await _service.resumoUltimaJornada();
     } finally {
