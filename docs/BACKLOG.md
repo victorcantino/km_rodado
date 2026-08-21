@@ -132,6 +132,8 @@
 
 ## Produto
 
+- Avaliação binária futura de posto/abastecimento (gostei/não gostei), sem
+  estrelas ou nota de 1 a 5.
 - Página futura de Resumo/Linha do tempo da Jornada encerrada, projetada a
   partir dos fatos especializados.
 - Indicadores visuais de ciclo de manutenção por km/tempo, sem barras

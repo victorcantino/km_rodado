@@ -61,6 +61,11 @@ class AbastecimentoService {
   Future<List<Abastecimento>> listar(int veiculoId) =>
       _repository.listarPorVeiculo(veiculoId);
 
+  Future<bool> atualizar(Abastecimento abastecimento) =>
+      _repository.atualizar(abastecimento);
+
+  Future<int> excluir(int id) => _repository.excluir(id);
+
   Future<ResumoInteligenciaAbastecimento> calcularInteligencia(
     int veiculoId,
   ) async {

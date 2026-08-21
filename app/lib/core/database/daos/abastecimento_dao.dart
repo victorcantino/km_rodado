@@ -17,6 +17,10 @@ class AbastecimentoDao extends DatabaseAccessor<AppDatabase>
 
   Future<int> inserir(AbastecimentosCompanion abastecimento) =>
       into(abastecimentos).insert(abastecimento);
+  Future<bool> atualizar(Abastecimento abastecimento) =>
+      update(abastecimentos).replace(abastecimento);
+  Future<int> excluir(int id) =>
+      (delete(abastecimentos)..where((a) => a.id.equals(id))).go();
 
   Future<Abastecimento?> buscarUltimoPorVeiculo(int veiculoId) =>
       (select(abastecimentos)
@@ -143,8 +147,14 @@ class AbastecimentoDao extends DatabaseAccessor<AppDatabase>
           WHERE veiculo_id = ? AND (? IS NULL OR id != ?)
       )
       SELECT
-        (SELECT MAX(odometro) FROM fatos WHERE data_hora <= ?) AS anterior,
-        (SELECT MIN(odometro) FROM fatos WHERE data_hora >= ?) AS posterior
+        (SELECT odometro FROM fatos
+          WHERE data_hora <= ?
+          ORDER BY data_hora DESC
+          LIMIT 1) AS anterior,
+        (SELECT odometro FROM fatos
+          WHERE data_hora >= ?
+          ORDER BY data_hora ASC
+          LIMIT 1) AS posterior
       ''',
       variables: [
         ...List.generate(6, (_) => Variable<int>(veiculoId)),

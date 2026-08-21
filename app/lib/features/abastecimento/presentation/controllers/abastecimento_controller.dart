@@ -18,7 +18,11 @@ class AbastecimentoController extends ChangeNotifier {
       _service.ultimoOdometro(veiculoId);
 
   Future<void> carregar(int veiculoId) async {
-    historico = await _service.listar(veiculoId);
+    historico = (await _service.listar(veiculoId))
+      ..sort((a, b) {
+        final porData = b.dataHora.compareTo(a.dataHora);
+        return porData != 0 ? porData : b.id.compareTo(a.id);
+      });
     ultimo = await _service.ultimoAbastecimento(veiculoId);
     inteligencia = await _service.calcularInteligencia(veiculoId);
     notifyListeners();
@@ -60,6 +64,30 @@ class AbastecimentoController extends ChangeNotifier {
       );
       ultimo = await _service.ultimoAbastecimento(veiculoId);
       inteligencia = await _service.calcularInteligencia(veiculoId);
+    } finally {
+      carregando = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> editar(Abastecimento abastecimento) async {
+    carregando = true;
+    notifyListeners();
+    try {
+      await _service.atualizar(abastecimento);
+      await carregar(abastecimento.veiculoId);
+    } finally {
+      carregando = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> excluir(Abastecimento abastecimento) async {
+    carregando = true;
+    notifyListeners();
+    try {
+      await _service.excluir(abastecimento.id);
+      await carregar(abastecimento.veiculoId);
     } finally {
       carregando = false;
       notifyListeners();

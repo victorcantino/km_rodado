@@ -225,7 +225,6 @@ class _JornadaPageState extends State<JornadaPage> {
         builder: (_) => AbastecimentosPage(
           veiculoId: controller?.jornadaAtual?.veiculoId ?? 1,
           controller: abastecimento,
-          abrirNovoAoEntrar: true,
           cidadeInicial:
               controller?.jornadaAtual?.cidadeOrigem ??
               controller?.ultimaJornadaFinalizada?.cidadeDestino,
@@ -994,15 +993,6 @@ class _JornadaPageState extends State<JornadaPage> {
                       valor: jornada.cidadeOrigem,
                     ),
 
-                    if (abastecimentoController.inteligencia?.possuiDados ==
-                        true) ...[
-                      const SizedBox(height: 24),
-                      ResumoInteligenciaAbastecimentoCard(
-                        resumo: abastecimentoController.inteligencia!,
-                        locale: locale,
-                      ),
-                    ],
-
                     const SizedBox(height: 24),
 
                     if (ganhoIndividualController.plataformas.isNotEmpty) ...[
@@ -1038,6 +1028,19 @@ class _JornadaPageState extends State<JornadaPage> {
                         resumo: controller.resumoIntraday!,
                         locale: locale,
                         formatarDuracao: _formatarDuracao,
+                      ),
+                    ],
+
+                    if (abastecimentoController.inteligencia?.possuiDados ==
+                        true) ...[
+                      const SizedBox(height: 24),
+                      Text(
+                        'Consumo recente',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      ResumoInteligenciaAbastecimentoCard(
+                        resumo: abastecimentoController.inteligencia!,
+                        locale: locale,
                       ),
                     ],
 
@@ -1169,20 +1172,24 @@ class _JornadaPageState extends State<JornadaPage> {
                       ultimaJornada.cidadeDestino,
                     ),
                   ),
-                  if (abastecimentoController.inteligencia?.possuiDados ==
-                      true) ...[
-                    const SizedBox(height: 16),
-                    ResumoInteligenciaAbastecimentoCard(
-                      resumo: abastecimentoController.inteligencia!,
-                      locale: locale,
-                    ),
-                  ],
                   if (resumo != null) ...[
                     const SizedBox(height: 16),
                     _ResumoJornadaConcluida(
                       resumo: resumo,
                       numeros: numeros,
                       formatarDuracao: _formatarDuracao,
+                    ),
+                  ],
+                  if (abastecimentoController.inteligencia?.possuiDados ==
+                      true) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      'Consumo recente',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    ResumoInteligenciaAbastecimentoCard(
+                      resumo: abastecimentoController.inteligencia!,
+                      locale: locale,
                     ),
                   ],
                   const SizedBox(height: 24),
@@ -1234,65 +1241,75 @@ class ResumoInteligenciaAbastecimentoCard extends StatelessWidget {
         ? null
         : resumo.ciclosRecentes.first;
     final referencia = resumo.odometroReferenciaAbastecimento;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Consumo recente',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            Text(
-              cicloRecente == null
-                  ? '—'
-                  : '${decimal.format(cicloRecente.kmPorLitro)} km/L',
-            ),
-            Text(
-              'Média recente: ${resumo.mediaKmPorLitro == null ? '—' : '${decimal.format(resumo.mediaKmPorLitro)} km/L'} '
-              '(${resumo.ciclosRecentes.length} ${resumo.ciclosRecentes.length == 1 ? 'ciclo' : 'ciclos'})',
-            ),
-            Text(
-              'Referência conservadora de consumo: '
-              '${resumo.kmPorLitroConservador == null ? '—' : '${decimal.format(resumo.kmPorLitroConservador)} km/L'}',
-            ),
-            Text(
-              'Autonomia estimada de tanque cheio: '
-              '${resumo.autonomiaConservadoraTanqueCheioKm == null ? '—' : '~${inteiros.format(resumo.autonomiaConservadoraTanqueCheioKm!.round())} km'}',
-            ),
-            if (referencia != null)
-              if (resumo.referenciaAtingida) ...[
-                const Text('Referência para abastecer atingida'),
-                Text('Referência: ~${inteiros.format(referencia)} km'),
-              ] else ...[
-                Text(
-                  'Referência para abastecer: '
-                  '~${inteiros.format(referencia)} km',
-                ),
-                if (resumo.distanciaAteReferenciaKm != null)
-                  Text(
-                    'Faltam aproximadamente '
-                    '${inteiros.format(resumo.distanciaAteReferenciaKm)} km '
-                    'até a referência comportamental.',
-                  ),
-                if (resumo.diasOperacaoAteReferencia != null)
-                  Text(
-                    'Aproximadamente '
-                    '${decimal.format(resumo.diasOperacaoAteReferencia)} '
-                    'dias de operação.',
-                  ),
-              ]
-            else
-              const Text('Referência para abastecer: —'),
-            if (resumo.ciclosRecentes.any((ciclo) => ciclo.potencialmenteMisto))
-              const Text(
-                'Há ciclo com abastecimento parcial; o consumo físico é '
-                'válido, mas não pertence exclusivamente a um único posto.',
-              ),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _LinhaTabulada(
+          rotulo: 'Consumo',
+          valor: cicloRecente == null
+              ? '—'
+              : '${decimal.format(cicloRecente.kmPorLitro)} km/L',
+          destaque: true,
         ),
-      ),
+        _LinhaTabulada(
+          rotulo: 'Média recente',
+          valor:
+              '${resumo.mediaKmPorLitro == null ? '—' : '${decimal.format(resumo.mediaKmPorLitro)} km/L'} '
+              '(${resumo.ciclosRecentes.length} ${resumo.ciclosRecentes.length == 1 ? 'ciclo' : 'ciclos'})',
+        ),
+        _LinhaTabulada(
+          rotulo: 'Referência conservadora',
+          valor: resumo.kmPorLitroConservador == null
+              ? '—'
+              : '${decimal.format(resumo.kmPorLitroConservador)} km/L',
+        ),
+        _LinhaTabulada(
+          rotulo: 'Autonomia estimada',
+          valor: resumo.autonomiaConservadoraTanqueCheioKm == null
+              ? '—'
+              : '~${inteiros.format(resumo.autonomiaConservadoraTanqueCheioKm!.round())} km',
+        ),
+        if (referencia != null)
+          if (resumo.referenciaAtingida) ...[
+            _LinhaTabulada(
+              rotulo: 'Referência para abastecer',
+              valor: 'Atingida · ~${inteiros.format(referencia)} km',
+            ),
+          ] else ...[
+            _LinhaTabulada(
+              rotulo: 'Referência para abastecer',
+              valor: '~${inteiros.format(referencia)} km',
+            ),
+            if (resumo.distanciaAteReferenciaKm != null)
+              _LinhaTabulada(
+                rotulo: 'Distância até referência',
+                valor:
+                    '~${inteiros.format(resumo.distanciaAteReferenciaKm)} km',
+              ),
+            if (resumo.diasOperacaoAteReferencia != null) ...[
+              _LinhaTabulada(
+                rotulo: 'Dias de operação',
+                valor:
+                    '~${decimal.format(resumo.diasOperacaoAteReferencia)} dias',
+              ),
+              const Padding(
+                padding: EdgeInsets.only(left: 4, top: 2, bottom: 6),
+                child: Text(
+                  'Estimativa de dias trabalhados até atingir a referência, '
+                  'com base no ritmo recente de km por dia operacional.',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ),
+            ],
+          ]
+        else
+          const _LinhaTabulada(rotulo: 'Referência para abastecer', valor: '—'),
+        if (resumo.ciclosRecentes.any((ciclo) => ciclo.potencialmenteMisto))
+          const Text(
+            'Há ciclo com abastecimento parcial; o consumo físico é '
+            'válido, mas não pertence exclusivamente a um único posto.',
+          ),
+      ],
     );
   }
 }
@@ -1301,21 +1318,16 @@ class _LinhaTabulada extends StatelessWidget {
   final String rotulo;
   final String valor;
   final bool destaque;
-  final bool alternarZebra;
 
   const _LinhaTabulada({
     required this.rotulo,
     required this.valor,
     this.destaque = false,
-    this.alternarZebra = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: alternarZebra
-          ? Theme.of(context).colorScheme.surfaceContainerHighest.withAlpha(90)
-          : null,
       padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1371,140 +1383,119 @@ class _ResumoIntradayCard extends StatelessWidget {
     final titulo = resumo.possuiCheckpointReal
         ? 'Jornada até $hora'
         : 'Jornada iniciada às $hora';
-    return Card(
+    return Column(
       key: const ValueKey('resumo_intraday'),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(titulo, style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'Tempo ativo',
-              valor: formatarDuracao(resumo.tempoAtivo, numeros),
-              destaque: true,
-            ),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'Distância',
-              valor: resumo.quilometros == null
-                  ? '—'
-                  : '${numeros.format(resumo.quilometros)} km',
-              destaque: true,
-            ),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'Faturamento',
-              valor: dinheiro(resumo.receitaTotalCentavos),
-              destaque: true,
-            ),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'R\$/hora ativa',
-              valor: decimal(resumo.receitaPorHoraAtiva),
-              destaque: true,
-            ),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'R\$/km',
-              valor: decimal(resumo.receitaPorKm),
-              destaque: true,
-            ),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'Tempo da Jornada',
-              valor: formatarDuracao(resumo.duracaoTotal, numeros),
-            ),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'Em pausa',
-              valor: formatarDuracao(resumo.tempoPausa, numeros),
-            ),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'Viagens',
-              valor: resumo.quantidadeTotalViagens == null
-                  ? '—'
-                  : numeros.format(resumo.quantidadeTotalViagens),
-            ),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'Ticket médio',
-              valor: decimal(resumo.ticketMedio),
-            ),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'Passes',
-              valor: dinheiro(resumo.custoPassesCentavos),
-            ),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'Bônus/promoções',
-              valor: dinheiro(resumo.bonusPromocoesCentavos),
-            ),
-            _LinhaTabulada(
-              alternarZebra: true,
-              rotulo: 'Resultado operacional',
-              valor: dinheiro(resumo.resultadoOperacionalCentavos),
-            ),
-            if (resumo.resultadosPlataformas.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text(
-                'Por plataforma',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              for (final resultado in resumo.resultadosPlataformas) ...[
-                Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 2),
-                  child: Text(
-                    resultado.nome,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                ),
-                _LinhaTabulada(
-                  alternarZebra: true,
-                  rotulo: 'Faturamento',
-                  valor: dinheiro(resultado.receitaCentavos),
-                ),
-                _LinhaTabulada(
-                  alternarZebra: true,
-                  rotulo: 'Viagens',
-                  valor: resultado.quantidadeViagens == null
-                      ? '—'
-                      : numeros.format(resultado.quantidadeViagens),
-                ),
-                _LinhaTabulada(
-                  alternarZebra: true,
-                  rotulo: 'Ticket médio',
-                  valor: decimal(resultado.ticketMedio),
-                ),
-                _LinhaTabulada(
-                  alternarZebra: true,
-                  rotulo: 'Passes',
-                  valor: dinheiro(resultado.custoPassesCentavos),
-                ),
-                _LinhaTabulada(
-                  alternarZebra: true,
-                  rotulo: 'Bônus',
-                  valor: dinheiro(resultado.bonusPromocoesCentavos),
-                ),
-                _LinhaTabulada(
-                  alternarZebra: true,
-                  rotulo: 'Resultado operacional',
-                  valor: dinheiro(resultado.resultadoOperacionalCentavos),
-                ),
-              ],
-            ],
-            if (!resumo.possuiCheckpointReal)
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Text('Aguardando primeira atualização.'),
-              ),
-          ],
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(titulo, style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 8),
+        _LinhaTabulada(
+          rotulo: 'Tempo ativo',
+          valor: formatarDuracao(resumo.tempoAtivo, numeros),
+          destaque: true,
         ),
-      ),
+        _LinhaTabulada(
+          rotulo: 'Distância',
+          valor: resumo.quilometros == null
+              ? '—'
+              : '${numeros.format(resumo.quilometros)} km',
+          destaque: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'Faturamento',
+          valor: dinheiro(resumo.receitaTotalCentavos),
+          destaque: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'R\$/hora ativa',
+          valor: decimal(resumo.receitaPorHoraAtiva),
+          destaque: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'R\$/km',
+          valor: decimal(resumo.receitaPorKm),
+          destaque: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'Tempo da Jornada',
+          valor: formatarDuracao(resumo.duracaoTotal, numeros),
+        ),
+        _LinhaTabulada(
+          rotulo: 'Em pausa',
+          valor: formatarDuracao(resumo.tempoPausa, numeros),
+        ),
+        _LinhaTabulada(
+          rotulo: 'Viagens',
+          valor: resumo.quantidadeTotalViagens == null
+              ? '—'
+              : numeros.format(resumo.quantidadeTotalViagens),
+        ),
+        _LinhaTabulada(
+          rotulo: 'Ticket médio',
+          valor: decimal(resumo.ticketMedio),
+        ),
+        _LinhaTabulada(
+          rotulo: 'Passes',
+          valor: dinheiro(resumo.custoPassesCentavos),
+        ),
+        _LinhaTabulada(
+          rotulo: 'Bônus/promoções',
+          valor: dinheiro(resumo.bonusPromocoesCentavos),
+        ),
+        _LinhaTabulada(
+          rotulo: 'Resultado operacional',
+          valor: dinheiro(resumo.resultadoOperacionalCentavos),
+        ),
+        if (resumo.resultadosPlataformas.isNotEmpty) ...[
+          const Divider(height: 24),
+          Text(
+            'Por plataforma',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          for (final resultado in resumo.resultadosPlataformas) ...[
+            Padding(
+              padding: const EdgeInsets.only(top: 10, bottom: 2),
+              child: Text(
+                resultado.nome,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+              ),
+            ),
+            _LinhaTabulada(
+              rotulo: 'Faturamento',
+              valor: dinheiro(resultado.receitaCentavos),
+            ),
+            _LinhaTabulada(
+              rotulo: 'Viagens',
+              valor: resultado.quantidadeViagens == null
+                  ? '—'
+                  : numeros.format(resultado.quantidadeViagens),
+            ),
+            _LinhaTabulada(
+              rotulo: 'Ticket médio',
+              valor: decimal(resultado.ticketMedio),
+            ),
+            _LinhaTabulada(
+              rotulo: 'Passes',
+              valor: dinheiro(resultado.custoPassesCentavos),
+            ),
+            _LinhaTabulada(
+              rotulo: 'Bônus',
+              valor: dinheiro(resultado.bonusPromocoesCentavos),
+            ),
+            _LinhaTabulada(
+              rotulo: 'Resultado operacional',
+              valor: dinheiro(resultado.resultadoOperacionalCentavos),
+            ),
+          ],
+        ],
+        if (!resumo.possuiCheckpointReal)
+          const Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: Text('Aguardando primeira atualização.'),
+          ),
+      ],
     );
   }
 }
@@ -1551,70 +1542,64 @@ class _ResumoJornadaConcluida extends StatelessWidget {
           rotulo: 'Tempo ativo',
           valor: formatarDuracao(resumo.tempoAtivo, numeros),
           destaque: true,
-          alternarZebra: true,
         ),
         _LinhaTabulada(
           rotulo: 'Distância ativa',
           valor: kmAtivo == null ? '—' : '${numeros.format(kmAtivo)} km',
           destaque: true,
-          alternarZebra: true,
         ),
         _LinhaTabulada(
           rotulo: 'Faturamento',
           valor: dinheiro(receitaTotal),
           destaque: true,
-          alternarZebra: true,
         ),
         _LinhaTabulada(
           rotulo: 'R\$/hora ativa',
           valor: decimalizar(resumo.receitaPorHoraAtiva),
           destaque: true,
-          alternarZebra: true,
         ),
         _LinhaTabulada(
           rotulo: 'R\$/km',
           valor: decimalizar(resumo.receitaPorKmAtivo),
           destaque: true,
-          alternarZebra: true,
         ),
         _LinhaTabulada(
           rotulo: 'Tempo da Jornada',
           valor: formatarDuracao(resumo.duracaoTotal, numeros),
-          alternarZebra: true,
         ),
         _LinhaTabulada(
           rotulo: 'Em pausa',
           valor: formatarDuracao(resumo.tempoPausa, numeros),
-          alternarZebra: true,
         ),
         _LinhaTabulada(
           rotulo: 'Viagens',
           valor: viagensTotal == null ? '—' : numeros.format(viagensTotal),
-          alternarZebra: true,
         ),
         _LinhaTabulada(
           rotulo: 'Ticket médio',
           valor: resumo.ticketMedioGeral == null
               ? '—'
               : moeda.format(resumo.ticketMedioGeral),
-          alternarZebra: true,
         ),
         _LinhaTabulada(
           rotulo: 'Passes',
           valor: dinheiro(resumo.custoPassesCentavos),
-          alternarZebra: true,
         ),
         _LinhaTabulada(
           rotulo: 'Bônus/promoções',
           valor: dinheiro(resumo.bonusPromocoesCentavos),
-          alternarZebra: true,
         ),
         _LinhaTabulada(
           rotulo: 'Resultado operacional',
           valor: dinheiro(resumo.resultadoOperacionalCentavos),
-          alternarZebra: true,
         ),
-        const SizedBox(height: 12),
+        if (resumo.resultadosPlataformas.isNotEmpty) ...[
+          const Divider(height: 24),
+          Text(
+            'Por plataforma',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ],
         for (final resultado in resumo.resultadosPlataformas)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
@@ -1623,39 +1608,35 @@ class _ResumoJornadaConcluida extends StatelessWidget {
               children: [
                 Text(
                   resultado.nome,
-                  style: Theme.of(context).textTheme.titleSmall,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 _LinhaTabulada(
                   rotulo: 'Faturamento',
                   valor: dinheiro(resultado.receitaCentavos),
-                  alternarZebra: true,
                 ),
                 _LinhaTabulada(
                   rotulo: 'Viagens',
                   valor: resultado.quantidadeViagens == null
                       ? '—'
                       : numeros.format(resultado.quantidadeViagens),
-                  alternarZebra: true,
                 ),
                 _LinhaTabulada(
                   rotulo: 'Ticket médio',
                   valor: decimalizar(resultado.ticketMedio),
-                  alternarZebra: true,
                 ),
                 _LinhaTabulada(
                   rotulo: 'Passes',
                   valor: dinheiro(resultado.custoPassesCentavos),
-                  alternarZebra: true,
                 ),
                 _LinhaTabulada(
                   rotulo: 'Bônus',
                   valor: dinheiro(resultado.bonusPromocoesCentavos),
-                  alternarZebra: true,
                 ),
                 _LinhaTabulada(
                   rotulo: 'Resultado operacional',
                   valor: dinheiro(resultado.resultadoOperacionalCentavos),
-                  alternarZebra: true,
                 ),
               ],
             ),

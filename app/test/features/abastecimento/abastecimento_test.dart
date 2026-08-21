@@ -131,6 +131,24 @@ void main() {
     expect(await database.select(database.abastecimentos).get(), hasLength(2));
   });
 
+  test(
+    'aceita abastecimento intermediário entre vizinhos cronológicos',
+    () async {
+      await registrar(odometro: 10000, dataHora: DateTime(2026, 8, 13));
+      await registrar(odometro: 10500, dataHora: DateTime(2026, 8, 19));
+
+      await registrar(odometro: 10250, dataHora: DateTime(2026, 8, 16));
+
+      final itens = await database.select(database.abastecimentos).get();
+      expect(itens, hasLength(3));
+      expect(itens.map((item) => item.dataHora).toList()..sort(), [
+        DateTime(2026, 8, 13),
+        DateTime(2026, 8, 16),
+        DateTime(2026, 8, 19),
+      ]);
+    },
+  );
+
   test('rejeita lançamento retroativo cronologicamente impossível', () async {
     await registrar(odometro: 200, dataHora: DateTime(2026, 8, 13, 9));
     await registrar(odometro: 300, dataHora: DateTime(2026, 8, 13, 12));
@@ -201,6 +219,13 @@ void main() {
       ),
       5975,
     );
+    expect(
+      AbastecimentoService.calcularPrecoEfetivoMilesimos(
+        valorTotalCentavos: 12500,
+        volumeMililitros: 34000,
+      ),
+      3676,
+    );
   });
 
   test('último abastecimento permanece recuperável em novo service', () async {
@@ -248,7 +273,7 @@ void main() {
       tester
           .widget<EditableText>(
             find.descendant(
-              of: find.byKey(const ValueKey('volume_abastecimento')),
+              of: find.byKey(const ValueKey('total_bomba_abastecimento')),
               matching: find.byType(EditableText),
             ),
           )
@@ -258,6 +283,10 @@ void main() {
     );
     await tester.enterText(
       find.byKey(const ValueKey('volume_abastecimento')),
+      '10000',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('total_bomba_abastecimento')),
       '10000',
     );
     await tester.enterText(
