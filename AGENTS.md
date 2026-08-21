@@ -16,6 +16,8 @@ de negócio e arquitetura.
 4. Execute git status.
 5. Inspecione a estrutura e os arquivos existentes.
 6. Procure implementações existentes antes de criar novos arquivos.
+7. Antes de alterações de UI ou formulários, leia
+   [`docs/CONVENCOES_UX.md`](docs/CONVENCOES_UX.md).
 
 ## Regras obrigatórias
 
@@ -33,6 +35,20 @@ de negócio e arquitetura.
 - Revisar o README quando mudar significativamente o conjunto público de
   funcionalidades.
 - Nunca declarar documentação atualizada sem confrontá-la com código e schema.
+
+## Convenções permanentes de UX
+
+As convenções permanentes de campos operacionais, formulários, listas, ações
+compactas, formatação e dados derivados estão em
+[`docs/CONVENCOES_UX.md`](docs/CONVENCOES_UX.md). Elas fazem parte das
+instruções obrigatórias para alterações de interface.
+
+O projeto não precisa se limitar a implementações didáticas ou voltadas a
+iniciantes. Bibliotecas maduras, mantidas e compatíveis podem ser usadas
+quando reduzirem complexidade e melhorarem a manutenção. Toda dependência nova
+exige justificativa concreta; não adicionar pacote apenas para evitar poucas
+linhas simples. Preferir soluções compreensíveis por uma pessoa desenvolvedora
+e fáceis de manter.
 
 ## Flutter e Dart
 

@@ -132,6 +132,12 @@
 
 ## Produto
 
+- Consolidar, quando houver outra repetição comprovada, um pequeno helper de
+  campos numéricos para seleção integral, teclado e navegação; não criar um
+  framework de formulários antes disso.
+- Ícones de plataformas nos títulos dos resumos, somente se houver ganho claro
+  de leitura e sem substituir o nome textual.
+
 - Avaliação binária futura de posto/abastecimento (gostei/não gostei), sem
   estrelas ou nota de 1 a 5.
 - Página futura de Resumo/Linha do tempo da Jornada encerrada, projetada a
