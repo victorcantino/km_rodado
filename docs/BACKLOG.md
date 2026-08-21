@@ -140,8 +140,8 @@
 
 - Avaliação binária futura de posto/abastecimento (gostei/não gostei), sem
   estrelas ou nota de 1 a 5.
-- Página futura de Resumo/Linha do tempo da Jornada encerrada, projetada a
-  partir dos fatos especializados.
+- Evoluir o Histórico da Jornada concluída com novos fatos especializados e
+  refinamentos de leitura, sempre como projeção sem persistência derivada.
 - Indicadores visuais de ciclo de manutenção por km/tempo, sem barras
   arbitrárias antes de haver histórico suficiente.
 - Definir cobertura e completude do Motor Econômico antes de incluir fontes ou

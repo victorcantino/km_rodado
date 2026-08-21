@@ -12,3 +12,5 @@
   forem erro.
 - Ações icon-only exigem Tooltip e Semantics.
 - Não usar zebra e não depender somente de cor para comunicar estado.
+- Em timelines com múltiplos eventos no mesmo dia, agrupar por data, mostrar a
+  data uma vez como separador e usar apenas horários nas linhas dos eventos.

@@ -68,6 +68,9 @@
 - Cobertura dos custos como diagnóstico derivado na página de Despesas, com
   estados Informado, Estimado e Não informado; parcela do veículo separada
   como obrigação de caixa e multa fora da cobertura estrutural.
+- primeira versão do Histórico da Jornada concluída, derivada dos fatos
+  temporais existentes, sem persistir timeline ou resumo adicional; a
+  presença de um evento não altera sua regra financeira.
 
 ## Em teste operacional
 
