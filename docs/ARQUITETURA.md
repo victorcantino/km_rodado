@@ -45,13 +45,14 @@ Page → Controller → Service → Repository → DAO → Drift → SQLite
 - DAO: consultas e transações Drift.
 - Drift/SQLite: schema e armazenamento local.
 
-O projeto usa `ChangeNotifier` com `AnimatedBuilder` e injeção manual. Não há
-Provider, Riverpod ou Bloc. Uma troca só deve ocorrer diante de necessidade
-concreta, sem criar abstrações antecipadas.
+O projeto usa `ChangeNotifier` com `AnimatedBuilder`, injeção manual e
+navegação direta com `Navigator`/`MaterialPageRoute`. Não há Provider, Riverpod,
+Bloc ou go_router no código da aplicação. Uma troca só deve ocorrer diante de
+necessidade concreta, sem criar abstrações antecipadas.
 
 ## Banco e funcionamento offline
 
-O schema atual é 12. O banco é criado localmente e suas migrações preservam
+O schema atual é 13. O banco é criado localmente e suas migrações preservam
 instalações anteriores. Seeds idempotentes garantem os dados temporários de
 usuário/veículo e as plataformas padrão sem sobrescrever registros existentes.
 
