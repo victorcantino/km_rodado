@@ -64,10 +64,16 @@ class _ManutencoesPageState extends State<ManutencoesPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Manutenções')),
-    floatingActionButton: FloatingActionButton.extended(
-      onPressed: _abrir,
-      icon: const Icon(Icons.add),
-      label: const Text('Nova'),
+    floatingActionButton: Tooltip(
+      message: 'Nova manutenção',
+      child: Semantics(
+        label: 'Nova manutenção',
+        button: true,
+        child: FloatingActionButton(
+          onPressed: _abrir,
+          child: const Icon(Icons.add),
+        ),
+      ),
     ),
     body: SafeArea(
       child: AnimatedBuilder(

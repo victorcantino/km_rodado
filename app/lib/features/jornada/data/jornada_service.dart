@@ -212,14 +212,29 @@ class JornadaService {
       jornada.id,
     );
     final totaisIndividuais =
-        await _ganhoIndividualRepository?.totalizarPorJornada(jornada.id) ??
+        await _ganhoIndividualRepository?.totalizarNoIntervalo(
+          jornada.dataHoraInicio,
+          jornada.dataHoraFim!,
+        ) ??
         const [];
-    final passes =
-        await _passePlataformaRepository?.listarPorJornada(jornada.id) ??
-        const [];
-    final bonusPromocoes =
-        await _bonusPromocaoRepository?.listarPorJornada(jornada.id) ??
-        const [];
+    final todosPasses =
+        await _passePlataformaRepository?.listarTodos() ?? const [];
+    final todosBonus =
+        await _bonusPromocaoRepository?.listarTodos() ?? const [];
+    final passes = todosPasses
+        .where(
+          (item) =>
+              !item.passe.dataHora.isBefore(jornada.dataHoraInicio) &&
+              !item.passe.dataHora.isAfter(jornada.dataHoraFim!),
+        )
+        .toList();
+    final bonusPromocoes = todosBonus
+        .where(
+          (item) =>
+              !item.bonusPromocao.dataHora.isBefore(jornada.dataHoraInicio) &&
+              !item.bonusPromocao.dataHora.isAfter(jornada.dataHoraFim!),
+        )
+        .toList();
     final duracaoTotal = _duracaoNaoNegativa(
       jornada.dataHoraFim!.difference(jornada.dataHoraInicio),
     );
@@ -255,7 +270,12 @@ class JornadaService {
       quilometrosEmPausa: quilometrosEmPausa,
       quilometrosAtivos: quilometrosAtivos,
       resultadosPlataformas: [
-        ..._calcularResultadosPlataformas(snapshots, passes, bonusPromocoes),
+        ..._calcularResultadosPlataformas(
+          snapshots,
+          passes,
+          bonusPromocoes,
+          dataHoraFimOperacional: jornada.dataHoraFim,
+        ),
         for (final total in totaisIndividuais)
           ResultadoPlataformaJornada(
             plataformaId: total.plataforma.id,
@@ -279,6 +299,7 @@ class JornadaService {
     List<PasseComPlataforma> passes,
     List<BonusPromocaoComPlataforma> bonusPromocoes, {
     bool usarUltimaLeitura = false,
+    DateTime? dataHoraFimOperacional,
   }) {
     final leituras = <int, LeiturasGanho>{};
     for (final snapshot in snapshots) {
@@ -319,6 +340,7 @@ class JornadaService {
           itensPorLeitura,
           passes,
           bonusPromocoes,
+          dataHoraFimOperacional: dataHoraFimOperacional,
         ),
     ]..sort((a, b) => a.nome.compareTo(b.nome));
   }
@@ -328,8 +350,9 @@ class JornadaService {
     List<LeiturasGanho> sequencia,
     Map<int, Map<int, SnapshotPlataforma>> itensPorLeitura,
     List<PasseComPlataforma> passes,
-    List<BonusPromocaoComPlataforma> bonusPromocoes,
-  ) {
+    List<BonusPromocaoComPlataforma> bonusPromocoes, {
+    DateTime? dataHoraFimOperacional,
+  }) {
     var receitaViagens = 0;
     var quantidadeViagens = 0;
     var calculavel = true;
@@ -399,6 +422,7 @@ class JornadaService {
       quantidadeViagens += variacaoViagens;
     }
 
+    final limiteBonus = dataHoraFimOperacional ?? sequencia.last.dataHora;
     return ResultadoPlataformaJornada(
       plataformaId: inicial.plataforma.id,
       nome: inicial.plataforma.nome,
@@ -409,7 +433,7 @@ class JornadaService {
           (item) => _pertenceAoIntervalo(
             item.bonusPromocao.dataHora,
             sequencia.first.dataHora,
-            sequencia.last.dataHora,
+            limiteBonus,
           ),
         ),
         inicial.plataforma.id,
