@@ -59,6 +59,7 @@ import '../../../depreciacao_veiculo/data/depreciacao_veiculo_service.dart';
 import '../../../depreciacao_veiculo/presentation/controllers/depreciacao_veiculo_controller.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
+import '../../data/historico_jornada.dart';
 import '../../data/resumo_jornada.dart';
 import '../controllers/jornada_controller.dart';
 import '../widgets/abrir_jornada_dialog.dart';
@@ -133,6 +134,9 @@ class _JornadaPageState extends State<JornadaPage> {
       passeRepository,
       bonusPromocaoRepository,
       abastecimentoRepository,
+      null,
+      ManutencaoRepository(ManutencaoDao(database)),
+      DespesaVeiculoRepository(DespesaVeiculoDao(database)),
     );
     final pausaService = PausaService(
       pausaRepository,
@@ -232,6 +236,20 @@ class _JornadaPageState extends State<JornadaPage> {
       ),
     );
     await _recarregarTudo();
+  }
+
+  Future<void> _abrirHistoricoJornada() async {
+    final jornada = controller?.ultimaJornadaFinalizada;
+    final jornadaController = controller;
+    if (jornada == null || jornadaController == null || !mounted) return;
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => HistoricoJornadaPage(
+          jornada: jornada,
+          eventos: jornadaController.historicoUltimaJornada,
+        ),
+      ),
+    );
   }
 
   Future<void> _abrirManutencoes() async {
@@ -1163,6 +1181,11 @@ class _JornadaPageState extends State<JornadaPage> {
                         onPressed: () => _editarJornada(ultimaJornada),
                         icon: const Icon(Icons.edit),
                       ),
+                      IconButton(
+                        tooltip: 'Histórico da Jornada',
+                        onPressed: _abrirHistoricoJornada,
+                        icon: const Icon(Icons.timeline),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -1642,6 +1665,139 @@ class _ResumoJornadaConcluida extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class HistoricoJornadaPage extends StatelessWidget {
+  final Jornada jornada;
+  final List<HistoricoJornadaEvento> eventos;
+
+  const HistoricoJornadaPage({
+    super.key,
+    required this.jornada,
+    required this.eventos,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final formatoData = DateFormat('dd/MM/yyyy — EEEE', 'pt_BR');
+    final formatoHora = DateFormat('HH:mm', 'pt_BR');
+    final grupos = <DateTime, List<HistoricoJornadaEvento>>{};
+    for (final evento in eventos) {
+      final dia = DateTime(
+        evento.dataHora.year,
+        evento.dataHora.month,
+        evento.dataHora.day,
+      );
+      grupos.putIfAbsent(dia, () => []).add(evento);
+    }
+    final gruposOrdenados = grupos.entries.toList();
+
+    final conteudo = <Widget>[];
+    for (
+      var grupoIndex = 0;
+      grupoIndex < gruposOrdenados.length;
+      grupoIndex++
+    ) {
+      final grupo = gruposOrdenados[grupoIndex];
+      if (grupoIndex > 0) {
+        conteudo.add(const SizedBox(height: 8));
+      }
+      conteudo.add(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Divider(),
+            Center(
+              child: Text(
+                formatoData.format(grupo.key),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+            ),
+            const Divider(),
+          ],
+        ),
+      );
+      for (
+        var eventoIndex = 0;
+        eventoIndex < grupo.value.length;
+        eventoIndex++
+      ) {
+        final evento = grupo.value[eventoIndex];
+        final ultimoEvento =
+            grupoIndex == gruposOrdenados.length - 1 &&
+            eventoIndex == grupo.value.length - 1;
+        conteudo.add(
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  width: 76,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      formatoHora.format(evento.dataHora),
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 20,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        margin: const EdgeInsets.only(top: 4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      if (!ultimoEvento)
+                        Expanded(
+                          child: Container(
+                            width: 1,
+                            color: Theme.of(context).dividerColor,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          evento.titulo,
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        if (evento.detalhe != null &&
+                            evento.detalhe!.trim().isNotEmpty)
+                          Text(evento.detalhe!),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+    }
+    return Scaffold(
+      appBar: AppBar(title: const Text('Histórico da Jornada')),
+      body: eventos.isEmpty
+          ? const Center(child: Text('Nenhum evento temporal registrado.'))
+          : ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              children: conteudo,
+            ),
     );
   }
 }

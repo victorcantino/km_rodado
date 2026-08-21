@@ -11,6 +11,10 @@ import '../../leitura_ganhos/data/leitura_ganhos_repository.dart';
 import '../../ganho_individual/data/ganho_individual_repository.dart';
 import '../../pausa/data/pausa_repository.dart';
 import '../../passe_plataforma/data/passe_plataforma_repository.dart';
+import '../../manutencao/data/manutencao_repository.dart';
+import '../../despesa_veiculo/data/despesa_veiculo_repository.dart';
+import '../../../core/constants/enums/tipo_despesa_veiculo.dart';
+import 'historico_jornada.dart';
 
 import 'jornada_repository.dart';
 import 'resumo_jornada.dart';
@@ -23,6 +27,8 @@ class JornadaService {
   final PassePlataformaRepository? _passePlataformaRepository;
   final BonusPromocaoRepository? _bonusPromocaoRepository;
   final AbastecimentoRepository? _abastecimentoRepository;
+  final ManutencaoRepository? _manutencaoRepository;
+  final DespesaVeiculoRepository? _despesaVeiculoRepository;
   final DateTime Function() _agora;
 
   JornadaService(
@@ -34,7 +40,179 @@ class JornadaService {
     this._bonusPromocaoRepository,
     this._abastecimentoRepository,
     DateTime Function()? agora,
-  ]) : _agora = agora ?? DateTime.now;
+    ManutencaoRepository? manutencaoRepository,
+    DespesaVeiculoRepository? despesaVeiculoRepository,
+  ]) : _manutencaoRepository = manutencaoRepository,
+       _despesaVeiculoRepository = despesaVeiculoRepository,
+       _agora = agora ?? DateTime.now;
+
+  Future<List<HistoricoJornadaEvento>> historicoJornada(Jornada jornada) async {
+    final fim = jornada.dataHoraFim;
+    if (fim == null) return const [];
+    final eventos = <HistoricoJornadaEvento>[
+      HistoricoJornadaEvento(
+        dataHora: jornada.dataHoraInicio,
+        ordem: 0,
+        id: jornada.id,
+        titulo: 'Início da Jornada',
+        detalhe: jornada.cidadeOrigem,
+      ),
+    ];
+    final leituras =
+        await _leituraGanhosRepository?.listarPorJornada(jornada.id) ??
+        const [];
+    for (final leitura in leituras) {
+      if (!_noIntervalo(leitura.dataHora, jornada, fim)) continue;
+      eventos.add(
+        HistoricoJornadaEvento(
+          dataHora: leitura.dataHora,
+          ordem: 10,
+          id: leitura.id,
+          titulo: switch (leitura.tipo) {
+            TipoLeituraGanhos.inicial => 'Leitura Inicial',
+            TipoLeituraGanhos.parcial => 'Checkpoint de ganhos',
+            TipoLeituraGanhos.finalDaJornada => 'Leitura Final',
+          },
+        ),
+      );
+    }
+    final pausas = await _pausaRepository.listarPorJornada(jornada.id);
+    for (final pausa in pausas) {
+      if (!_noIntervalo(pausa.inicio, jornada, fim)) continue;
+      eventos.add(
+        HistoricoJornadaEvento(
+          dataHora: pausa.inicio,
+          ordem: 20,
+          id: pausa.id,
+          titulo: 'Pausa',
+          detalhe: pausa.titulo,
+        ),
+      );
+      if (pausa.fim != null && _noIntervalo(pausa.fim!, jornada, fim)) {
+        eventos.add(
+          HistoricoJornadaEvento(
+            dataHora: pausa.fim!,
+            ordem: 21,
+            id: pausa.id,
+            titulo: 'Retorno da Pausa',
+          ),
+        );
+      }
+    }
+    final ganhos =
+        await _ganhoIndividualRepository?.listarPorJornada(jornada.id) ??
+        const [];
+    for (final ganho in ganhos) {
+      if (!_noIntervalo(ganho.dataHora, jornada, fim)) continue;
+      eventos.add(
+        HistoricoJornadaEvento(
+          dataHora: ganho.dataHora,
+          ordem: 30,
+          id: ganho.id,
+          titulo: 'Ganho individual',
+          detalhe:
+              '${ganho.quantidadeViagens} ${ganho.quantidadeViagens == 1 ? 'viagem' : 'viagens'}',
+        ),
+      );
+    }
+    final passes =
+        await _passePlataformaRepository?.listarPorJornada(jornada.id) ??
+        const [];
+    for (final item in passes) {
+      if (!_noIntervalo(item.passe.dataHora, jornada, fim)) continue;
+      eventos.add(
+        HistoricoJornadaEvento(
+          dataHora: item.passe.dataHora,
+          ordem: 40,
+          id: item.passe.id,
+          titulo: 'Passe · ${item.plataforma.nome}',
+        ),
+      );
+    }
+    final bonus =
+        await _bonusPromocaoRepository?.listarPorJornada(jornada.id) ??
+        const [];
+    for (final item in bonus) {
+      if (!_noIntervalo(item.bonusPromocao.dataHora, jornada, fim)) continue;
+      eventos.add(
+        HistoricoJornadaEvento(
+          dataHora: item.bonusPromocao.dataHora,
+          ordem: 50,
+          id: item.bonusPromocao.id,
+          titulo: 'Bônus · ${item.plataforma.nome}',
+        ),
+      );
+    }
+    final abastecimentos =
+        await _abastecimentoRepository?.listarPorVeiculoNoIntervalo(
+          jornada.veiculoId,
+          jornada.dataHoraInicio,
+          fim,
+        ) ??
+        const [];
+    for (final abastecimento in abastecimentos) {
+      eventos.add(
+        HistoricoJornadaEvento(
+          dataHora: abastecimento.dataHora,
+          ordem: 60,
+          id: abastecimento.id,
+          titulo: 'Abastecimento · ${abastecimento.tipoCombustivel.name}',
+          detalhe: '${abastecimento.volumeMililitros / 1000} L',
+        ),
+      );
+    }
+    final manutencoes =
+        await _manutencaoRepository?.listarPorVeiculo(jornada.veiculoId) ??
+        const [];
+    for (final item in manutencoes) {
+      if (_noIntervalo(item.manutencao.dataHora, jornada, fim)) {
+        eventos.add(
+          HistoricoJornadaEvento(
+            dataHora: item.manutencao.dataHora,
+            ordem: 70,
+            id: item.manutencao.id,
+            titulo: 'Manutenção',
+            detalhe: item.manutencao.oficina,
+          ),
+        );
+      }
+    }
+    final despesas =
+        await _despesaVeiculoRepository?.listarPorVeiculo(jornada.veiculoId) ??
+        const [];
+    for (final despesa in despesas) {
+      if (_noIntervalo(despesa.dataHora, jornada, fim)) {
+        eventos.add(
+          HistoricoJornadaEvento(
+            dataHora: despesa.dataHora,
+            ordem: 80,
+            id: despesa.id,
+            titulo: despesa.tipo.label,
+            detalhe: despesa.descricao,
+          ),
+        );
+      }
+    }
+    eventos.add(
+      HistoricoJornadaEvento(
+        dataHora: fim,
+        ordem: 90,
+        id: jornada.id,
+        titulo: 'Encerramento da Jornada',
+        detalhe: jornada.cidadeDestino,
+      ),
+    );
+    eventos.sort((a, b) {
+      final porData = a.dataHora.compareTo(b.dataHora);
+      if (porData != 0) return porData;
+      final porOrdem = a.ordem.compareTo(b.ordem);
+      return porOrdem != 0 ? porOrdem : a.id.compareTo(b.id);
+    });
+    return eventos;
+  }
+
+  bool _noIntervalo(DateTime dataHora, Jornada jornada, DateTime fim) =>
+      !dataHora.isBefore(jornada.dataHoraInicio) && !dataHora.isAfter(fim);
 
   Future<Jornada?> jornadaAberta() {
     return _repository.buscarJornadaAberta();

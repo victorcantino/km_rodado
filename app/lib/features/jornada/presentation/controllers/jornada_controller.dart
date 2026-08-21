@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/database/app_database.dart';
 import '../../data/jornada_service.dart';
 import '../../data/resumo_jornada.dart';
+import '../../data/historico_jornada.dart';
 
 class JornadaController extends ChangeNotifier {
   final JornadaService _service;
@@ -13,6 +14,7 @@ class JornadaController extends ChangeNotifier {
   Jornada? ultimaJornadaFinalizada;
   ResumoJornada? resumoUltimaJornada;
   ResumoIntradayJornada? resumoIntraday;
+  List<HistoricoJornadaEvento> historicoUltimaJornada = const [];
 
   bool carregando = false;
 
@@ -30,6 +32,12 @@ class JornadaController extends ChangeNotifier {
       resumoIntraday = await _service.resumoJornadaAberta();
       ultimaJornadaFinalizada = await _service.ultimaJornadaFinalizada();
       resumoUltimaJornada = await _service.resumoUltimaJornada();
+      historicoUltimaJornada = ultimaJornadaFinalizada == null
+          ? const []
+          : await _service.historicoJornada(ultimaJornadaFinalizada!);
+      historicoUltimaJornada = ultimaJornadaFinalizada == null
+          ? const []
+          : await _service.historicoJornada(ultimaJornadaFinalizada!);
     } finally {
       carregando = false;
       notifyListeners();
@@ -95,6 +103,9 @@ class JornadaController extends ChangeNotifier {
       resumoIntraday = await _service.resumoJornadaAberta();
       ultimaJornadaFinalizada = await _service.ultimaJornadaFinalizada();
       resumoUltimaJornada = await _service.resumoUltimaJornada();
+      historicoUltimaJornada = ultimaJornadaFinalizada == null
+          ? const []
+          : await _service.historicoJornada(ultimaJornadaFinalizada!);
     } finally {
       carregando = false;
       notifyListeners();
