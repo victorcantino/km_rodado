@@ -257,7 +257,9 @@ void main() {
 
     await tester.tap(abastecimento);
     await tester.pumpAndSettle();
-    expect(find.text('Registrar abastecimento'), findsOneWidget);
+    expect(find.text('Abastecimentos'), findsOneWidget);
+    expect(find.text('Registrar abastecimento'), findsNothing);
+    expect(find.byTooltip('Novo abastecimento'), findsOneWidget);
     semantics.dispose();
   });
 

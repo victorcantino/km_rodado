@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/constants/enums/tipo_combustivel.dart';
+import '../../../../core/database/app_database.dart';
 import '../../../../core/formatters/quilometragem_input_formatter.dart';
 import '../../data/abastecimento_service.dart';
 
@@ -21,6 +22,10 @@ typedef RegistrarAbastecimentoResultado = ({
 });
 
 class RegistrarAbastecimentoDialog extends StatefulWidget {
+  final Abastecimento? existente;
+  final VoidCallback? onExcluir;
+  final List<String> sugestoesPostos;
+  final List<String> sugestoesBandeiras;
   final int? odometroInicial;
   final String? cidadeInicial;
   final TipoCombustivel? tipoCombustivelInicial;
@@ -28,6 +33,10 @@ class RegistrarAbastecimentoDialog extends StatefulWidget {
 
   const RegistrarAbastecimentoDialog({
     super.key,
+    this.existente,
+    this.onExcluir,
+    this.sugestoesPostos = const [],
+    this.sugestoesBandeiras = const [],
     this.odometroInicial,
     this.cidadeInicial,
     this.tipoCombustivelInicial,
@@ -45,17 +54,15 @@ class _RegistrarAbastecimentoDialogState
   late final TextEditingController odometro;
   final volume = TextEditingController();
   final total = TextEditingController();
-  final precoCalculo = TextEditingController();
-  final precoBomba = TextEditingController();
+  final totalBomba = TextEditingController();
   late final TextEditingController cidade;
   final posto = TextEditingController();
   final bandeira = TextEditingController();
   final observacao = TextEditingController();
   final focoOdometro = FocusNode();
   final focoVolume = FocusNode();
+  final focoTotalBomba = FocusNode();
   final focoTotal = FocusNode();
-  final focoPrecoCalculo = FocusNode();
-  final focoPrecoBomba = FocusNode();
   final focoCidade = FocusNode();
   final focoPosto = FocusNode();
   final focoBandeira = FocusNode();
@@ -73,6 +80,26 @@ class _RegistrarAbastecimentoDialogState
     cidade = TextEditingController(text: widget.cidadeInicial ?? '');
     combustivel = widget.tipoCombustivelInicial ?? TipoCombustivel.gasolina;
     dataHora = widget.dataHoraInicial ?? DateTime.now();
+    final existente = widget.existente;
+    if (existente != null) {
+      odometro.text = formatarQuilometragem(existente.odometro);
+      volume.text = _formatarMilesimos(existente.volumeMililitros);
+      total.text = _formatarCentavos(existente.valorTotalPagoCentavos);
+      cidade.text = existente.cidade ?? '';
+      posto.text = existente.nomePosto ?? '';
+      bandeira.text = existente.bandeiraPosto ?? '';
+      observacao.text = existente.observacao ?? '';
+      combustivel = existente.tipoCombustivel;
+      dataHora = existente.dataHora;
+      tanqueCheio = existente.tanqueCheio;
+      if (existente.precoBombaMilesimosRealPorLitro != null) {
+        totalBomba.text = _formatarCentavos(
+          (existente.volumeMililitros *
+                  existente.precoBombaMilesimosRealPorLitro!) ~/
+              10000,
+        );
+      }
+    }
   }
 
   int? _inteiro(TextEditingController controller) {
@@ -82,8 +109,18 @@ class _RegistrarAbastecimentoDialogState
 
   int? get volumeMl => _inteiro(volume);
   int? get totalCentavos => _inteiro(total);
-  int? get precoCalculoMilesimos => _inteiro(precoCalculo);
-  int? get precoBombaMilesimos => _inteiro(precoBomba);
+  int? get totalBombaCentavos => _inteiro(totalBomba);
+  int? get precoBombaCalculado {
+    final volumeAtual = volumeMl;
+    final totalAtual = totalBombaCentavos;
+    if (volumeAtual == null || volumeAtual <= 0 || totalAtual == null) {
+      return null;
+    }
+    return AbastecimentoService.calcularPrecoEfetivoMilesimos(
+      valorTotalCentavos: totalAtual,
+      volumeMililitros: volumeAtual,
+    );
+  }
 
   int? get precoEfetivo {
     final volumeAtual = volumeMl;
@@ -95,32 +132,6 @@ class _RegistrarAbastecimentoDialogState
       valorTotalCentavos: totalAtual,
       volumeMililitros: volumeAtual,
     );
-  }
-
-  void _calcularTotal() {
-    final volumeAtual = volumeMl;
-    final preco = precoCalculoMilesimos;
-    if (volumeAtual == null || volumeAtual <= 0 || preco == null) return;
-    total.text = _formatarCentavos(
-      AbastecimentoService.calcularTotalCentavos(
-        volumeMililitros: volumeAtual,
-        precoMilesimosRealPorLitro: preco,
-      ),
-    );
-    setState(() {});
-  }
-
-  void _calcularVolume() {
-    final totalAtual = totalCentavos;
-    final preco = precoCalculoMilesimos;
-    if (totalAtual == null || preco == null || preco <= 0) return;
-    volume.text = _formatarMilesimos(
-      AbastecimentoService.calcularVolumeMililitros(
-        valorTotalCentavos: totalAtual,
-        precoMilesimosRealPorLitro: preco,
-      ),
-    );
-    setState(() {});
   }
 
   String? _opcional(TextEditingController controller) {
@@ -137,7 +148,7 @@ class _RegistrarAbastecimentoDialogState
       tipoCombustivel: combustivel,
       volumeMililitros: volumeMl!,
       valorTotalPagoCentavos: totalCentavos!,
-      precoBombaMilesimosRealPorLitro: precoBombaMilesimos,
+      precoBombaMilesimosRealPorLitro: precoBombaCalculado,
       tanqueCheio: tanqueCheio,
       cidade: _opcional(cidade),
       nomePosto: _opcional(posto),
@@ -176,8 +187,7 @@ class _RegistrarAbastecimentoDialogState
       odometro,
       volume,
       total,
-      precoCalculo,
-      precoBomba,
+      totalBomba,
       cidade,
       posto,
       bandeira,
@@ -188,9 +198,8 @@ class _RegistrarAbastecimentoDialogState
     for (final focusNode in [
       focoOdometro,
       focoVolume,
+      focoTotalBomba,
       focoTotal,
-      focoPrecoCalculo,
-      focoPrecoBomba,
       focoCidade,
       focoPosto,
       focoBandeira,
@@ -205,7 +214,11 @@ class _RegistrarAbastecimentoDialogState
   Widget build(BuildContext context) {
     final preco = precoEfetivo;
     return AlertDialog(
-      title: const Text('Registrar abastecimento'),
+      title: Text(
+        widget.existente == null
+            ? 'Registrar abastecimento'
+            : 'Editar abastecimento',
+      ),
       content: SizedBox(
         width: 430,
         child: Form(
@@ -214,24 +227,6 @@ class _RegistrarAbastecimentoDialogState
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextFormField(
-                  key: const ValueKey('odometro_abastecimento'),
-                  controller: odometro,
-                  focusNode: focoOdometro,
-                  autofocus: true,
-                  selectAllOnFocus: true,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: const [QuilometragemInputFormatter()],
-                  textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (_) => focoVolume.requestFocus(),
-                  decoration: const InputDecoration(labelText: 'Odômetro'),
-                  validator: (texto) {
-                    final valor = parseQuilometragem(texto);
-                    if (valor == null) return 'Informe o odômetro.';
-                    if (valor < 0) return 'O odômetro não pode ser negativo.';
-                    return null;
-                  },
-                ),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Data e hora'),
@@ -255,11 +250,40 @@ class _RegistrarAbastecimentoDialogState
                   ],
                   onChanged: (valor) => combustivel = valor!,
                 ),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Tanque cheio'),
-                  value: tanqueCheio,
-                  onChanged: (valor) => setState(() => tanqueCheio = valor),
+                TextFormField(
+                  key: const ValueKey('odometro_abastecimento'),
+                  controller: odometro,
+                  focusNode: focoOdometro,
+                  autofocus: true,
+                  selectAllOnFocus: true,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: const [QuilometragemInputFormatter()],
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => focoTotalBomba.requestFocus(),
+                  decoration: const InputDecoration(labelText: 'Odômetro'),
+                  validator: (texto) {
+                    final valor = parseQuilometragem(texto);
+                    if (valor == null) return 'Informe o odômetro.';
+                    if (valor < 0) return 'O odômetro não pode ser negativo.';
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  key: const ValueKey('total_bomba_abastecimento'),
+                  controller: totalBomba,
+                  focusNode: focoTotalBomba,
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => focoVolume.requestFocus(),
+                  inputFormatters: const [_CentavosFormatter()],
+                  decoration: const InputDecoration(
+                    labelText: 'Total mostrado na bomba',
+                    prefixText: r'R$ ',
+                  ),
+                  onChanged: (_) => setState(() {}),
+                  validator: (_) => totalBombaCentavos == null
+                      ? 'Informe o total mostrado na bomba.'
+                      : null,
                 ),
                 TextFormField(
                   key: const ValueKey('volume_abastecimento'),
@@ -278,49 +302,29 @@ class _RegistrarAbastecimentoDialogState
                       ? 'Informe um volume maior que zero.'
                       : null,
                 ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Preço da bomba: '
+                    '${precoBombaCalculado == null ? '—' : 'R\$ ${_formatarMilesimos(precoBombaCalculado!)}/L'}',
+                  ),
+                ),
                 TextFormField(
                   key: const ValueKey('total_abastecimento'),
                   controller: total,
                   focusNode: focoTotal,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (_) => focoPrecoCalculo.requestFocus(),
+                  onFieldSubmitted: (_) => focoCidade.requestFocus(),
                   inputFormatters: const [_CentavosFormatter()],
                   decoration: const InputDecoration(
-                    labelText: 'Total pago',
+                    labelText: 'Valor efetivamente pago',
                     prefixText: r'R$ ',
                   ),
                   onChanged: (_) => setState(() {}),
                   validator: (_) => totalCentavos == null
-                      ? 'Informe o total realmente pago.'
+                      ? 'Informe o valor efetivamente pago.'
                       : null,
-                ),
-                TextFormField(
-                  key: const ValueKey('preco_calculo_abastecimento'),
-                  controller: precoCalculo,
-                  focusNode: focoPrecoCalculo,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (_) => focoPrecoBomba.requestFocus(),
-                  inputFormatters: const [_MilesimosFormatter()],
-                  decoration: const InputDecoration(
-                    labelText: 'Preço por litro para cálculo (opcional)',
-                    prefixText: r'R$ ',
-                    suffixText: '/L',
-                  ),
-                ),
-                Wrap(
-                  alignment: WrapAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: _calcularTotal,
-                      child: const Text('Calcular total'),
-                    ),
-                    TextButton(
-                      onPressed: _calcularVolume,
-                      child: const Text('Calcular volume'),
-                    ),
-                  ],
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
@@ -329,19 +333,11 @@ class _RegistrarAbastecimentoDialogState
                     '${preco == null ? '—' : 'R\$ ${_formatarMilesimos(preco)}/L'}',
                   ),
                 ),
-                TextFormField(
-                  key: const ValueKey('preco_bomba_abastecimento'),
-                  controller: precoBomba,
-                  focusNode: focoPrecoBomba,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (_) => focoPrecoBomba.unfocus(),
-                  inputFormatters: const [_MilesimosFormatter()],
-                  decoration: const InputDecoration(
-                    labelText: 'Preço da bomba (opcional)',
-                    prefixText: r'R$ ',
-                    suffixText: '/L',
-                  ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Tanque cheio'),
+                  value: tanqueCheio,
+                  onChanged: (valor) => setState(() => tanqueCheio = valor),
                 ),
                 ExpansionTile(
                   tilePadding: EdgeInsets.zero,
@@ -355,21 +351,17 @@ class _RegistrarAbastecimentoDialogState
                       onFieldSubmitted: (_) => focoPosto.requestFocus(),
                       decoration: const InputDecoration(labelText: 'Cidade'),
                     ),
-                    TextFormField(
-                      controller: posto,
-                      focusNode: focoPosto,
-                      textInputAction: TextInputAction.next,
-                      onFieldSubmitted: (_) => focoBandeira.requestFocus(),
-                      decoration: const InputDecoration(
-                        labelText: 'Nome do posto',
-                      ),
+                    _SugestaoTexto(
+                      label: 'Nome do posto',
+                      sugestoes: widget.sugestoesPostos,
+                      valorInicial: posto.text,
+                      onChanged: (valor) => posto.text = valor,
                     ),
-                    TextFormField(
-                      controller: bandeira,
-                      focusNode: focoBandeira,
-                      textInputAction: TextInputAction.next,
-                      onFieldSubmitted: (_) => focoObservacao.requestFocus(),
-                      decoration: const InputDecoration(labelText: 'Bandeira'),
+                    _SugestaoTexto(
+                      label: 'Bandeira',
+                      sugestoes: widget.sugestoesBandeiras,
+                      valorInicial: bandeira.text,
+                      onChanged: (valor) => bandeira.text = valor,
                     ),
                     TextFormField(
                       controller: observacao,
@@ -392,10 +384,46 @@ class _RegistrarAbastecimentoDialogState
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancelar'),
         ),
+        if (widget.onExcluir != null)
+          TextButton(onPressed: widget.onExcluir, child: const Text('Excluir')),
         ElevatedButton(onPressed: _salvar, child: const Text('Salvar')),
       ],
     );
   }
+}
+
+class _SugestaoTexto extends StatelessWidget {
+  final String label;
+  final List<String> sugestoes;
+  final String valorInicial;
+  final ValueChanged<String> onChanged;
+
+  const _SugestaoTexto({
+    required this.label,
+    required this.sugestoes,
+    required this.valorInicial,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) => Autocomplete<String>(
+    initialValue: TextEditingValue(text: valorInicial),
+    optionsBuilder: (texto) {
+      final busca = texto.text.trim().toLowerCase();
+      return sugestoes.where(
+        (item) => busca.isEmpty || item.toLowerCase().contains(busca),
+      );
+    },
+    onSelected: onChanged,
+    fieldViewBuilder: (context, controller, focusNode, onSubmitted) =>
+        TextField(
+          controller: controller,
+          focusNode: focusNode,
+          decoration: InputDecoration(labelText: label),
+          onChanged: onChanged,
+          onSubmitted: (_) => onSubmitted(),
+        ),
+  );
 }
 
 String _nomeCombustivel(TipoCombustivel tipo) => switch (tipo) {

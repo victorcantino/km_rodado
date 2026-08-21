@@ -369,8 +369,8 @@ void main() {
       ),
     );
 
-    expect(find.text('Referência para abastecer atingida'), findsOneWidget);
-    expect(find.text('Referência: ~1.300 km'), findsOneWidget);
+    expect(find.text('Referência para abastecer'), findsOneWidget);
+    expect(find.text('Atingida · ~1.300 km'), findsOneWidget);
     expect(find.textContaining('tanque vazio'), findsNothing);
     expect(find.textContaining('dias de operação'), findsNothing);
     expect(tester.takeException(), isNull);

@@ -8,6 +8,9 @@ class AbastecimentoRepository {
 
   Future<int> inserir(AbastecimentosCompanion abastecimento) =>
       _dao.inserir(abastecimento);
+  Future<bool> atualizar(Abastecimento abastecimento) =>
+      _dao.atualizar(abastecimento);
+  Future<int> excluir(int id) => _dao.excluir(id);
   Future<Abastecimento?> buscarUltimoPorVeiculo(int veiculoId) =>
       _dao.buscarUltimoPorVeiculo(veiculoId);
   Future<List<Abastecimento>> listarPorVeiculo(int veiculoId) =>
