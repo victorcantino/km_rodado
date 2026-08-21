@@ -8,6 +8,7 @@ import '../../data/resumo_inteligencia_abastecimento.dart';
 class AbastecimentoController extends ChangeNotifier {
   final AbastecimentoService _service;
   Abastecimento? ultimo;
+  List<Abastecimento> historico = const [];
   ResumoInteligenciaAbastecimento? inteligencia;
   bool carregando = false;
 
@@ -17,10 +18,14 @@ class AbastecimentoController extends ChangeNotifier {
       _service.ultimoOdometro(veiculoId);
 
   Future<void> carregar(int veiculoId) async {
+    historico = await _service.listar(veiculoId);
     ultimo = await _service.ultimoAbastecimento(veiculoId);
     inteligencia = await _service.calcularInteligencia(veiculoId);
     notifyListeners();
   }
+
+  Future<int?> ultimoOdometroOperacional(int veiculoId) =>
+      _service.ultimoOdometro(veiculoId);
 
   Future<void> registrar({
     required int veiculoId,

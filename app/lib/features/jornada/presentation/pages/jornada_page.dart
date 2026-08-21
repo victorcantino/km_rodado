@@ -22,7 +22,7 @@ import '../../../abastecimento/data/abastecimento_repository.dart';
 import '../../../abastecimento/data/abastecimento_service.dart';
 import '../../../abastecimento/data/resumo_inteligencia_abastecimento.dart';
 import '../../../abastecimento/presentation/controllers/abastecimento_controller.dart';
-import '../../../abastecimento/presentation/widgets/registrar_abastecimento_dialog.dart';
+import '../../../abastecimento/presentation/pages/abastecimentos_page.dart';
 import '../../../ganho_individual/data/ganho_individual_repository.dart';
 import '../../../ganho_individual/data/ganho_individual_service.dart';
 import '../../../ganho_individual/presentation/controllers/ganho_individual_controller.dart';
@@ -196,57 +196,43 @@ class _JornadaPageState extends State<JornadaPage> {
         ),
       ),
     );
+    await _recarregarTudo();
+  }
+
+  Future<void> _recarregarTudo() async {
+    final jornadaController = controller;
+    if (jornadaController == null) return;
+    await jornadaController.carregarJornadaAberta();
+    await pausaController?.carregar(jornadaController.jornadaAtual?.id);
+    await leituraGanhosController?.carregarEstado(
+      jornadaController.jornadaAtual?.id,
+    );
+    await ganhoIndividualController?.carregar(
+      jornadaController.jornadaAtual?.id,
+    );
+    await abastecimentoController?.carregar(
+      jornadaController.jornadaAtual?.veiculoId ?? 1,
+    );
+    await passePlataformaController?.carregar();
+    await bonusPromocaoController?.carregar();
   }
 
   Future<void> _registrarAbastecimento() async {
-    final abastecimentoController = this.abastecimentoController;
-    if (abastecimentoController == null) return;
-    final veiculoId = controller?.jornadaAtual?.veiculoId ?? 1;
-    final odometroInicial = await abastecimentoController.ultimoOdometro(
-      veiculoId,
-    );
-    final ultimoAbastecimento = abastecimentoController.ultimo;
-    if (!mounted) return;
-    final resultado = await showDialog<RegistrarAbastecimentoResultado>(
-      context: context,
-      builder: (_) => RegistrarAbastecimentoDialog(
-        odometroInicial: odometroInicial,
-        cidadeInicial:
-            controller?.jornadaAtual?.cidadeOrigem ??
-            controller?.ultimaJornadaFinalizada?.cidadeDestino,
-        tipoCombustivelInicial: ultimoAbastecimento?.tipoCombustivel,
+    final abastecimento = abastecimentoController;
+    if (abastecimento == null) return;
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => AbastecimentosPage(
+          veiculoId: controller?.jornadaAtual?.veiculoId ?? 1,
+          controller: abastecimento,
+          abrirNovoAoEntrar: true,
+          cidadeInicial:
+              controller?.jornadaAtual?.cidadeOrigem ??
+              controller?.ultimaJornadaFinalizada?.cidadeDestino,
+        ),
       ),
     );
-    if (!mounted || resultado == null) return;
-    try {
-      await abastecimentoController.registrar(
-        veiculoId: veiculoId,
-        odometro: resultado.odometro,
-        tipoCombustivel: resultado.tipoCombustivel,
-        volumeMililitros: resultado.volumeMililitros,
-        valorTotalPagoCentavos: resultado.valorTotalPagoCentavos,
-        tanqueCheio: resultado.tanqueCheio,
-        dataHora: resultado.dataHora,
-        precoBombaMilesimosRealPorLitro:
-            resultado.precoBombaMilesimosRealPorLitro,
-        cidade: resultado.cidade,
-        nomePosto: resultado.nomePosto,
-        bandeiraPosto: resultado.bandeiraPosto,
-        observacao: resultado.observacao,
-      );
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Abastecimento registrado.')),
-      );
-    } catch (error, stackTrace) {
-      if (!mounted) return;
-      _apresentarErro(
-        operacao: 'registrar o abastecimento',
-        error: error,
-        stackTrace: stackTrace,
-        mensagemPadrao: 'Não foi possível registrar o abastecimento.',
-      );
-    }
+    await _recarregarTudo();
   }
 
   Future<void> _abrirManutencoes() async {
@@ -267,6 +253,7 @@ class _JornadaPageState extends State<JornadaPage> {
     await abastecimentoController?.carregar(
       controller?.jornadaAtual?.veiculoId ?? 1,
     );
+    await _recarregarTudo();
   }
 
   Future<void> _abrirDespesas() async {
@@ -312,6 +299,7 @@ class _JornadaPageState extends State<JornadaPage> {
     custosController.dispose();
     depreciacaoController.dispose();
     manutencaoController.dispose();
+    await _recarregarTudo();
   }
 
   Future<void> _registrarGanhoIndividual([Plataforma? plataforma]) async {
@@ -336,7 +324,7 @@ class _JornadaPageState extends State<JornadaPage> {
         observacao: resultado.observacao,
         dataHora: resultado.dataHora,
       );
-      await controller?.carregarResumoIntraday();
+      await _recarregarTudo();
     } catch (error, stackTrace) {
       if (!mounted) return;
       _apresentarErro(
@@ -653,6 +641,7 @@ class _JornadaPageState extends State<JornadaPage> {
         },
       ),
     );
+    await _recarregarTudo();
   }
 
   Future<void> _fecharJornada() async {
@@ -752,7 +741,7 @@ class _JornadaPageState extends State<JornadaPage> {
         cidadeDestino: resultado.cidadeDestino,
         observacoes: resultado.observacoes,
       );
-      await pausaController?.carregar(controller.jornadaAtual?.id);
+      await _recarregarTudo();
     } catch (error, stackTrace) {
       if (!mounted) return;
       _apresentarErro(
@@ -921,46 +910,234 @@ class _JornadaPageState extends State<JornadaPage> {
           ),
         ],
       ),
-      body: SafeArea(
-        key: const ValueKey('jornada_safe_area'),
-        bottom: false,
-        child: AnimatedBuilder(
-          animation: Listenable.merge([
-            controller,
-            pausaController,
-            leituraGanhosController,
-            ganhoIndividualController,
-            abastecimentoController,
-            passePlataformaController,
-            bonusPromocaoController,
-          ]),
-          builder: (context, _) {
-            if (controller.carregando ||
-                pausaController.carregando ||
-                leituraGanhosController.carregando ||
-                ganhoIndividualController.carregando ||
-                abastecimentoController.carregando ||
-                passePlataformaController.carregando ||
-                bonusPromocaoController.carregando) {
-              return const Center(child: CircularProgressIndicator());
-            }
+      body: RefreshIndicator(
+        onRefresh: _recarregarTudo,
+        child: SafeArea(
+          key: const ValueKey('jornada_safe_area'),
+          bottom: false,
+          child: AnimatedBuilder(
+            animation: Listenable.merge([
+              controller,
+              pausaController,
+              leituraGanhosController,
+              ganhoIndividualController,
+              abastecimentoController,
+              passePlataformaController,
+              bonusPromocaoController,
+            ]),
+            builder: (context, _) {
+              if (controller.carregando ||
+                  pausaController.carregando ||
+                  leituraGanhosController.carregando ||
+                  ganhoIndividualController.carregando ||
+                  abastecimentoController.carregando ||
+                  passePlataformaController.carregando ||
+                  bonusPromocaoController.carregando) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-            if (controller.possuiJornadaAberta) {
-              final jornada = controller.jornadaAtual!;
+              if (controller.possuiJornadaAberta) {
+                final jornada = controller.jornadaAtual!;
+                final locale = View.of(
+                  context,
+                ).platformDispatcher.locale.toLanguageTag();
+                final inicioFormatado = DateFormat.yMd(
+                  locale,
+                ).add_jms().format(jornada.dataHoraInicio);
+                final odometroFormatado = NumberFormat.decimalPattern(
+                  locale,
+                ).format(jornada.odometroInicio);
+
+                final pausaAberta = pausaController.pausaAberta;
+                final formatoHora = DateFormat.Hm(locale);
+                final inicialConcluida =
+                    leituraGanhosController.leituraInicialConcluida;
+
+                return ListView(
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    16,
+                    16,
+                    16 + MediaQuery.viewPaddingOf(context).bottom,
+                  ),
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Status: ${jornada.status.name.toUpperCase()}',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: 'Editar Jornada',
+                          onPressed: () => _editarJornada(jornada),
+                          icon: const Icon(Icons.edit),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    _LinhaTabulada(
+                      rotulo: 'Status',
+                      valor: jornada.status.name.toUpperCase(),
+                      destaque: true,
+                    ),
+                    _LinhaTabulada(rotulo: 'Início', valor: inicioFormatado),
+                    _LinhaTabulada(
+                      rotulo: 'Odômetro inicial',
+                      valor: '$odometroFormatado km',
+                    ),
+                    _LinhaTabulada(
+                      rotulo: 'Cidade de origem',
+                      valor: jornada.cidadeOrigem,
+                    ),
+
+                    if (abastecimentoController.inteligencia?.possuiDados ==
+                        true) ...[
+                      const SizedBox(height: 24),
+                      ResumoInteligenciaAbastecimentoCard(
+                        resumo: abastecimentoController.inteligencia!,
+                        locale: locale,
+                      ),
+                    ],
+
+                    const SizedBox(height: 24),
+
+                    if (ganhoIndividualController.plataformas.isNotEmpty) ...[
+                      OutlinedButton.icon(
+                        onPressed: _registrarGanhoIndividual,
+                        icon: const Icon(Icons.add),
+                        label: Text(
+                          ganhoIndividualController.plataformas.length == 1
+                              ? ganhoIndividualController
+                                    .plataformas
+                                    .single
+                                    .nome
+                              : 'Ganho individual',
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    if (!inicialConcluida) ...[
+                      Text(
+                        'Ganhos iniciais pendentes',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () => _registrarLeituraInicial(jornada.id),
+                        child: const Text('Registrar ganhos iniciais'),
+                      ),
+                    ],
+
+                    if (controller.resumoIntraday != null) ...[
+                      const SizedBox(height: 24),
+                      _ResumoIntradayCard(
+                        resumo: controller.resumoIntraday!,
+                        locale: locale,
+                        formatarDuracao: _formatarDuracao,
+                      ),
+                    ],
+
+                    if (inicialConcluida)
+                      if (pausaAberta == null)
+                        ElevatedButton(
+                          onPressed: _iniciarPausa,
+                          child: const Text('Pausar'),
+                        )
+                      else ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Pausa em andamento',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ),
+                            IconButton(
+                              tooltip: 'Editar Pausa',
+                              onPressed: () => _editarPausa(pausaAberta),
+                              icon: const Icon(Icons.edit),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          'Iniciada às ${formatoHora.format(pausaAberta.inicio)}',
+                        ),
+                        Text(
+                          formatarDuracaoPausa(
+                            DateTime.now().difference(pausaAberta.inicio),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: _finalizarPausa,
+                          child: const Text('Retomar Jornada'),
+                        ),
+                        TextButton(
+                          onPressed: () =>
+                              _registrarLeituraParcial(pausaAberta),
+                          child: const Text('Registrar ganhos'),
+                        ),
+                      ],
+
+                    if (pausaController.pausas.any(
+                      (pausa) => pausa.fim != null,
+                    )) ...[
+                      const SizedBox(height: 24),
+                      Text(
+                        'Pausas da Jornada',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      for (
+                        var indice = 0;
+                        indice < pausaController.pausas.length;
+                        indice++
+                      )
+                        if (pausaController.pausas[indice].fim != null)
+                          _PausaItem(
+                            pausa: pausaController.pausas[indice],
+                            numero: indice + 1,
+                            formatoHora: formatoHora,
+                            onEditar: _editarPausa,
+                          ),
+                    ],
+
+                    if (inicialConcluida && pausaAberta == null) ...[
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: _fecharJornada,
+                        child: const Text('Fechar Jornada'),
+                      ),
+                    ],
+                  ],
+                );
+              }
+
+              final ultimaJornada = controller.ultimaJornadaFinalizada;
+              final resumo = controller.resumoUltimaJornada;
+
+              if (ultimaJornada == null) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.viewPaddingOf(context).bottom,
+                  ),
+                  child: Center(
+                    child: ElevatedButton(
+                      onPressed: _abrirJornada,
+                      child: const Text('Abrir Jornada'),
+                    ),
+                  ),
+                );
+              }
+
               final locale = View.of(
                 context,
               ).platformDispatcher.locale.toLanguageTag();
-              final inicioFormatado = DateFormat.yMd(
-                locale,
-              ).add_jms().format(jornada.dataHoraInicio);
-              final odometroFormatado = NumberFormat.decimalPattern(
-                locale,
-              ).format(jornada.odometroInicio);
-
-              final pausaAberta = pausaController.pausaAberta;
-              final formatoHora = DateFormat.Hm(locale);
-              final inicialConcluida =
-                  leituraGanhosController.leituraInicialConcluida;
+              final numeros = NumberFormat.decimalPattern(locale);
 
               return ListView(
                 padding: EdgeInsets.fromLTRB(
@@ -974,230 +1151,49 @@ class _JornadaPageState extends State<JornadaPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Status: ${jornada.status.name.toUpperCase()}',
+                          'Jornada concluída',
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
                       IconButton(
                         tooltip: 'Editar Jornada',
-                        onPressed: () => _editarJornada(jornada),
+                        onPressed: () => _editarJornada(ultimaJornada),
                         icon: const Icon(Icons.edit),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 16),
-
-                  _LinhaTabulada(
-                    rotulo: 'Status',
-                    valor: jornada.status.name.toUpperCase(),
-                    destaque: true,
+                  Text(
+                    _formatarLocalizacao(
+                      ultimaJornada.cidadeOrigem,
+                      ultimaJornada.cidadeDestino,
+                    ),
                   ),
-                  _LinhaTabulada(rotulo: 'Início', valor: inicioFormatado),
-                  _LinhaTabulada(
-                    rotulo: 'Odômetro inicial',
-                    valor: '$odometroFormatado km',
-                  ),
-                  _LinhaTabulada(
-                    rotulo: 'Cidade de origem',
-                    valor: jornada.cidadeOrigem,
-                  ),
-
                   if (abastecimentoController.inteligencia?.possuiDados ==
                       true) ...[
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     ResumoInteligenciaAbastecimentoCard(
                       resumo: abastecimentoController.inteligencia!,
                       locale: locale,
                     ),
                   ],
-
-                  const SizedBox(height: 24),
-
-                  if (ganhoIndividualController.plataformas.isNotEmpty) ...[
-                    OutlinedButton.icon(
-                      onPressed: _registrarGanhoIndividual,
-                      icon: const Icon(Icons.add),
-                      label: Text(
-                        ganhoIndividualController.plataformas.length == 1
-                            ? ganhoIndividualController.plataformas.single.nome
-                            : 'Ganho individual',
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                  if (!inicialConcluida) ...[
-                    Text(
-                      'Ganhos iniciais pendentes',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () => _registrarLeituraInicial(jornada.id),
-                      child: const Text('Registrar ganhos iniciais'),
-                    ),
-                  ],
-
-                  if (controller.resumoIntraday != null) ...[
-                    const SizedBox(height: 24),
-                    _ResumoIntradayCard(
-                      resumo: controller.resumoIntraday!,
-                      locale: locale,
+                  if (resumo != null) ...[
+                    const SizedBox(height: 16),
+                    _ResumoJornadaConcluida(
+                      resumo: resumo,
+                      numeros: numeros,
                       formatarDuracao: _formatarDuracao,
                     ),
                   ],
-
-                  if (inicialConcluida)
-                    if (pausaAberta == null)
-                      ElevatedButton(
-                        onPressed: _iniciarPausa,
-                        child: const Text('Pausar'),
-                      )
-                    else ...[
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Pausa em andamento',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ),
-                          IconButton(
-                            tooltip: 'Editar Pausa',
-                            onPressed: () => _editarPausa(pausaAberta),
-                            icon: const Icon(Icons.edit),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        'Iniciada às ${formatoHora.format(pausaAberta.inicio)}',
-                      ),
-                      Text(
-                        formatarDuracaoPausa(
-                          DateTime.now().difference(pausaAberta.inicio),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: _finalizarPausa,
-                        child: const Text('Retomar Jornada'),
-                      ),
-                      TextButton(
-                        onPressed: () => _registrarLeituraParcial(pausaAberta),
-                        child: const Text('Registrar ganhos'),
-                      ),
-                    ],
-
-                  if (pausaController.pausas.any(
-                    (pausa) => pausa.fim != null,
-                  )) ...[
-                    const SizedBox(height: 24),
-                    Text(
-                      'Pausas da Jornada',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    for (
-                      var indice = 0;
-                      indice < pausaController.pausas.length;
-                      indice++
-                    )
-                      if (pausaController.pausas[indice].fim != null)
-                        _PausaItem(
-                          pausa: pausaController.pausas[indice],
-                          numero: indice + 1,
-                          formatoHora: formatoHora,
-                          onEditar: _editarPausa,
-                        ),
-                  ],
-
-                  if (inicialConcluida && pausaAberta == null) ...[
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: _fecharJornada,
-                      child: const Text('Fechar Jornada'),
-                    ),
-                  ],
-                ],
-              );
-            }
-
-            final ultimaJornada = controller.ultimaJornadaFinalizada;
-            final resumo = controller.resumoUltimaJornada;
-
-            if (ultimaJornada == null) {
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.viewPaddingOf(context).bottom,
-                ),
-                child: Center(
-                  child: ElevatedButton(
+                  const SizedBox(height: 24),
+                  ElevatedButton(
                     onPressed: _abrirJornada,
                     child: const Text('Abrir Jornada'),
                   ),
-                ),
+                ],
               );
-            }
-
-            final locale = View.of(
-              context,
-            ).platformDispatcher.locale.toLanguageTag();
-            final numeros = NumberFormat.decimalPattern(locale);
-
-            return ListView(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                16,
-                16,
-                16 + MediaQuery.viewPaddingOf(context).bottom,
-              ),
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Jornada concluída',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: 'Editar Jornada',
-                      onPressed: () => _editarJornada(ultimaJornada),
-                      icon: const Icon(Icons.edit),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  _formatarLocalizacao(
-                    ultimaJornada.cidadeOrigem,
-                    ultimaJornada.cidadeDestino,
-                  ),
-                ),
-                if (abastecimentoController.inteligencia?.possuiDados ==
-                    true) ...[
-                  const SizedBox(height: 16),
-                  ResumoInteligenciaAbastecimentoCard(
-                    resumo: abastecimentoController.inteligencia!,
-                    locale: locale,
-                  ),
-                ],
-                if (resumo != null) ...[
-                  const SizedBox(height: 16),
-                  _ResumoJornadaConcluida(
-                    resumo: resumo,
-                    numeros: numeros,
-                    formatarDuracao: _formatarDuracao,
-                  ),
-                ],
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _abrirJornada,
-                  child: const Text('Abrir Jornada'),
-                ),
-              ],
-            );
-          },
+            },
+          ),
         ),
       ),
     );
@@ -1536,165 +1532,134 @@ class _ResumoJornadaConcluida extends StatelessWidget {
       ..maximumFractionDigits = 2;
     final receitaTotal = resumo.receitaTotalCentavos;
     final viagensTotal = resumo.quantidadeTotalViagens;
-    final kmPausa = resumo.quilometrosEmPausa;
     final kmAtivo = resumo.quilometrosAtivos;
+
+    String dinheiro(int? centavos) =>
+        centavos == null ? '—' : moeda.format(centavos / 100);
+    String decimalizar(double? valor) =>
+        valor == null ? '—' : decimal.format(valor);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Resultado da Jornada',
+          'Resumo da Jornada',
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 8),
-        if (receitaTotal != null && viagensTotal != null) ...[
-          Text(
-            moeda.format(receitaTotal / 100),
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          Text('$viagensTotal ${viagensTotal == 1 ? 'viagem' : 'viagens'}'),
-          Text(
-            'Ticket médio geral: '
-            '${resumo.ticketMedioGeral == null ? '—' : moeda.format(resumo.ticketMedioGeral)}',
-          ),
-        ] else
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Resultado financeiro incompleto'),
-              const Text('Ticket médio geral: —'),
-            ],
-          ),
+        _LinhaTabulada(
+          rotulo: 'Tempo ativo',
+          valor: formatarDuracao(resumo.tempoAtivo, numeros),
+          destaque: true,
+          alternarZebra: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'Distância ativa',
+          valor: kmAtivo == null ? '—' : '${numeros.format(kmAtivo)} km',
+          destaque: true,
+          alternarZebra: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'Faturamento',
+          valor: dinheiro(receitaTotal),
+          destaque: true,
+          alternarZebra: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'R\$/hora ativa',
+          valor: decimalizar(resumo.receitaPorHoraAtiva),
+          destaque: true,
+          alternarZebra: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'R\$/km',
+          valor: decimalizar(resumo.receitaPorKmAtivo),
+          destaque: true,
+          alternarZebra: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'Tempo da Jornada',
+          valor: formatarDuracao(resumo.duracaoTotal, numeros),
+          alternarZebra: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'Em pausa',
+          valor: formatarDuracao(resumo.tempoPausa, numeros),
+          alternarZebra: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'Viagens',
+          valor: viagensTotal == null ? '—' : numeros.format(viagensTotal),
+          alternarZebra: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'Ticket médio',
+          valor: resumo.ticketMedioGeral == null
+              ? '—'
+              : moeda.format(resumo.ticketMedioGeral),
+          alternarZebra: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'Passes',
+          valor: dinheiro(resumo.custoPassesCentavos),
+          alternarZebra: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'Bônus/promoções',
+          valor: dinheiro(resumo.bonusPromocoesCentavos),
+          alternarZebra: true,
+        ),
+        _LinhaTabulada(
+          rotulo: 'Resultado operacional',
+          valor: dinheiro(resumo.resultadoOperacionalCentavos),
+          alternarZebra: true,
+        ),
         const SizedBox(height: 12),
         for (final resultado in resumo.resultadosPlataformas)
           Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: resultado.calculavel
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${resultado.nome}: '
-                        '${moeda.format(resultado.receitaCentavos! / 100)} em viagens · '
-                        '${resultado.quantidadeViagens} '
-                        '${resultado.quantidadeViagens == 1 ? 'viagem' : 'viagens'} · '
-                        'Ticket médio: '
-                        '${resultado.ticketMedio == null ? '—' : moeda.format(resultado.ticketMedio)}',
-                      ),
-                      Text(
-                        'Bônus/promoções: '
-                        '${moeda.format(resultado.bonusPromocoesCentavos / 100)} · '
-                        'Passes: ${moeda.format(resultado.custoPassesCentavos / 100)} · '
-                        'Resultado operacional: '
-                        '${moeda.format(resultado.resultadoOperacionalCentavos! / 100)}',
-                      ),
-                    ],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${resultado.nome}: Revisão necessária · '
-                        'Ticket médio: —',
-                      ),
-                      Text(
-                        'Bônus/promoções: '
-                        '${moeda.format(resultado.bonusPromocoesCentavos / 100)} · '
-                        'Passes: ${moeda.format(resultado.custoPassesCentavos / 100)} · '
-                        'Resultado operacional: —',
-                      ),
-                    ],
-                  ),
-          ),
-        const SizedBox(height: 12),
-        if (resumo.passes.isNotEmpty) ...[
-          Text(
-            'Passes registrados',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          for (final item in resumo.passes)
-            Text(
-              '${item.plataforma.nome}: '
-              '${moeda.format(item.passe.valorPagoCentavos / 100)}',
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  resultado.nome,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                _LinhaTabulada(
+                  rotulo: 'Faturamento',
+                  valor: dinheiro(resultado.receitaCentavos),
+                  alternarZebra: true,
+                ),
+                _LinhaTabulada(
+                  rotulo: 'Viagens',
+                  valor: resultado.quantidadeViagens == null
+                      ? '—'
+                      : numeros.format(resultado.quantidadeViagens),
+                  alternarZebra: true,
+                ),
+                _LinhaTabulada(
+                  rotulo: 'Ticket médio',
+                  valor: decimalizar(resultado.ticketMedio),
+                  alternarZebra: true,
+                ),
+                _LinhaTabulada(
+                  rotulo: 'Passes',
+                  valor: dinheiro(resultado.custoPassesCentavos),
+                  alternarZebra: true,
+                ),
+                _LinhaTabulada(
+                  rotulo: 'Bônus',
+                  valor: dinheiro(resultado.bonusPromocoesCentavos),
+                  alternarZebra: true,
+                ),
+                _LinhaTabulada(
+                  rotulo: 'Resultado operacional',
+                  valor: dinheiro(resultado.resultadoOperacionalCentavos),
+                  alternarZebra: true,
+                ),
+              ],
             ),
-          Text(
-            'Custo total de passes: '
-            '${moeda.format(resumo.custoPassesCentavos / 100)}',
           ),
-          const SizedBox(height: 12),
-        ],
-        if (resumo.bonusPromocoes.isNotEmpty) ...[
-          Text(
-            'Bônus/promoções registrados',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          for (final item in resumo.bonusPromocoes)
-            Text(
-              '${item.plataforma.nome}: '
-              '${moeda.format(item.bonusPromocao.valorCentavos / 100)}',
-            ),
-          Text(
-            'Total de bônus/promoções: '
-            '${moeda.format(resumo.bonusPromocoesCentavos / 100)}',
-          ),
-          const SizedBox(height: 12),
-        ],
-        Text(
-          'Resultado operacional da Jornada: '
-          '${resumo.resultadoOperacionalCentavos == null ? '—' : moeda.format(resumo.resultadoOperacionalCentavos! / 100)}',
-        ),
-        const SizedBox(height: 12),
-        _SecaoResumo(
-          titulo: 'Tempo',
-          linhas: [
-            '${formatarDuracao(resumo.duracaoTotal, numeros)} total',
-            '${formatarDuracao(resumo.tempoPausa, numeros)} em pausa',
-            '${formatarDuracao(resumo.tempoAtivo, numeros)} ativo',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _SecaoResumo(
-          titulo: 'Distância',
-          linhas: [
-            '${numeros.format(resumo.quilometrosTotal)} km total',
-            kmPausa == null
-                ? 'km em pausa: indisponível'
-                : '${numeros.format(kmPausa)} km em pausa',
-            kmAtivo == null
-                ? 'km ativo: indisponível'
-                : '${numeros.format(kmAtivo)} km ativo',
-          ],
-        ),
-        const SizedBox(height: 12),
-        _SecaoResumo(
-          titulo: 'Desempenho',
-          linhas: [
-            resumo.receitaPorHoraAtiva == null
-                ? r'R$/h ativo: —'
-                : 'R\$ ${decimal.format(resumo.receitaPorHoraAtiva)}/h ativo',
-            resumo.receitaPorKmAtivo == null
-                ? r'R$/km ativo: —'
-                : 'R\$ ${decimal.format(resumo.receitaPorKmAtivo)}/km ativo',
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _SecaoResumo extends StatelessWidget {
-  final String titulo;
-  final List<String> linhas;
-
-  const _SecaoResumo({required this.titulo, required this.linhas});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(titulo, style: Theme.of(context).textTheme.titleSmall),
-        for (final linha in linhas) Text(linha),
       ],
     );
   }

@@ -20,6 +20,10 @@ class GanhoIndividualRepository {
   ) => _dao.listarPorJornada(jornadaId);
   Future<List<TotalGanhoIndividual>> totalizarPorJornada(int jornadaId) =>
       _dao.totalizarPorJornada(jornadaId);
+  Future<List<TotalGanhoIndividual>> totalizarNoIntervalo(
+    DateTime inicio,
+    DateTime fim,
+  ) => _dao.totalizarNoIntervalo(inicio, fim);
   Future<List<TotalGanhoIndividual>> totalizarPorJornadaNoIntervalo(
     int jornadaId,
     DateTime inicio,

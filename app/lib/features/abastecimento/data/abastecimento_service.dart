@@ -58,6 +58,9 @@ class AbastecimentoService {
   Future<Abastecimento?> ultimoAbastecimento(int veiculoId) =>
       _repository.buscarUltimoPorVeiculo(veiculoId);
 
+  Future<List<Abastecimento>> listar(int veiculoId) =>
+      _repository.listarPorVeiculo(veiculoId);
+
   Future<ResumoInteligenciaAbastecimento> calcularInteligencia(
     int veiculoId,
   ) async {

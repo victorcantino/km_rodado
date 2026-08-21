@@ -806,6 +806,7 @@ void main() {
             jornadaId: Value(jornadaId),
             quantidadeViagens: 3,
             valorTotalCentavos: 12500,
+            dataHora: Value(DateTime(2026, 8, 10, 9)),
           ),
         );
     await inserirBonus(jornadaId, particularId, DateTime(2026, 8, 10, 9), 500);
@@ -828,7 +829,7 @@ void main() {
   });
 
   test('reconcilia bônus e exclui crédito do ticket médio', () async {
-    final jornadaId = await inserirJornada();
+    final jornadaId = await inserirJornada(fim: DateTime(2026, 8, 10, 18));
     final plataformaId = await inserirPlataforma('Acumulada');
     await inserirLeitura(
       jornadaId,
@@ -858,15 +859,25 @@ void main() {
             tipo: TipoBonusPromocao.bonus,
           ),
         );
+    await database
+        .into(database.bonusPromocoes)
+        .insert(
+          BonusPromocoesCompanion.insert(
+            plataformaId: plataformaId,
+            dataHora: DateTime(2026, 8, 10, 17),
+            valorCentavos: 1000,
+            tipo: TipoBonusPromocao.bonus,
+          ),
+        );
 
     final resumo = (await service.resumoUltimaJornada())!;
     final resultado = resumo.resultadosPlataformas.single;
-    expect(resultado.receitaCentavos, 6000);
-    expect(resultado.bonusPromocoesCentavos, 2000);
-    expect(resultado.ticketMedio, 12);
-    expect(resultado.resultadoOperacionalCentavos, 8000);
-    expect(resumo.bonusPromocoesCentavos, 2000);
-    expect(resumo.resultadoOperacionalCentavos, 8000);
+    expect(resultado.receitaCentavos, 3000);
+    expect(resultado.bonusPromocoesCentavos, 6000);
+    expect(resultado.ticketMedio, 6);
+    expect(resultado.resultadoOperacionalCentavos, 9000);
+    expect(resumo.bonusPromocoesCentavos, 6000);
+    expect(resumo.resultadoOperacionalCentavos, 9000);
   });
 
   test(
