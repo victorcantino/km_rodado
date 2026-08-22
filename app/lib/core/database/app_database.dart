@@ -32,6 +32,7 @@ import 'tables/item_manutencao.dart';
 import 'tables/despesa_veiculo.dart';
 import 'tables/custo_recorrente.dart';
 import 'tables/depreciacao_veiculo.dart';
+import 'tables/planejamento_mensal.dart';
 
 import 'daos/jornada_dao.dart';
 import 'daos/leitura_ganhos_dao.dart';
@@ -44,6 +45,7 @@ import 'daos/manutencao_dao.dart';
 import 'daos/despesa_veiculo_dao.dart';
 import 'daos/custo_recorrente_dao.dart';
 import 'daos/depreciacao_veiculo_dao.dart';
+import 'daos/planejamento_mensal_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -66,6 +68,7 @@ part 'app_database.g.dart';
     DespesasVeiculo,
     CustosRecorrentes,
     DepreciacoesVeiculo,
+    PlanejamentosMensais,
   ],
   daos: [
     JornadaDao,
@@ -79,6 +82,7 @@ part 'app_database.g.dart';
     DespesaVeiculoDao,
     CustoRecorrenteDao,
     DepreciacaoVeiculoDao,
+    PlanejamentoMensalDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -87,7 +91,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -130,6 +134,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from >= 4 && from < 13) {
         await _migrarSchema12Para13(migrator);
+      }
+      if (from < 14) {
+        await migrator.createTable(planejamentosMensais);
       }
     },
     beforeOpen: (details) async {

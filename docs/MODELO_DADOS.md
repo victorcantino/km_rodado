@@ -1,6 +1,6 @@
 # Modelo de dados — KM Rodado
 
-O schema Drift atual é **13**. Esta seção separa o que existe no SQLite do que é
+O schema Drift atual é **14**. Esta seção separa o que existe no SQLite do que é
 derivado ou apenas planejado.
 
 ## Tabelas persistidas
@@ -184,10 +184,17 @@ Veiculo ── DepreciacaoVeiculo (0..1)
 - custo conhecido/completo da Manutenção, próximo hodômetro e estados de
   recorrência por km/data.
 - equivalente mensal de cada Custo Recorrente.
+
+## Planejamento Mensal
+
+`PlanejamentosMensais` persiste somente `usuarioId`, `mesReferencia`,
+`diasPlanejados` e `metaKmMensal`, com unicidade por usuário e mês. Km
+realizados, médias, percentuais, dias trabalhados e valores restantes são
+derivados das Jornadas finalizadas e não são persistidos.
 - depreciação observada/projetada em R$/km.
 
 ## Planejado, sem tabela atual
 
-Evento financeiro genérico, carteira de
-plataforma, alertas, clima, localização e sincronização não fazem parte do
-schema 13. Suas decisões e ideias permanecem no backlog e nas regras futuras.
+Evento financeiro genérico, carteira de plataforma, alertas, clima, localização
+e sincronização não fazem parte do schema 14. Suas decisões e ideias permanecem
+no backlog e nas regras futuras.

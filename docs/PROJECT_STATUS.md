@@ -4,7 +4,7 @@
 
 - desenvolvimento ativo com teste operacional real em Android;
 - aplicativo Flutter offline-first com Drift/SQLite;
-- schema atual: **13**;
+- schema atual: **14**;
 - suíte automatizada: **219 testes aprovados** na última validação disponível;
   a validação final desta revisão depende do ambiente Flutter local.
 
@@ -64,13 +64,15 @@
 - JornadaPage protegida pelos insets seguros inferiores do Android;
 - formulários operacionais navegam pelo teclado entre campos editáveis,
   ignorando botões, seletores e calendários, e encerram a sequência com Done;
-- migrações preservadoras até schema 13 e seeds idempotentes.
+- migrações preservadoras até schema 14 e seeds idempotentes.
 - Cobertura dos custos como diagnóstico derivado na página de Despesas, com
   estados Informado, Estimado e Não informado; parcela do veículo separada
   como obrigação de caixa e multa fora da cobertura estrutural.
 - primeira versão do Histórico da Jornada concluída, derivada dos fatos
   temporais existentes, sem persistir timeline ou resumo adicional; a
   presença de um evento não altera sua regra financeira.
+- primeira versão do Planejamento Mensal, com mês, dias planejados e meta de
+  km persistidos; progresso e médias são derivados das Jornadas concluídas.
 
 ## Em teste operacional
 

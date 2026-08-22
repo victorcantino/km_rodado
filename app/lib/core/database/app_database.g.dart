@@ -10709,6 +10709,380 @@ class DepreciacoesVeiculoCompanion extends UpdateCompanion<DepreciacaoVeiculo> {
   }
 }
 
+class $PlanejamentosMensaisTable extends PlanejamentosMensais
+    with TableInfo<$PlanejamentosMensaisTable, PlanejamentoMensal> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlanejamentosMensaisTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _usuarioIdMeta = const VerificationMeta(
+    'usuarioId',
+  );
+  @override
+  late final GeneratedColumn<int> usuarioId = GeneratedColumn<int>(
+    'usuario_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES usuarios (id)',
+    ),
+  );
+  static const VerificationMeta _mesReferenciaMeta = const VerificationMeta(
+    'mesReferencia',
+  );
+  @override
+  late final GeneratedColumn<DateTime> mesReferencia =
+      GeneratedColumn<DateTime>(
+        'mes_referencia',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _diasPlanejadosMeta = const VerificationMeta(
+    'diasPlanejados',
+  );
+  @override
+  late final GeneratedColumn<int> diasPlanejados = GeneratedColumn<int>(
+    'dias_planejados',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _metaKmMensalMeta = const VerificationMeta(
+    'metaKmMensal',
+  );
+  @override
+  late final GeneratedColumn<int> metaKmMensal = GeneratedColumn<int>(
+    'meta_km_mensal',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    usuarioId,
+    mesReferencia,
+    diasPlanejados,
+    metaKmMensal,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'planejamentos_mensais';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PlanejamentoMensal> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('usuario_id')) {
+      context.handle(
+        _usuarioIdMeta,
+        usuarioId.isAcceptableOrUnknown(data['usuario_id']!, _usuarioIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_usuarioIdMeta);
+    }
+    if (data.containsKey('mes_referencia')) {
+      context.handle(
+        _mesReferenciaMeta,
+        mesReferencia.isAcceptableOrUnknown(
+          data['mes_referencia']!,
+          _mesReferenciaMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_mesReferenciaMeta);
+    }
+    if (data.containsKey('dias_planejados')) {
+      context.handle(
+        _diasPlanejadosMeta,
+        diasPlanejados.isAcceptableOrUnknown(
+          data['dias_planejados']!,
+          _diasPlanejadosMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_diasPlanejadosMeta);
+    }
+    if (data.containsKey('meta_km_mensal')) {
+      context.handle(
+        _metaKmMensalMeta,
+        metaKmMensal.isAcceptableOrUnknown(
+          data['meta_km_mensal']!,
+          _metaKmMensalMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_metaKmMensalMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PlanejamentoMensal map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PlanejamentoMensal(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      usuarioId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}usuario_id'],
+      )!,
+      mesReferencia: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}mes_referencia'],
+      )!,
+      diasPlanejados: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}dias_planejados'],
+      )!,
+      metaKmMensal: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}meta_km_mensal'],
+      )!,
+    );
+  }
+
+  @override
+  $PlanejamentosMensaisTable createAlias(String alias) {
+    return $PlanejamentosMensaisTable(attachedDatabase, alias);
+  }
+}
+
+class PlanejamentoMensal extends DataClass
+    implements Insertable<PlanejamentoMensal> {
+  final int id;
+  final int usuarioId;
+  final DateTime mesReferencia;
+  final int diasPlanejados;
+  final int metaKmMensal;
+  const PlanejamentoMensal({
+    required this.id,
+    required this.usuarioId,
+    required this.mesReferencia,
+    required this.diasPlanejados,
+    required this.metaKmMensal,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['usuario_id'] = Variable<int>(usuarioId);
+    map['mes_referencia'] = Variable<DateTime>(mesReferencia);
+    map['dias_planejados'] = Variable<int>(diasPlanejados);
+    map['meta_km_mensal'] = Variable<int>(metaKmMensal);
+    return map;
+  }
+
+  PlanejamentosMensaisCompanion toCompanion(bool nullToAbsent) {
+    return PlanejamentosMensaisCompanion(
+      id: Value(id),
+      usuarioId: Value(usuarioId),
+      mesReferencia: Value(mesReferencia),
+      diasPlanejados: Value(diasPlanejados),
+      metaKmMensal: Value(metaKmMensal),
+    );
+  }
+
+  factory PlanejamentoMensal.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PlanejamentoMensal(
+      id: serializer.fromJson<int>(json['id']),
+      usuarioId: serializer.fromJson<int>(json['usuarioId']),
+      mesReferencia: serializer.fromJson<DateTime>(json['mesReferencia']),
+      diasPlanejados: serializer.fromJson<int>(json['diasPlanejados']),
+      metaKmMensal: serializer.fromJson<int>(json['metaKmMensal']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'usuarioId': serializer.toJson<int>(usuarioId),
+      'mesReferencia': serializer.toJson<DateTime>(mesReferencia),
+      'diasPlanejados': serializer.toJson<int>(diasPlanejados),
+      'metaKmMensal': serializer.toJson<int>(metaKmMensal),
+    };
+  }
+
+  PlanejamentoMensal copyWith({
+    int? id,
+    int? usuarioId,
+    DateTime? mesReferencia,
+    int? diasPlanejados,
+    int? metaKmMensal,
+  }) => PlanejamentoMensal(
+    id: id ?? this.id,
+    usuarioId: usuarioId ?? this.usuarioId,
+    mesReferencia: mesReferencia ?? this.mesReferencia,
+    diasPlanejados: diasPlanejados ?? this.diasPlanejados,
+    metaKmMensal: metaKmMensal ?? this.metaKmMensal,
+  );
+  PlanejamentoMensal copyWithCompanion(PlanejamentosMensaisCompanion data) {
+    return PlanejamentoMensal(
+      id: data.id.present ? data.id.value : this.id,
+      usuarioId: data.usuarioId.present ? data.usuarioId.value : this.usuarioId,
+      mesReferencia: data.mesReferencia.present
+          ? data.mesReferencia.value
+          : this.mesReferencia,
+      diasPlanejados: data.diasPlanejados.present
+          ? data.diasPlanejados.value
+          : this.diasPlanejados,
+      metaKmMensal: data.metaKmMensal.present
+          ? data.metaKmMensal.value
+          : this.metaKmMensal,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlanejamentoMensal(')
+          ..write('id: $id, ')
+          ..write('usuarioId: $usuarioId, ')
+          ..write('mesReferencia: $mesReferencia, ')
+          ..write('diasPlanejados: $diasPlanejados, ')
+          ..write('metaKmMensal: $metaKmMensal')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, usuarioId, mesReferencia, diasPlanejados, metaKmMensal);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PlanejamentoMensal &&
+          other.id == this.id &&
+          other.usuarioId == this.usuarioId &&
+          other.mesReferencia == this.mesReferencia &&
+          other.diasPlanejados == this.diasPlanejados &&
+          other.metaKmMensal == this.metaKmMensal);
+}
+
+class PlanejamentosMensaisCompanion
+    extends UpdateCompanion<PlanejamentoMensal> {
+  final Value<int> id;
+  final Value<int> usuarioId;
+  final Value<DateTime> mesReferencia;
+  final Value<int> diasPlanejados;
+  final Value<int> metaKmMensal;
+  const PlanejamentosMensaisCompanion({
+    this.id = const Value.absent(),
+    this.usuarioId = const Value.absent(),
+    this.mesReferencia = const Value.absent(),
+    this.diasPlanejados = const Value.absent(),
+    this.metaKmMensal = const Value.absent(),
+  });
+  PlanejamentosMensaisCompanion.insert({
+    this.id = const Value.absent(),
+    required int usuarioId,
+    required DateTime mesReferencia,
+    required int diasPlanejados,
+    required int metaKmMensal,
+  }) : usuarioId = Value(usuarioId),
+       mesReferencia = Value(mesReferencia),
+       diasPlanejados = Value(diasPlanejados),
+       metaKmMensal = Value(metaKmMensal);
+  static Insertable<PlanejamentoMensal> custom({
+    Expression<int>? id,
+    Expression<int>? usuarioId,
+    Expression<DateTime>? mesReferencia,
+    Expression<int>? diasPlanejados,
+    Expression<int>? metaKmMensal,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (usuarioId != null) 'usuario_id': usuarioId,
+      if (mesReferencia != null) 'mes_referencia': mesReferencia,
+      if (diasPlanejados != null) 'dias_planejados': diasPlanejados,
+      if (metaKmMensal != null) 'meta_km_mensal': metaKmMensal,
+    });
+  }
+
+  PlanejamentosMensaisCompanion copyWith({
+    Value<int>? id,
+    Value<int>? usuarioId,
+    Value<DateTime>? mesReferencia,
+    Value<int>? diasPlanejados,
+    Value<int>? metaKmMensal,
+  }) {
+    return PlanejamentosMensaisCompanion(
+      id: id ?? this.id,
+      usuarioId: usuarioId ?? this.usuarioId,
+      mesReferencia: mesReferencia ?? this.mesReferencia,
+      diasPlanejados: diasPlanejados ?? this.diasPlanejados,
+      metaKmMensal: metaKmMensal ?? this.metaKmMensal,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (usuarioId.present) {
+      map['usuario_id'] = Variable<int>(usuarioId.value);
+    }
+    if (mesReferencia.present) {
+      map['mes_referencia'] = Variable<DateTime>(mesReferencia.value);
+    }
+    if (diasPlanejados.present) {
+      map['dias_planejados'] = Variable<int>(diasPlanejados.value);
+    }
+    if (metaKmMensal.present) {
+      map['meta_km_mensal'] = Variable<int>(metaKmMensal.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlanejamentosMensaisCompanion(')
+          ..write('id: $id, ')
+          ..write('usuarioId: $usuarioId, ')
+          ..write('mesReferencia: $mesReferencia, ')
+          ..write('diasPlanejados: $diasPlanejados, ')
+          ..write('metaKmMensal: $metaKmMensal')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -10739,6 +11113,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $CustosRecorrentesTable(this);
   late final $DepreciacoesVeiculoTable depreciacoesVeiculo =
       $DepreciacoesVeiculoTable(this);
+  late final $PlanejamentosMensaisTable planejamentosMensais =
+      $PlanejamentosMensaisTable(this);
   late final JornadaDao jornadaDao = JornadaDao(this as AppDatabase);
   late final PausaDao pausaDao = PausaDao(this as AppDatabase);
   late final LeituraGanhosDao leituraGanhosDao = LeituraGanhosDao(
@@ -10765,6 +11141,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final DepreciacaoVeiculoDao depreciacaoVeiculoDao =
       DepreciacaoVeiculoDao(this as AppDatabase);
+  late final PlanejamentoMensalDao planejamentoMensalDao =
+      PlanejamentoMensalDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -10787,6 +11165,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     despesasVeiculo,
     custosRecorrentes,
     depreciacoesVeiculo,
+    planejamentosMensais,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -10837,6 +11216,31 @@ final class $$UsuariosTableReferences
     ).filter((f) => f.usuarioId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_jornadasRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $PlanejamentosMensaisTable,
+    List<PlanejamentoMensal>
+  >
+  _planejamentosMensaisRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.planejamentosMensais,
+        aliasName: 'usuarios__id__planejamentos_mensais__usuario_id',
+      );
+
+  $$PlanejamentosMensaisTableProcessedTableManager
+  get planejamentosMensaisRefs {
+    final manager = $$PlanejamentosMensaisTableTableManager(
+      $_db,
+      $_db.planejamentosMensais,
+    ).filter((f) => f.usuarioId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _planejamentosMensaisRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -10898,6 +11302,31 @@ class $$UsuariosTableFilterComposer
           }) => $$JornadasTableFilterComposer(
             $db: $db,
             $table: $db.jornadas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> planejamentosMensaisRefs(
+    Expression<bool> Function($$PlanejamentosMensaisTableFilterComposer f) f,
+  ) {
+    final $$PlanejamentosMensaisTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.planejamentosMensais,
+      getReferencedColumn: (t) => t.usuarioId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlanejamentosMensaisTableFilterComposer(
+            $db: $db,
+            $table: $db.planejamentosMensais,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -11001,6 +11430,32 @@ class $$UsuariosTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> planejamentosMensaisRefs<T extends Object>(
+    Expression<T> Function($$PlanejamentosMensaisTableAnnotationComposer a) f,
+  ) {
+    final $$PlanejamentosMensaisTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.planejamentosMensais,
+          getReferencedColumn: (t) => t.usuarioId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PlanejamentosMensaisTableAnnotationComposer(
+                $db: $db,
+                $table: $db.planejamentosMensais,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$UsuariosTableTableManager
@@ -11016,7 +11471,10 @@ class $$UsuariosTableTableManager
           $$UsuariosTableUpdateCompanionBuilder,
           (Usuario, $$UsuariosTableReferences),
           Usuario,
-          PrefetchHooks Function({bool jornadasRefs})
+          PrefetchHooks Function({
+            bool jornadasRefs,
+            bool planejamentosMensaisRefs,
+          })
         > {
   $$UsuariosTableTableManager(_$AppDatabase db, $UsuariosTable table)
     : super(
@@ -11069,28 +11527,63 @@ class $$UsuariosTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({jornadasRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (jornadasRefs) db.jornadas],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (jornadasRefs)
-                    await $_getPrefetchedData<Usuario, $UsuariosTable, Jornada>(
-                      currentTable: table,
-                      referencedTable: $$UsuariosTableReferences
-                          ._jornadasRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$UsuariosTableReferences(db, table, p0).jornadasRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.usuarioId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({jornadasRefs = false, planejamentosMensaisRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (jornadasRefs) db.jornadas,
+                    if (planejamentosMensaisRefs) db.planejamentosMensais,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (jornadasRefs)
+                        await $_getPrefetchedData<
+                          Usuario,
+                          $UsuariosTable,
+                          Jornada
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UsuariosTableReferences
+                              ._jornadasRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UsuariosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).jornadasRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.usuarioId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (planejamentosMensaisRefs)
+                        await $_getPrefetchedData<
+                          Usuario,
+                          $UsuariosTable,
+                          PlanejamentoMensal
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UsuariosTableReferences
+                              ._planejamentosMensaisRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UsuariosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).planejamentosMensaisRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.usuarioId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -11107,7 +11600,7 @@ typedef $$UsuariosTableProcessedTableManager =
       $$UsuariosTableUpdateCompanionBuilder,
       (Usuario, $$UsuariosTableReferences),
       Usuario,
-      PrefetchHooks Function({bool jornadasRefs})
+      PrefetchHooks Function({bool jornadasRefs, bool planejamentosMensaisRefs})
     >;
 typedef $$VeiculosTableCreateCompanionBuilder =
     VeiculosCompanion Function({
@@ -20288,6 +20781,342 @@ typedef $$DepreciacoesVeiculoTableProcessedTableManager =
       DepreciacaoVeiculo,
       PrefetchHooks Function({bool veiculoId})
     >;
+typedef $$PlanejamentosMensaisTableCreateCompanionBuilder =
+    PlanejamentosMensaisCompanion Function({
+      Value<int> id,
+      required int usuarioId,
+      required DateTime mesReferencia,
+      required int diasPlanejados,
+      required int metaKmMensal,
+    });
+typedef $$PlanejamentosMensaisTableUpdateCompanionBuilder =
+    PlanejamentosMensaisCompanion Function({
+      Value<int> id,
+      Value<int> usuarioId,
+      Value<DateTime> mesReferencia,
+      Value<int> diasPlanejados,
+      Value<int> metaKmMensal,
+    });
+
+final class $$PlanejamentosMensaisTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $PlanejamentosMensaisTable,
+          PlanejamentoMensal
+        > {
+  $$PlanejamentosMensaisTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $UsuariosTable _usuarioIdTable(_$AppDatabase db) => db.usuarios
+      .createAlias('planejamentos_mensais__usuario_id__usuarios__id');
+
+  $$UsuariosTableProcessedTableManager get usuarioId {
+    final $_column = $_itemColumn<int>('usuario_id')!;
+
+    final manager = $$UsuariosTableTableManager(
+      $_db,
+      $_db.usuarios,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_usuarioIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PlanejamentosMensaisTableFilterComposer
+    extends Composer<_$AppDatabase, $PlanejamentosMensaisTable> {
+  $$PlanejamentosMensaisTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get mesReferencia => $composableBuilder(
+    column: $table.mesReferencia,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get diasPlanejados => $composableBuilder(
+    column: $table.diasPlanejados,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get metaKmMensal => $composableBuilder(
+    column: $table.metaKmMensal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$UsuariosTableFilterComposer get usuarioId {
+    final $$UsuariosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.usuarioId,
+      referencedTable: $db.usuarios,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsuariosTableFilterComposer(
+            $db: $db,
+            $table: $db.usuarios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlanejamentosMensaisTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlanejamentosMensaisTable> {
+  $$PlanejamentosMensaisTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get mesReferencia => $composableBuilder(
+    column: $table.mesReferencia,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get diasPlanejados => $composableBuilder(
+    column: $table.diasPlanejados,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get metaKmMensal => $composableBuilder(
+    column: $table.metaKmMensal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$UsuariosTableOrderingComposer get usuarioId {
+    final $$UsuariosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.usuarioId,
+      referencedTable: $db.usuarios,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsuariosTableOrderingComposer(
+            $db: $db,
+            $table: $db.usuarios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlanejamentosMensaisTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlanejamentosMensaisTable> {
+  $$PlanejamentosMensaisTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get mesReferencia => $composableBuilder(
+    column: $table.mesReferencia,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get diasPlanejados => $composableBuilder(
+    column: $table.diasPlanejados,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get metaKmMensal => $composableBuilder(
+    column: $table.metaKmMensal,
+    builder: (column) => column,
+  );
+
+  $$UsuariosTableAnnotationComposer get usuarioId {
+    final $$UsuariosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.usuarioId,
+      referencedTable: $db.usuarios,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsuariosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.usuarios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlanejamentosMensaisTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PlanejamentosMensaisTable,
+          PlanejamentoMensal,
+          $$PlanejamentosMensaisTableFilterComposer,
+          $$PlanejamentosMensaisTableOrderingComposer,
+          $$PlanejamentosMensaisTableAnnotationComposer,
+          $$PlanejamentosMensaisTableCreateCompanionBuilder,
+          $$PlanejamentosMensaisTableUpdateCompanionBuilder,
+          (PlanejamentoMensal, $$PlanejamentosMensaisTableReferences),
+          PlanejamentoMensal,
+          PrefetchHooks Function({bool usuarioId})
+        > {
+  $$PlanejamentosMensaisTableTableManager(
+    _$AppDatabase db,
+    $PlanejamentosMensaisTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlanejamentosMensaisTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlanejamentosMensaisTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PlanejamentosMensaisTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> usuarioId = const Value.absent(),
+                Value<DateTime> mesReferencia = const Value.absent(),
+                Value<int> diasPlanejados = const Value.absent(),
+                Value<int> metaKmMensal = const Value.absent(),
+              }) => PlanejamentosMensaisCompanion(
+                id: id,
+                usuarioId: usuarioId,
+                mesReferencia: mesReferencia,
+                diasPlanejados: diasPlanejados,
+                metaKmMensal: metaKmMensal,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int usuarioId,
+                required DateTime mesReferencia,
+                required int diasPlanejados,
+                required int metaKmMensal,
+              }) => PlanejamentosMensaisCompanion.insert(
+                id: id,
+                usuarioId: usuarioId,
+                mesReferencia: mesReferencia,
+                diasPlanejados: diasPlanejados,
+                metaKmMensal: metaKmMensal,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PlanejamentosMensaisTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({usuarioId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (usuarioId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.usuarioId,
+                                referencedTable:
+                                    $$PlanejamentosMensaisTableReferences
+                                        ._usuarioIdTable(db),
+                                referencedColumn:
+                                    $$PlanejamentosMensaisTableReferences
+                                        ._usuarioIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PlanejamentosMensaisTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PlanejamentosMensaisTable,
+      PlanejamentoMensal,
+      $$PlanejamentosMensaisTableFilterComposer,
+      $$PlanejamentosMensaisTableOrderingComposer,
+      $$PlanejamentosMensaisTableAnnotationComposer,
+      $$PlanejamentosMensaisTableCreateCompanionBuilder,
+      $$PlanejamentosMensaisTableUpdateCompanionBuilder,
+      (PlanejamentoMensal, $$PlanejamentosMensaisTableReferences),
+      PlanejamentoMensal,
+      PrefetchHooks Function({bool usuarioId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -20333,4 +21162,6 @@ class $AppDatabaseManager {
       $$CustosRecorrentesTableTableManager(_db, _db.custosRecorrentes);
   $$DepreciacoesVeiculoTableTableManager get depreciacoesVeiculo =>
       $$DepreciacoesVeiculoTableTableManager(_db, _db.depreciacoesVeiculo);
+  $$PlanejamentosMensaisTableTableManager get planejamentosMensais =>
+      $$PlanejamentosMensaisTableTableManager(_db, _db.planejamentosMensais);
 }

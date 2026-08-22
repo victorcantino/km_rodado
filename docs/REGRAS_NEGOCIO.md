@@ -1,5 +1,23 @@
 # Regras de negócio — KM Rodado
 
+## Planejamento Mensal
+
+- O planejamento é identificado pelo mês de referência, dias planejados para
+  trabalhar e meta mensal de quilômetros.
+- A média planejada de km por dia é derivada de `metaKmMensal / diasPlanejados`.
+- O progresso considera somente Jornadas finalizadas cuja `dataHoraInicio`
+  pertença ao mês de referência.
+- Uma Jornada pertence ao dia e ao mês de sua `dataHoraInicio`. Se atravessar
+  meia-noite ou mudar de mês, todos os seus km e métricas são atribuídos
+  integralmente ao dia/mês de início; não há rateio proporcional.
+- Dias trabalhados são os dias distintos das `dataHoraInicio` dessas Jornadas.
+  Dias planejados restantes são `max(diasPlanejados - diasTrabalhados, 0)`.
+- Meta zero ou dias planejados zero não geram percentuais ou médias artificiais.
+- Planejamento incompleto não bloqueia o restante do aplicativo.
+- Planejado representa a meta informada pelo usuário; realizado representa
+  fatos registrados; projetado será uma estimativa futura do fechamento e não
+  é calculado nesta versão.
+
 ## Cobertura dos custos
 
 Cobertura dos custos é um diagnóstico derivado da completude dos dados atuais,

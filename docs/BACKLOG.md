@@ -100,9 +100,7 @@
 - Análise histórica de produtividade por faixa horária a partir dos intervalos
   entre Leituras de Ganhos: faturamento/hora, resultado/hora, viagens/hora e
   R$/km, sem persistir agregados horários.
-- Planejamento Mensal com mês, dias planejados de trabalho, meta mensal de km,
-  km médios necessários por dia e futura meta de resultado/lucro por km.
-- Contexto opcional de calendário para o Planejamento Mensal: feriados
+- Evoluir o Planejamento Mensal com contexto opcional de calendário: feriados
   nacionais, estaduais e municipais, shows, esportes, festivais e eventos
   locais. Informar apenas possível alteração de demanda e trânsito; o núcleo
   deve continuar offline e não presumir aumento de faturamento.
@@ -131,6 +129,18 @@
   sem ainda implementar seus rateios ou decisões de inclusão.
 
 ## Produto
+
+- Projeção de fechamento mensal baseada no ritmo realizado.
+- Política de Aceitação de Corridas.
+- Configuração de R$/km alvo/mínimo e de R$/hora mínimo desejado.
+- Tolerâncias abaixo do R$/km alvo por faixas, sem recomendar valor abaixo do
+  custo econômico mínimo sustentável.
+- Considerar distância de aproximação/retorno quando houver dados suficientes.
+- Mover futuramente metas e preferências econômicas para Perfil/Configurações,
+  mantendo a Home focada em consulta e decisão.
+
+- Resumo fiscal anual / apoio à declaração MEI, com consolidação anual de
+  faturamento e dados necessários para declaração futura.
 
 - Consolidar, quando houver outra repetição comprovada, um pequeno helper de
   campos numéricos para seleção integral, teclado e navegação; não criar um

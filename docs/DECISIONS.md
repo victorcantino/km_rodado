@@ -91,6 +91,16 @@ de verdade e sem persistir informação derivada. O abastecimento pertence ao
 veículo e associa-se automaticamente à Jornada aberta, permanecendo possível
 fora dela.
 
+## ADR-013 — Planejamento mensal por início da Jornada
+
+Decisão: persistir somente mês de referência, dias planejados e meta mensal de
+quilômetros. O progresso é derivado das Jornadas finalizadas cuja
+`dataHoraInicio` pertence ao mês.
+
+Motivo: uma Jornada atravessando meia-noite ou mudança de mês não possui rateio
+seguro sem checkpoints suficientes. A Jornada inteira, incluindo seus km e
+métricas, permanece atribuída ao dia e ao mês em que começou.
+
 O instante operacional (`dataHora`) é separado do instante técnico de criação
 para permitir lançamentos retroativos. A progressão do odômetro é validada pela
 posição cronológica do evento, e não pelo maior valor existente no momento da

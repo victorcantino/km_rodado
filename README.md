@@ -13,7 +13,7 @@ transformar registros reais em uma referência econômica pessoal de quanto o
 motorista precisa receber por quilômetro e por hora para cobrir custos e atingir
 a margem desejada.
 
-Estado atual: schema Drift 13, com validação automatizada e teste operacional
+Estado atual: schema Drift 14, com validação automatizada e teste operacional
 em Android em andamento.
 
 ## Funcionalidades atuais
@@ -36,13 +36,15 @@ em Android em andamento.
 - Custos recorrentes como referências de competência econômica, separados dos
   pagamentos efetivos.
 - Depreciação observada e projetada por veículo, calculada em R$/km.
+- Planejamento Mensal com meta de quilômetros, dias planejados e progresso
+  derivado das Jornadas concluídas.
 
 ## Próximos passos
 
 Refinar a experiência móvel, ampliar o histórico e a linha do tempo de Jornadas,
-melhorar indicadores de manutenção e preparar a cobertura de custos para o
-futuro Motor Econômico. Planejamento Mensal e InDrive continuam pendentes de
-definição e observação operacional.
+melhorar indicadores de manutenção, evoluir o Planejamento Mensal e preparar a
+cobertura de custos para o futuro Motor Econômico. InDrive continua pendente de
+observação operacional.
 
 ## Arquitetura
 
