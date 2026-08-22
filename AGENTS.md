@@ -31,7 +31,8 @@ referencie-a aqui. Não crie documentação especulativa sem necessidade real.
    - regras financeiras: [`docs/CONVENCOES_FINANCEIRAS.md`](docs/CONVENCOES_FINANCEIRAS.md);
    - fatos e correções temporais: [`docs/CONVENCOES_TEMPORAIS.md`](docs/CONVENCOES_TEMPORAIS.md);
    - testes: [`docs/CONVENCOES_TESTES.md`](docs/CONVENCOES_TESTES.md).
-8. Para operações de branch, commit ou PR, leia
+8. Para tarefas envolvendo commit, fechamento de branch, criação de PR,
+   merge ou sincronização, consulte e siga
    [`docs/CONVENCOES_GIT_PR.md`](docs/CONVENCOES_GIT_PR.md).
 
 ## Regras obrigatórias
@@ -74,6 +75,8 @@ e fáceis de manter.
 
 ## Git
 
+- Tarefas de commit, fechamento de branch, PR, merge ou sincronização devem
+  consultar e seguir `docs/CONVENCOES_GIT_PR.md`.
 - Trabalhar em uma única funcionalidade por vez.
 - Não fazer commit sem solicitação do usuário.
 - Antes do commit, apresentar resumo dos arquivos alterados.
