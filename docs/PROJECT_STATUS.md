@@ -67,7 +67,11 @@
 - migrações preservadoras até schema 14 e seeds idempotentes.
 - Cobertura dos custos como diagnóstico derivado na página de Despesas, com
   estados Informado, Estimado e Não informado; parcela do veículo separada
-  como obrigação de caixa e multa fora da cobertura estrutural.
+  como obrigação de caixa e multa fora da cobertura estrutural; combustível
+  usa apenas ciclos válidos do mesmo tipo, manutenção exige intervalo de km,
+  custos recorrentes usam a meta mensal como referência de rateio planejado e
+  itens não informados permitem acesso ao cadastro correspondente; Manutenção,
+  Parcela e Outros custos recorrentes reutilizam os fluxos/listas existentes.
 - primeira versão do Histórico da Jornada concluída, derivada dos fatos
   temporais existentes, sem persistir timeline ou resumo adicional; a
   presença de um evento não altera sua regra financeira.

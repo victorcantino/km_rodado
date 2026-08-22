@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+import '../../../core/constants/enums/tipo_custo_recorrente.dart';
 import '../data/cobertura_custos.dart';
 
 class CoberturaCustosCard extends StatelessWidget {
   final CoberturaCustos cobertura;
   final void Function(ItemCoberturaCusto item)? onConfigurar;
+  final VoidCallback? onNovoCustoRecorrente;
 
   const CoberturaCustosCard({
     super.key,
     required this.cobertura,
     this.onConfigurar,
+    this.onNovoCustoRecorrente,
   });
 
   IconData _icone(EstadoCoberturaCusto estado) => switch (estado) {
@@ -49,17 +53,38 @@ class CoberturaCustosCard extends StatelessWidget {
                 semanticLabel: _estado(item.estado),
               ),
               title: Text(item.nome),
-              subtitle: Text(
-                item.parcelaCaixa
-                    ? '${_estado(item.estado)} · obrigação de caixa'
-                    : _estado(item.estado),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: _linhas(item),
               ),
               trailing:
-                  item.estado == EstadoCoberturaCusto.naoInformado &&
-                      onConfigurar != null
-                  ? TextButton(
-                      onPressed: () => onConfigurar!(item),
-                      child: const Text('Configurar'),
+                  item.tipo == TipoCustoRecorrente.outro &&
+                      onNovoCustoRecorrente != null
+                  ? Tooltip(
+                      message: 'Novo custo recorrente',
+                      excludeFromSemantics: true,
+                      child: Semantics(
+                        label: 'Novo custo recorrente',
+                        button: true,
+                        child: IconButton(
+                          onPressed: onNovoCustoRecorrente,
+                          icon: const Icon(Icons.event_repeat),
+                        ),
+                      ),
+                    )
+                  : item.estado == EstadoCoberturaCusto.naoInformado &&
+                        onConfigurar != null
+                  ? Tooltip(
+                      message: 'Configurar ${item.nome}',
+                      excludeFromSemantics: true,
+                      child: Semantics(
+                        label: 'Configurar ${item.nome}',
+                        button: true,
+                        child: IconButton(
+                          onPressed: () => onConfigurar!(item),
+                          icon: const Icon(Icons.edit_outlined),
+                        ),
+                      ),
                     )
                   : null,
             ),
@@ -67,4 +92,59 @@ class CoberturaCustosCard extends StatelessWidget {
       ),
     ),
   );
+
+  List<Widget> _linhas(ItemCoberturaCusto item) {
+    final linhas = <Widget>[_linha('Estado', _estado(item.estado))];
+    if (item.parcelaCaixa) {
+      linhas.add(_linha('Natureza', 'Obrigação de caixa'));
+    }
+    if (item.reaisPorKm != null) {
+      linhas.add(
+        _linha('Custo por km', 'R\$ ${_decimal(item.reaisPorKm!)}/km'),
+      );
+    }
+    if (item.precoEfetivoReaisPorLitro != null) {
+      linhas.add(
+        _linha(
+          'Último preço efetivo',
+          'R\$ ${_decimal(item.precoEfetivoReaisPorLitro!)}/L',
+        ),
+      );
+    }
+    if (item.valorAtualEstimadoCentavos != null) {
+      linhas.add(
+        _linha(
+          'Valor atual estimado',
+          NumberFormat.currency(
+            locale: 'pt_BR',
+            symbol: r'R$',
+          ).format(item.valorAtualEstimadoCentavos! / 100),
+        ),
+      );
+    }
+    if (item.quantidadeItens != null) {
+      linhas.add(_linha('Itens considerados', '${item.quantidadeItens}'));
+    }
+    if (item.referencia != null) {
+      linhas.add(_linha('Referência', item.referencia!));
+    }
+    return linhas;
+  }
+
+  Widget _linha(String rotulo, String valor) => Padding(
+    padding: const EdgeInsets.only(top: 2),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: Text(rotulo)),
+        const SizedBox(width: 12),
+        Flexible(child: Text(valor, textAlign: TextAlign.right)),
+      ],
+    ),
+  );
+
+  String _decimal(double valor) => NumberFormat.decimalPatternDigits(
+    locale: 'pt_BR',
+    decimalDigits: 2,
+  ).format(valor);
 }

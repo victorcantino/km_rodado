@@ -115,6 +115,7 @@ class AbastecimentoService {
 
     return ResumoInteligenciaAbastecimento(
       ciclosRecentes: ciclosRecentes,
+      ciclosHistoricos: ciclosValidos,
       mediaKmPorLitro: media,
       kmPorLitroConservador: conservador,
       capacidadeTanqueLitros: capacidade,
@@ -157,6 +158,11 @@ class AbastecimentoService {
           0,
           (total, item) => total + item.volumeMililitros,
         );
+        final tipos = trecho.map((item) => item.tipoCombustivel).toSet();
+        final custo = posteriores.fold<int>(
+          0,
+          (total, item) => total + item.valorTotalPagoCentavos,
+        );
         final distanciaPrimeiro = posteriores.isEmpty
             ? 0
             : posteriores.first.odometro - inicio.odometro;
@@ -176,6 +182,9 @@ class AbastecimentoService {
                   .where((item) => !item.tanqueCheio)
                   .length,
               distanciaAtePrimeiroReabastecimentoKm: distanciaPrimeiro,
+              custoTotalCentavos: custo,
+              misturaCombustiveis: tipos.length > 1,
+              tipoCombustivel: fim.tipoCombustivel,
             ),
           );
         }

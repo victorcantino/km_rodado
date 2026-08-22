@@ -36,5 +36,10 @@ Planejamento e apropriação futura:
 
 O Motor Econômico não é implementado por estas convenções.
 
+Na Cobertura dos Custos, R$/km de ciclo de combustível e manutenção por uso é
+uma derivação factual quando houver base suficiente; R$/km de custo mensal é
+uma referência planejada baseada na meta do Planejamento Mensal. Referência
+histórica de combustível não representa o consumo atual.
+
 Não inferir regras econômicas ainda não decididas; Motor Econômico permanece
 futuro.
