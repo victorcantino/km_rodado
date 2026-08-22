@@ -14,8 +14,10 @@ import '../controllers/despesa_veiculo_controller.dart';
 import '../widgets/editar_despesa_veiculo_dialog.dart';
 import '../../../abastecimento/presentation/controllers/abastecimento_controller.dart';
 import '../../../manutencao/presentation/controllers/manutencao_controller.dart';
+import '../../../manutencao/presentation/pages/manutencoes_page.dart';
 import '../../../cobertura_custos/data/cobertura_custos.dart';
 import '../../../cobertura_custos/presentation/cobertura_custos_card.dart';
+import '../../../planejamento_mensal/presentation/controllers/planejamento_mensal_controller.dart';
 
 class DespesasPage extends StatefulWidget {
   final int veiculoId;
@@ -24,6 +26,7 @@ class DespesasPage extends StatefulWidget {
   final DepreciacaoVeiculoController depreciacaoController;
   final AbastecimentoController? abastecimentoController;
   final ManutencaoController? manutencaoController;
+  final PlanejamentoMensalController? planejamentoController;
 
   const DespesasPage({
     super.key,
@@ -33,6 +36,7 @@ class DespesasPage extends StatefulWidget {
     required this.depreciacaoController,
     this.abastecimentoController,
     this.manutencaoController,
+    this.planejamentoController,
   });
 
   @override
@@ -49,6 +53,7 @@ class _DespesasPageState extends State<DespesasPage> {
     widget.custoRecorrenteController.carregar();
     widget.depreciacaoController.carregar(widget.veiculoId);
     widget.manutencaoController?.carregar(widget.veiculoId);
+    widget.planejamentoController?.carregar();
   }
 
   Future<void> _abrirDespesa([DespesaVeiculo? existente]) async {
@@ -85,7 +90,10 @@ class _DespesasPageState extends State<DespesasPage> {
     }
   }
 
-  Future<void> _abrirCustoRecorrente([CustoRecorrente? existente]) async {
+  Future<void> _abrirCustoRecorrente({
+    CustoRecorrente? existente,
+    TipoCustoRecorrente? tipoInicial,
+  }) async {
     final controller = widget.custoRecorrenteController;
     if (controller.veiculos.isEmpty || controller.plataformas.isEmpty) {
       await controller.carregar();
@@ -95,6 +103,7 @@ class _DespesasPageState extends State<DespesasPage> {
       context: context,
       builder: (_) => EditarCustoRecorrenteDialog(
         existente: existente,
+        tipoInicial: existente == null ? tipoInicial : null,
         veiculoIdInicial: widget.veiculoId,
         veiculos: controller.veiculos,
         plataformas: controller.plataformas,
@@ -144,6 +153,21 @@ class _DespesasPageState extends State<DespesasPage> {
     await widget.depreciacaoController.carregar(widget.veiculoId);
   }
 
+  Future<void> _abrirManutencoes() async {
+    final manutencaoController = widget.manutencaoController;
+    if (manutencaoController == null) return;
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => ManutencoesPage(
+          veiculoId: widget.veiculoId,
+          controller: manutencaoController,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    await manutencaoController.carregar(widget.veiculoId);
+  }
+
   String _escopoLabel(CustoRecorrente custo) {
     if (custo.escopo != EscopoCustoRecorrente.plataforma) {
       return custo.escopo.label;
@@ -168,7 +192,7 @@ class _DespesasPageState extends State<DespesasPage> {
             button: true,
             child: FloatingActionButton(
               heroTag: 'novo_custo_recorrente',
-              onPressed: _abrirCustoRecorrente,
+              onPressed: () => _abrirCustoRecorrente(),
               child: const Icon(Icons.event_repeat),
             ),
           ),
@@ -199,6 +223,8 @@ class _DespesasPageState extends State<DespesasPage> {
           if (widget.abastecimentoController != null)
             widget.abastecimentoController!,
           if (widget.manutencaoController != null) widget.manutencaoController!,
+          if (widget.planejamentoController != null)
+            widget.planejamentoController!,
         ]),
         builder: (context, _) {
           final custos = widget.custoRecorrenteController.historico;
@@ -208,6 +234,12 @@ class _DespesasPageState extends State<DespesasPage> {
                 widget.manutencaoController?.historico.isNotEmpty == true,
             depreciacao: widget.depreciacaoController.selecionada,
             custos: custos,
+            ultimoAbastecimento: widget.abastecimentoController?.ultimo,
+            inteligenciaAbastecimento:
+                widget.abastecimentoController?.inteligencia,
+            manutencoes: widget.manutencaoController?.historico ?? const [],
+            veiculoId: widget.veiculoId,
+            planejamento: widget.planejamentoController?.resumo,
           );
           final despesas = mostrarTodasDespesas
               ? widget.controller.historico
@@ -267,7 +299,8 @@ class _DespesasPageState extends State<DespesasPage> {
                         _CustoRecorrenteCard(
                           custo: custo,
                           escopoLabel: _escopoLabel(custo),
-                          onEditar: () => _abrirCustoRecorrente(custo),
+                          onEditar: () =>
+                              _abrirCustoRecorrente(existente: custo),
                         ),
                       if (mostrarTodosCustos && inativos.isNotEmpty) ...[
                         Padding(
@@ -296,7 +329,24 @@ class _DespesasPageState extends State<DespesasPage> {
               ),
               const SizedBox(height: 24),
               _TituloSecao(titulo: 'Cobertura dos custos'),
-              CoberturaCustosCard(cobertura: cobertura),
+              CoberturaCustosCard(
+                cobertura: cobertura,
+                onConfigurar: (item) {
+                  final tipo = item.tipo;
+                  if (item.nome == 'Manutenção') {
+                    _abrirManutencoes();
+                  } else if (tipo == TipoCustoRecorrente.seguro ||
+                      tipo == TipoCustoRecorrente.ipva ||
+                      tipo == TipoCustoRecorrente.licenciamento ||
+                      tipo == TipoCustoRecorrente.telefoneProfissional ||
+                      tipo == TipoCustoRecorrente.parcelaVeiculo) {
+                    _abrirCustoRecorrente(tipoInicial: tipo);
+                  }
+                },
+                onNovoCustoRecorrente: () => _abrirCustoRecorrente(
+                  tipoInicial: TipoCustoRecorrente.outro,
+                ),
+              ),
             ],
           );
         },

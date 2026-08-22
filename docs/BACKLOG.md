@@ -130,6 +130,23 @@
 
 ## Produto
 
+- Estratégia Free/Premium baseada em inteligência derivada: fatos básicos e
+  registros operacionais podem permanecer acessíveis, enquanto Cobertura dos
+  Custos, análises históricas, comparações e Motor Econômico podem futuramente
+  compor uma camada Premium. Não definir features pagas nem adicionar flags de
+  plano antes de uma decisão de produto.
+- Onboarding contextual nas próprias telas, com dicas de primeiro uso,
+  explicação direta, opção de dispensar e não exibir novamente; evitar tutorial
+  genérico longo quando a explicação contextual resolver.
+- Explicação contextual dos componentes da Cobertura dos Custos: permitir
+  futuramente tocar no ícone ou em ação discreta para explicar o que o custo
+  representa e como é calculado, sem obrigar a sair da tela para consultar
+  Help.
+
+- Média mensal de consumo por combustível quando houver múltiplos ciclos
+  válidos suficientes.
+- Comparação histórica de consumo por combustível e período.
+
 - Projeção de fechamento mensal baseada no ritmo realizado.
 - Política de Aceitação de Corridas.
 - Configuração de R$/km alvo/mínimo e de R$/hora mínimo desejado.

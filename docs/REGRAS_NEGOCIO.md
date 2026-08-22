@@ -29,6 +29,14 @@ como obrigação/necessidade de caixa, enquanto multas não compõem a cobertura
 estrutural futura por km. Passes, Bônus e custos de plataforma ficam fora
 deste checklist. Motor Econômico e Planejamento Mensal continuam futuros.
 
+Na Cobertura dos custos, combustível só recebe R$/km de ciclo tanque cheio →
+tanque cheio válido. Sem ciclo atual, um ciclo histórico do mesmo combustível é
+apenas referência. Mistura de combustíveis não recebe atribuição isolada sem
+separação física segura. Manutenção só recebe custo por km com valor conhecido
+e intervalo confiável; custos mensais usam a meta mensal como R$/km planejado.
+Parcela permanece necessidade de caixa e multa fica fora da cobertura
+estrutural.
+
 ## Jornada
 
 - Uma Jornada representa o período de trabalho ativo do motorista.

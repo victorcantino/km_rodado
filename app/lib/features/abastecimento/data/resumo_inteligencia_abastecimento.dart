@@ -1,4 +1,5 @@
 import '../../../core/database/app_database.dart';
+import '../../../core/constants/enums/tipo_combustivel.dart';
 
 class ResumoCicloAbastecimento {
   final Abastecimento abastecimentoInicio;
@@ -8,6 +9,9 @@ class ResumoCicloAbastecimento {
   final double kmPorLitro;
   final int quantidadeParciaisIntermediarios;
   final int distanciaAtePrimeiroReabastecimentoKm;
+  final int custoTotalCentavos;
+  final bool misturaCombustiveis;
+  final TipoCombustivel tipoCombustivel;
 
   const ResumoCicloAbastecimento({
     required this.abastecimentoInicio,
@@ -17,6 +21,9 @@ class ResumoCicloAbastecimento {
     required this.kmPorLitro,
     required this.quantidadeParciaisIntermediarios,
     required this.distanciaAtePrimeiroReabastecimentoKm,
+    this.custoTotalCentavos = 0,
+    this.misturaCombustiveis = false,
+    required this.tipoCombustivel,
   });
 
   bool get potencialmenteMisto => quantidadeParciaisIntermediarios > 0;
@@ -24,6 +31,7 @@ class ResumoCicloAbastecimento {
 
 class ResumoInteligenciaAbastecimento {
   final List<ResumoCicloAbastecimento> ciclosRecentes;
+  final List<ResumoCicloAbastecimento> ciclosHistoricos;
   final double? mediaKmPorLitro;
   final double? kmPorLitroConservador;
   final double? capacidadeTanqueLitros;
@@ -35,6 +43,7 @@ class ResumoInteligenciaAbastecimento {
 
   const ResumoInteligenciaAbastecimento({
     required this.ciclosRecentes,
+    this.ciclosHistoricos = const [],
     required this.mediaKmPorLitro,
     required this.kmPorLitroConservador,
     required this.capacidadeTanqueLitros,

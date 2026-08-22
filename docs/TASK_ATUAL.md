@@ -1,20 +1,24 @@
-# Tarefa atual — Planejamento Mensal
+# Tarefa atual — Evolução da Cobertura dos Custos
 
-Implementada a primeira versão do Planejamento Mensal. O mês de referência,
-os dias planejados e a meta mensal de km são persistidos; média planejada,
-progresso, dias trabalhados, km restantes e média necessária são derivados no
-Service. Jornadas concluídas pertencem ao mês da `dataHoraInicio`, inclusive
-quando atravessam meia-noite ou mudam de mês; não há rateio sem checkpoints.
+Implementado o diagnóstico derivado de Cobertura dos custos, agora enriquecido
+com referências seguras de combustível, manutenção, depreciação e custos
+recorrentes. O diagnóstico não persiste cobertura, não calcula confiança e não
+é o Motor Econômico. Itens não informados direcionam para os cadastros já
+existentes quando há formulário apropriado. Manutenção e Parcela reutilizam
+seus fluxos existentes; Outros custos recorrentes são agregados somente quando
+seus valores e periodicidades permitem o R$/km planejado, com contagem dos
+itens incluídos.
 
-O schema evoluiu de 13 para 14 com a tabela `planejamentos_mensais` e migração
-de criação preservadora.
+O schema permanece em 14. A meta do Planejamento Mensal continua sendo apenas
+uma referência planejada para custos recorrentes mensais; não há novo rateio
+econômico nesta frente.
 
 ## Validação
 
-Implementação em validação automatizada e teste operacional Android.
+Implementação em validação automatizada e teste operacional Android. A
+validação desta revisão depende da disponibilidade local do SDK Flutter.
 
 ## Estado anterior preservado
-O resumo intraday, Cobertura dos custos, abastecimentos, Passes/Bônus e
-Histórico da Jornada permanecem implementados conforme documentado em
-`PROJECT_STATUS.md`. Motor Econômico e regras de rateio de custos continuam
-fora deste pacote.
+O resumo intraday, abastecimentos, Passes/Bônus e Histórico da Jornada
+permanecem implementados conforme documentado em `PROJECT_STATUS.md`. Motor
+Econômico e regras econômicas finais continuam fora deste pacote.

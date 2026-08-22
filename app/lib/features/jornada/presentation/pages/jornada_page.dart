@@ -333,6 +333,7 @@ class _JornadaPageState extends State<JornadaPage> {
           depreciacaoController: depreciacaoController,
           abastecimentoController: abastecimentoController,
           manutencaoController: manutencaoController,
+          planejamentoController: planejamentoController,
         ),
       ),
     );

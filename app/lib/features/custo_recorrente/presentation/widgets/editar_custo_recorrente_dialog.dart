@@ -26,6 +26,7 @@ enum _PeriodicidadeVisual { mensal, anual, personalizada }
 
 class EditarCustoRecorrenteDialog extends StatefulWidget {
   final CustoRecorrente? existente;
+  final TipoCustoRecorrente? tipoInicial;
   final int? veiculoIdInicial;
   final List<Veiculo> veiculos;
   final List<Plataforma> plataformas;
@@ -35,6 +36,7 @@ class EditarCustoRecorrenteDialog extends StatefulWidget {
   const EditarCustoRecorrenteDialog({
     super.key,
     this.existente,
+    this.tipoInicial,
     this.veiculoIdInicial,
     required this.veiculos,
     required this.plataformas,
@@ -75,7 +77,7 @@ class _EditarCustoRecorrenteDialogState
   void initState() {
     super.initState();
     final existente = widget.existente;
-    tipo = existente?.tipo ?? TipoCustoRecorrente.ipva;
+    tipo = existente?.tipo ?? widget.tipoInicial ?? TipoCustoRecorrente.ipva;
     final padrao = widget.padraoPara(tipo);
     escopo =
         existente?.escopo ?? padrao.escopo ?? EscopoCustoRecorrente.atividade;
@@ -113,6 +115,11 @@ class _EditarCustoRecorrenteDialogState
     focoQuantidade = FocusNode();
     focoObservacao = FocusNode();
     _carregarSugestoes();
+    if (widget.tipoInicial != null && existente == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) focoValor.requestFocus();
+      });
+    }
   }
 
   @override
