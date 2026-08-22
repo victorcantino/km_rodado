@@ -28,7 +28,7 @@ void main() {
     }
   });
 
-  test('migra schema 1 vazio para schema 13', () async {
+  test('migra schema 1 vazio para schema 14', () async {
     _criarBancoSchema1(arquivoBanco);
 
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
@@ -37,7 +37,7 @@ void main() {
     expect(await _contar(database, 'pausas'), 0);
     expect(await _contar(database, 'leituras_ganhos'), 0);
     expect(await _contar(database, 'leituras_ganho_plataforma'), 0);
-    expect(await _userVersion(database), 13);
+    expect(await _userVersion(database), 14);
     expect(await _tabelaExiste(database, 'depreciacoes_veiculo'), isTrue);
     expect(await _tabelaExiste(database, 'despesas_veiculo'), isTrue);
     expect(
@@ -99,7 +99,7 @@ void main() {
       plataformas.map((plataforma) => plataforma.tipoRegistroGanhos).toSet(),
       {TipoRegistroGanhos.acumulado},
     );
-    expect(await _userVersion(database), 13);
+    expect(await _userVersion(database), 14);
     expect(await _contar(database, 'lancamentos_ganho_individual'), 0);
     expect(await _tabelaExiste(database, 'ganhos'), isFalse);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -207,7 +207,7 @@ void main() {
     addTearDown(database.close);
     final pausa = (await database.select(database.pausas).get()).single;
 
-    expect(await _userVersion(database), 13);
+    expect(await _userVersion(database), 14);
     expect(pausa.odometroInicio, isNull);
     expect(pausa.odometroFim, isNull);
   });
@@ -247,7 +247,7 @@ void main() {
     final abastecimento =
         (await database.select(database.abastecimentos).get()).single;
 
-    expect(await _userVersion(database), 13);
+    expect(await _userVersion(database), 14);
     expect(abastecimento.odometro, 123456);
     expect(abastecimento.dataHora, abastecimento.dataCriacao);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
@@ -288,7 +288,7 @@ void main() {
     final abastecimento =
         (await database.select(database.abastecimentos).get()).single;
 
-    expect(await _userVersion(database), 13);
+    expect(await _userVersion(database), 14);
     expect(abastecimento.id, 7);
     expect(abastecimento.odometro, 123456);
     expect(abastecimento.dataHora, isNot(abastecimento.dataCriacao));
@@ -326,14 +326,14 @@ void main() {
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 13);
+    expect(await _userVersion(database), 14);
     expect(await _contar(database, 'passes_plataforma'), 1);
     expect(await _tabelaExiste(database, 'bonus_promocoes'), isTrue);
     expect(await _contar(database, 'bonus_promocoes'), 0);
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
 
-  test('migra schema 8 populado para 10 preservando dados e FKs', () async {
+  test('migra schema 8 populado para 14 preservando dados e FKs', () async {
     final banco = sqlite.sqlite3.open(arquivoBanco.path);
     banco.execute('''
       PRAGMA foreign_keys = ON;
@@ -362,7 +362,7 @@ void main() {
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 13);
+    expect(await _userVersion(database), 14);
     expect(await _contar(database, 'bonus_promocoes'), 1);
     expect(await _tabelaExiste(database, 'manutencoes'), isTrue);
     expect(await _tabelaExiste(database, 'itens_manutencao'), isTrue);
@@ -386,7 +386,7 @@ void main() {
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
 
-  test('migra schema 9 populado para 12 preservando Manutenções', () async {
+  test('migra schema 9 populado para 14 preservando Manutenções', () async {
     final banco = sqlite.sqlite3.open(arquivoBanco.path);
     banco.execute('''
       PRAGMA foreign_keys = ON;
@@ -454,7 +454,7 @@ void main() {
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 13);
+    expect(await _userVersion(database), 14);
     expect(await _contar(database, 'manutencoes'), 1);
     expect(await _contar(database, 'itens_manutencao'), 1);
     expect(await _contar(database, 'jornadas'), 1);
@@ -494,7 +494,63 @@ void main() {
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
 
-  test('migra schema 12 para 13 preservando ganho individual', () async {
+  test(
+    'migra schema 13 para 14 criando planejamento e preservando dados',
+    () async {
+      final banco = sqlite.sqlite3.open(arquivoBanco.path);
+      banco.execute('''
+      PRAGMA foreign_keys = ON;
+      CREATE TABLE usuarios (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        email TEXT NULL,
+        senha TEXT NULL,
+        data_criacao INTEGER NOT NULL,
+        ativo INTEGER NOT NULL DEFAULT 1
+      );
+      INSERT INTO usuarios VALUES (1, 'Legado', NULL, NULL, 1786608000, 1);
+      PRAGMA user_version = 13;
+    ''');
+      banco.close();
+
+      final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
+      addTearDown(database.close);
+
+      expect(await _userVersion(database), 14);
+      expect(await _tabelaExiste(database, 'planejamentos_mensais'), isTrue);
+      expect(await _contar(database, 'planejamentos_mensais'), 0);
+      expect(await _contar(database, 'usuarios'), 1);
+      expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
+
+      await database
+          .into(database.planejamentosMensais)
+          .insert(
+            PlanejamentosMensaisCompanion.insert(
+              usuarioId: 1,
+              mesReferencia: DateTime(2026, 8),
+              diasPlanejados: 20,
+              metaKmMensal: 3000,
+            ),
+          );
+      expect(await _contar(database, 'planejamentos_mensais'), 1);
+      await expectLater(
+        database
+            .into(database.planejamentosMensais)
+            .insert(
+              PlanejamentosMensaisCompanion.insert(
+                usuarioId: 999,
+                mesReferencia: DateTime(2026, 9),
+                diasPlanejados: 1,
+                metaKmMensal: 1,
+              ),
+            ),
+        throwsA(anything),
+      );
+      expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
+    },
+  );
+
+  test('migra schema 12 para 14 preservando ganho individual', () async {
     final banco = sqlite.sqlite3.open(arquivoBanco.path);
     banco.execute('''
       PRAGMA foreign_keys = ON;
@@ -521,7 +577,7 @@ void main() {
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 13);
+    expect(await _userVersion(database), 14);
     final lancamento = await database
         .select(database.lancamentosGanhoIndividual)
         .getSingle();
@@ -531,7 +587,7 @@ void main() {
     expect(await _chavesEstrangeirasInvalidas(database), isEmpty);
   });
 
-  test('migra schema 10 populado para 13 preservando Despesas', () async {
+  test('migra schema 10 populado para 14 preservando Despesas', () async {
     final banco = sqlite.sqlite3.open(arquivoBanco.path);
     banco.execute('''
       PRAGMA foreign_keys = ON;
@@ -589,7 +645,7 @@ void main() {
     final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
     addTearDown(database.close);
 
-    expect(await _userVersion(database), 13);
+    expect(await _userVersion(database), 14);
     for (final tabela in [
       'despesas_veiculo',
       'manutencoes',
@@ -657,7 +713,7 @@ void main() {
   });
 
   test(
-    'migra schema 11 para 13 preservando custos e criando depreciação',
+    'migra schema 11 para 14 preservando custos e criando depreciação',
     () async {
       final banco = sqlite.sqlite3.open(arquivoBanco.path);
       banco.execute('''
@@ -693,7 +749,7 @@ void main() {
       final database = AppDatabase.forTesting(NativeDatabase(arquivoBanco));
       addTearDown(database.close);
 
-      expect(await _userVersion(database), 13);
+      expect(await _userVersion(database), 14);
       expect(await _contar(database, 'custos_recorrentes'), 1);
       expect(await _tabelaExiste(database, 'depreciacoes_veiculo'), isTrue);
       expect(await _contar(database, 'depreciacoes_veiculo'), 0);

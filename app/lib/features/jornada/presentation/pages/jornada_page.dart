@@ -15,6 +15,7 @@ import '../../../../core/database/daos/manutencao_dao.dart';
 import '../../../../core/database/daos/despesa_veiculo_dao.dart';
 import '../../../../core/database/daos/custo_recorrente_dao.dart';
 import '../../../../core/database/daos/depreciacao_veiculo_dao.dart';
+import '../../../../core/database/daos/planejamento_mensal_dao.dart';
 import '../../../../core/database/seeds/seed.dart';
 import '../../../../core/database/seeds/plataformas_seed.dart';
 import '../../../leitura_ganhos/data/leitura_ganhos_repository.dart';
@@ -57,6 +58,10 @@ import '../../../custo_recorrente/presentation/controllers/custo_recorrente_cont
 import '../../../depreciacao_veiculo/data/depreciacao_veiculo_repository.dart';
 import '../../../depreciacao_veiculo/data/depreciacao_veiculo_service.dart';
 import '../../../depreciacao_veiculo/presentation/controllers/depreciacao_veiculo_controller.dart';
+import '../../../planejamento_mensal/data/planejamento_mensal_repository.dart';
+import '../../../planejamento_mensal/data/planejamento_mensal_service.dart';
+import '../../../planejamento_mensal/presentation/controllers/planejamento_mensal_controller.dart';
+import '../../../planejamento_mensal/presentation/pages/planejamento_mensal_page.dart';
 import '../../data/jornada_repository.dart';
 import '../../data/jornada_service.dart';
 import '../../data/historico_jornada.dart';
@@ -83,6 +88,7 @@ class _JornadaPageState extends State<JornadaPage> {
   AbastecimentoController? abastecimentoController;
   PassePlataformaController? passePlataformaController;
   BonusPromocaoController? bonusPromocaoController;
+  PlanejamentoMensalController? planejamentoController;
   late final AppDatabase database;
   Timer? atualizadorDuracao;
 
@@ -165,6 +171,13 @@ class _JornadaPageState extends State<JornadaPage> {
     final novoBonusPromocaoController = BonusPromocaoController(
       BonusPromocaoService(bonusPromocaoRepository, repository),
     );
+    final novoPlanejamentoController = PlanejamentoMensalController(
+      PlanejamentoMensalService(
+        PlanejamentoMensalRepository(PlanejamentoMensalDao(database)),
+        repository,
+      ),
+      usuarioId: 1,
+    );
 
     setState(() {
       controller = novoController;
@@ -174,6 +187,7 @@ class _JornadaPageState extends State<JornadaPage> {
       abastecimentoController = novoAbastecimentoController;
       passePlataformaController = novoPasseController;
       bonusPromocaoController = novoBonusPromocaoController;
+      planejamentoController = novoPlanejamentoController;
     });
 
     await novoController.carregarJornadaAberta();
@@ -201,6 +215,16 @@ class _JornadaPageState extends State<JornadaPage> {
       ),
     );
     await _recarregarTudo();
+  }
+
+  Future<void> _abrirPlanejamentoMensal() async {
+    final planejamento = planejamentoController;
+    if (planejamento == null) return;
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => PlanejamentoMensalPage(controller: planejamento),
+      ),
+    );
   }
 
   Future<void> _recarregarTudo() async {
@@ -879,6 +903,20 @@ class _JornadaPageState extends State<JornadaPage> {
           ),
           const SizedBox(height: 12),
           Tooltip(
+            message: 'Planejamento mensal',
+            excludeFromSemantics: true,
+            child: Semantics(
+              label: 'Planejamento mensal',
+              button: true,
+              child: FloatingActionButton(
+                heroTag: 'planejamento_mensal',
+                onPressed: _abrirPlanejamentoMensal,
+                child: const Icon(Icons.calendar_month_outlined),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Tooltip(
             message: 'Manutenções',
             excludeFromSemantics: true,
             child: Semantics(
@@ -1238,6 +1276,7 @@ class _JornadaPageState extends State<JornadaPage> {
     abastecimentoController?.dispose();
     passePlataformaController?.dispose();
     bonusPromocaoController?.dispose();
+    planejamentoController?.dispose();
     controller?.dispose();
     database.close();
     super.dispose();
